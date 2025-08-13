@@ -1,0 +1,2588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Consultation Training - AI Patient Simulator</title>
+    
+    <!-- Modern styling for the interface -->
+    <style>
+        /* Reset default browser styles and set custom properties for colors */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* CSS Variables for easy color scheme changes */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --background: #1e3a8a;
+            --card-background: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --success-color: #059669;
+            --warning-color: #f59e0b;
+        }
+        
+        /* Main body styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Container for centering content */
+        .container {
+            max-width: 95%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header section styling */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        /* Improved instructions styling for better centering */
+        .instructions-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: flex-start;
+            text-align: left;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+        
+        .instructions-column {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .instructions-column ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .instructions-column li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        /* Grid layout for main content - MODIFIED FOR 3 COLUMNS */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Card component for sections */
+        .card {
+            background: var(--card-background);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+        }
+        
+        /* Form input styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        /* Button styling */
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #047857;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        /* New button style for export */
+        .btn-info {
+            background-color: #0ea5e9;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #0284c7;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+        
+        /* Push to talk button special styling */
+        .talk-button {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            font-size: 18px;
+            margin: 20px auto;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .talk-button.recording {
+            animation: pulse 1.5s infinite;
+            background-color: var(--danger-color);
+        }
+        
+        /* Animation for recording state */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+        
+        /* Chat display area */
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        
+        /* Individual message styling */
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        
+        .message.user {
+            background-color: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message.ai {
+            background-color: #e5e7eb;
+            color: var(--text-primary);
+        }
+        
+        .message.system {
+            background-color: #f3f4f6;
+            color: var(--text-secondary);
+            font-style: italic;
+            border-left: 4px solid var(--success-color);
+            max-width: 100%;
+        }
+        
+        /* Status indicator */
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .status.success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status.info {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Button group styling for control buttons */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .button-group button {
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        /* TTS Provider Styling */
+        .tts-provider-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .tts-provider-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            background: white;
+            color: var(--text-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tts-provider-btn.active {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tts-provider-btn:hover:not(.active) {
+            border-color: var(--primary-hover);
+            background-color: #f8fafc;
+        }
+        
+        /* STT Provider Styling */
+        .stt-provider-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .stt-provider-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            background: white;
+            color: var(--text-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .stt-provider-btn.active {
+            border-color: var(--secondary-color);
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .stt-provider-btn:hover:not(.active) {
+            border-color: #059669;
+            background-color: #f8fafc;
+        }
+        
+        /* ElevenLabs specific styling */
+        .elevenlabs-config {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            background-color: #f8fafc;
+        }
+        
+        /* Deepgram specific styling */
+        .deepgram-config {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            background-color: #f0fdf4;
+        }
+        
+        .voice-preview-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-left: 8px;
+            background-color: var(--warning-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .voice-preview-btn:hover {
+            background-color: #d97706;
+        }
+        
+        /* Patient Image Button Styling */
+        .patient-image-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .patient-image-btn.available {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .patient-image-btn.available:hover {
+            background-color: #047857;
+        }
+        
+        .patient-image-btn.unavailable {
+            background-color: var(--danger-color);
+            color: white;
+            cursor: not-allowed;
+        }
+        
+        .patient-image-btn.disabled {
+            background-color: var(--text-secondary);
+            color: white;
+            cursor: not-allowed;
+        }
+        
+        /* Image Modal Styling */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .image-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-modal-content {
+            position: relative;
+            max-width: 95%;
+            max-height: 95%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .image-modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .image-modal-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        
+        .image-modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        
+        .image-modal-close:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .image-modal-body {
+            padding: 0;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+        
+        .patient-image {
+            max-width: 100%;
+            max-height: 85vh;
+            width: auto;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        
+        .image-loading {
+            padding: 40px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .image-error {
+            padding: 40px;
+            color: var(--danger-color);
+            text-align: center;
+        }
+        
+        /* Modal Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.8) translateY(-20px);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+       
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header section with title and description -->
+        <div class="header">
+            <h1>Pharmacy Consultation Training</h1>
+            <p>Practice your consultation skills with an AI-powered patient simulator</p>
+        </div>
+        
+        <!-- Instructions box -->
+        <div class="header">
+            <h2>📋 Instructions</h2>
+            <div class="instructions-container">
+                <div class="instructions-column">
+                    <ol>
+            <li>Enter your n8n webhook URLs in the Configuration section</li>
+            <li>Load your Google Sheet with patient scenarios</li>
+            <li>Select a patient scenario from the dropdown (or choose random)</li>
+        </ol>
+    </div>
+    <div class="instructions-column" style="flex: 1;">
+        <ol start="4">
+            <li>Choose your TTS provider (Browser or ElevenLabs)</li>
+            <li>Adjust voice settings as needed</li>
+            <li>Hold down the "Push to Talk" button and speak your consultation</li>
+        </ol>
+    </div>
+    <div class="instructions-column" style="flex: 1;">
+        <ol start="7">
+            <li>The AI patient will respond both in text and speech</li>
+            <li>Use "Submit Conversation" to get evaluation feedback</li>
+            <li>IMPORTANT - refresh the browser after each scenario to generate a new session id</li>
+        </ol>
+                </div>
+            </div>
+            <p><strong>Tips:</strong> Speak clearly, ask open-ended questions, and practice active listening skills!</p>
+        </div>
+        
+           
+        <!-- Main content grid -->
+        <div class="grid">
+            <!-- Configuration section -->
+            <div class="card">
+                <h2>⚙️ Configuration</h2>
+                
+                <!-- n8n webhook URL input -->
+                <div class="form-group">
+                    <label for="webhookUrl">n8n Webhook URL (Chat):</label>
+                    <input 
+                        type="url" 
+                        id="webhookUrl" 
+                        placeholder="https://your-n8n-instance.com/webhook/..."
+                        title="Enter your n8n webhook URL that will receive the messages"
+                    >
+                </div>
+                
+                <!-- Submit webhook URL input -->
+                <div class="form-group">
+                    <label for="submitWebhookUrl">n8n Submit Webhook URL:</label>
+                    <input 
+                        type="url" 
+                        id="submitWebhookUrl" 
+                        placeholder="https://your-n8n-instance.com/webhook/submit..."
+                        title="Enter your n8n webhook URL for submitting conversation history"
+                    >
+                </div>
+                
+                <!-- Google Sheets configuration -->
+                <div class="form-group">
+                    <label for="sheetId">Google Sheet ID:</label>
+                    <input 
+                        type="text" 
+                        id="sheetId" 
+                        placeholder="1ABC...xyz"
+                        title="The ID from your Google Sheets URL"
+                    >
+                    <button 
+                        class="btn-secondary" 
+                        onclick="loadSheetNames()" 
+                        style="margin-top: 10px; width: 100%;"
+                    >
+                        📋 Get Sheet Names
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sheetName">Sheet Name:</label>
+                    <select id="sheetName" disabled>
+                        <option value="">Get sheet names first...</option>
+                    </select>
+                </div>
+                
+                <!-- Scenario selection dropdown -->
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="scenarioSelect">Select Scenario:</label>
+                    <select id="scenarioSelect" disabled>
+                        <option value="">Load sheet data first...</option>
+                    </select>
+                </div>
+                
+                <button class="btn-secondary" onclick="selectRandomScenario()" style="margin-top: 10px;">
+                    🎲 Random Scenario
+                </button>
+                
+                <!-- Patient Image Button -->
+                <button 
+                    class="patient-image-btn disabled" 
+                    id="patientImageBtn"
+                    onclick="showPatientImage()"
+                    disabled
+                >
+                    📷 No Scenario Selected
+                </button>
+            </div>
+            
+            <!-- Voice control section -->
+            <div class="card">
+                <h2>🎙️ Voice Control</h2>
+                
+                <!-- STT Provider Selection -->
+                <div class="form-group">
+                    <label>Speech-to-Text Provider:</label>
+                    <div class="stt-provider-group">
+                        <button class="stt-provider-btn active" id="browserSttBtn" onclick="selectSttProvider('browser')">
+                            🌐 Browser STT
+                        </button>
+                        <button class="stt-provider-btn" id="deepgramSttBtn" onclick="selectSttProvider('deepgram')">
+                            🎤 Deepgram
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Deepgram STT Settings -->
+                <div id="deepgramSettings" class="stt-settings deepgram-config" style="display: none;">
+                    <div class="form-group">
+                        <label for="deepgramApiKey">Deepgram API Key:</label>
+                        <input 
+                            type="password" 
+                            id="deepgramApiKey" 
+                            placeholder="Enter your Deepgram API key"
+                            title="Get your API key from deepgram.com"
+                        >
+                        <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
+                            Get your API key from <a href="https://deepgram.com" target="_blank">deepgram.com</a>
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deepgramModel">Model:</label>
+                        <select id="deepgramModel">
+                            <option value="nova-2">Nova-2 (Latest)</option>
+                            <option value="nova">Nova</option>
+                            <option value="enhanced">Enhanced</option>
+                            <option value="base">Base</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deepgramLanguage">Language:</label>
+                        <select id="deepgramLanguage">
+                            <option value="en-US">English (US)</option>
+                            <option value="en-GB">English (UK)</option>
+                            <option value="en-AU">English (AU)</option>
+                            <option value="en-CA">English (CA)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- TTS Provider Selection -->
+                <div class="form-group">
+                    <label>Text-to-Speech Provider:</label>
+                    <div class="tts-provider-group">
+                        <button class="tts-provider-btn active" id="browserTtsBtn" onclick="selectTtsProvider('browser')">
+                            🌐 Browser TTS
+                        </button>
+                        <button class="tts-provider-btn" id="elevenlabsTtsBtn" onclick="selectTtsProvider('elevenlabs')">
+                            🎵 ElevenLabs
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Browser TTS Settings -->
+                <div id="browserTtsSettings" class="tts-settings">
+                    <div class="form-group">
+                        <label for="voiceSelect">Browser Voice:</label>
+                        <select id="voiceSelect">
+                            <option value="">Loading voices...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="speechRate">Speech Rate:</label>
+                        <input 
+                            type="range" 
+                            id="speechRate" 
+                            min="0.5" 
+                            max="2" 
+                            step="0.1" 
+                            value="1"
+                        >
+                        <span id="rateValue">1.0</span>
+                    </div>
+                </div>
+                
+                <!-- ElevenLabs TTS Settings -->
+                <div id="elevenlabsSettings" class="tts-settings elevenlabs-config" style="display: none;">
+                    <div class="form-group">
+                        <label for="elevenlabsApiKey">ElevenLabs API Key:</label>
+                        <input 
+                            type="password" 
+                            id="elevenlabsApiKey" 
+                            placeholder="Enter your ElevenLabs API key"
+                            title="Get your API key from elevenlabs.io"
+                        >
+                        <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
+                            Get your API key from <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a>
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="elevenlabsVoice">ElevenLabs Voice:</label>
+                        <select id="elevenlabsVoice" disabled>
+                            <option value="">Enter API key to load voices...</option>
+                        </select>
+                        <button class="btn-warning" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;">
+                            🔄 Load Voices
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="elevenlabsStability">Voice Stability:</label>
+                        <input 
+                            type="range" 
+                            id="elevenlabsStability" 
+                            min="0" 
+                            max="1" 
+                            step="0.1" 
+                            value="0.5"
+                        >
+                        <span id="stabilityValue">0.5</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="elevenlabsClarity">Voice Clarity:</label>
+                        <input 
+                            type="range" 
+                            id="elevenlabsClarity" 
+                            min="0" 
+                            max="1" 
+                            step="0.1" 
+                            value="0.75"
+                        >
+                        <span id="clarityValue">0.75</span>
+                    </div>
+                </div>
+                
+                <!-- Live transcription within voice control -->
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="transcriptionBox">📝 Live Transcription:</label>
+                    <div id="transcriptionBox" style="
+                        min-height: 60px;
+                        max-height: 120px;
+                        overflow-y: auto;
+                        padding: 15px;
+                        background-color: #f9fafb;
+                        border: 1px solid var(--border-color);
+                        border-radius: 6px;
+                        font-size: 16px;
+                        line-height: 1.5;
+                    ">
+                        <span style="color: var(--text-secondary);">Transcription will appear here when you speak...</span>
+                    </div>
+                </div>
+                
+                <!-- Push to talk button -->
+                <button 
+                    class="talk-button btn-danger" 
+                    id="talkButton"
+                    onmousedown="startRecording()"
+                    onmouseup="stopRecording()"
+                    onmouseleave="stopRecording()"
+                    ontouchstart="startRecording()"
+                    ontouchend="stopRecording()"
+                    style="margin-top: 60px;"
+                >
+                    Push to Talk
+                </button>
+                
+                <p style="text-align: center; color: var(--text-secondary);">
+                    Hold down the button to speak
+                </p>
+            </div>
+            
+            <!-- Chat display area -->
+            <div class="card">
+                <h2>💬 Conversation</h2>
+                <div class="chat-container" id="chatContainer">
+                    <p style="text-align: center; color: var(--text-secondary);">
+                        Select a scenario and start speaking to begin the consultation...
+                    </p>
+                </div>
+                
+                <!-- Control buttons with improved layout -->
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="clearChat()">
+                        🔄 Clear Chat
+                    </button>
+                    <button class="btn-danger" onclick="submitConversation()">
+                        📤 Submit Chat
+                    </button>
+                    <button class="btn-info" onclick="exportConversation()">
+                        📥 Export Chat
+                    </button>
+                </div>    
+                    <!-- Status display area for system messages -->
+        <div id="status" class="status info" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Patient Image Modal -->
+    <div class="image-modal" id="imageModal" onclick="closeImageModal(event)">
+        <div class="image-modal-content" onclick="event.stopPropagation()">
+            <div class="image-modal-header">
+                <h3 id="imageModalTitle">Patient Image</h3>
+                <button class="image-modal-close" onclick="closeImageModal()">&times;</button>
+            </div>
+            <div class="image-modal-body" id="imageModalBody">
+                <div class="image-loading">
+                    <div class="spinner"></div>
+                    Loading image...
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- JavaScript code for functionality -->
+    <script>
+        // ===== GLOBAL VARIABLES =====
+        // These store the state of our application
+        
+        let recognition = null;           // Speech recognition object
+        let synthesis = window.speechSynthesis; // Speech synthesis object
+        let isRecording = false;          // Track if we're currently recording
+        let currentScenario = null;       // Store the selected patient scenario
+        let conversationHistory = [];     // Store all messages in the conversation
+        let sheetData = [];              // Store data loaded from Google Sheets
+        let sessionId = '';              // Unique session identifier for this training session
+        let fullTranscript = '';         // Store the complete transcript during recording
+        let forceStopRecognition = false; // Flag to force stop recognition
+        let currentTtsProvider = 'browser'; // Current TTS provider
+        let currentSttProvider = 'browser'; // Current STT provider
+        let elevenlabsVoices = [];       // Store ElevenLabs voices
+        let currentAudio = null;         // Current playing audio for ElevenLabs
+        let deepgramSocket = null;       // Deepgram WebSocket connection
+        let mediaRecorder = null;        // MediaRecorder for Deepgram
+        let audioStream = null;          // Audio stream for recording
+        
+        // ===== INITIALIZATION =====
+        // This runs when the page loads
+        
+        window.onload = function() {
+            // Generate unique session ID for this training session
+            generateSessionId();
+            
+            // Initialize speech recognition if available
+            initializeSpeechRecognition();
+            
+            // Load available voices for text-to-speech
+            loadVoices();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Load saved configuration from localStorage
+            loadSavedConfig();
+            
+            // Display session info
+            displaySessionInfo();
+        };
+        
+        // ===== SESSION MANAGEMENT =====
+        // Generate and manage unique session IDs
+        
+        function generateSessionId() {
+            // Generate a unique session ID using timestamp and random string
+            const timestamp = Date.now();
+            const randomStr = Math.random().toString(36).substring(2, 15);
+            sessionId = `session_${timestamp}_${randomStr}`;
+            
+            console.log('New session started:', sessionId);
+        }
+        
+        function displaySessionInfo() {
+            // Add session ID display to the page
+            const header = document.querySelector('.header');
+            const sessionInfo = document.createElement('p');
+            sessionInfo.style.fontSize = '0.9em';
+            sessionInfo.style.color = 'var(--text-secondary)';
+            sessionInfo.style.marginTop = '10px';
+            sessionInfo.innerHTML = `Session ID: <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">${sessionId}</code>`;
+            header.appendChild(sessionInfo);
+        }
+        
+        // ===== TTS PROVIDER MANAGEMENT =====
+        // Handle switching between browser and ElevenLabs TTS
+        
+        function selectTtsProvider(provider) {
+            currentTtsProvider = provider;
+            
+            // Update UI
+            document.getElementById('browserTtsBtn').classList.toggle('active', provider === 'browser');
+            document.getElementById('elevenlabsTtsBtn').classList.toggle('active', provider === 'elevenlabs');
+            
+            // Show/hide settings
+            document.getElementById('browserTtsSettings').style.display = provider === 'browser' ? 'block' : 'none';
+            document.getElementById('elevenlabsSettings').style.display = provider === 'elevenlabs' ? 'block' : 'none';
+            
+            // Save preference
+            saveConfig();
+            
+            console.log('TTS provider changed to:', provider);
+        }
+
+// ===== ELEVENLABS INTEGRATION =====
+        // Functions for ElevenLabs TTS API
+        
+        async function loadElevenLabsVoices() {
+            const apiKey = document.getElementById('elevenlabsApiKey').value;
+            
+            if (!apiKey) {
+                showStatus('Please enter your ElevenLabs API key first', 'error');
+                return;
+            }
+            
+            showStatus('Loading ElevenLabs voices...', 'info');
+            
+            try {
+                const response = await fetch('https://api.elevenlabs.io/v1/voices', {
+                    method: 'GET',
+                    headers: {
+                        'xi-api-key': apiKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Invalid API key');
+                    } else if (response.status === 429) {
+                        throw new Error('Rate limit exceeded');
+                    } else {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                }
+                
+                const data = await response.json();
+                elevenlabsVoices = data.voices;
+                
+                // Populate voice dropdown
+                const voiceSelect = document.getElementById('elevenlabsVoice');
+                voiceSelect.innerHTML = '<option value="">Select a voice...</option>';
+                voiceSelect.disabled = false;
+                
+                elevenlabsVoices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.voice_id;
+                    option.textContent = `${voice.name} (${voice.labels?.gender || 'Unknown'})`;
+                    voiceSelect.appendChild(option);
+                });
+                
+                showStatus(`Loaded ${elevenlabsVoices.length} ElevenLabs voices`, 'success');
+                console.log('ElevenLabs voices loaded:', elevenlabsVoices);
+                
+            } catch (error) {
+                console.error('Error loading ElevenLabs voices:', error);
+                showStatus(`Error loading voices: ${error.message}`, 'error');
+            }
+        }
+        
+        async function speakWithElevenLabs(text) {
+            const apiKey = document.getElementById('elevenlabsApiKey').value;
+            const voiceId = document.getElementById('elevenlabsVoice').value;
+            const stability = parseFloat(document.getElementById('elevenlabsStability').value);
+            const clarity = parseFloat(document.getElementById('elevenlabsClarity').value);
+            
+            if (!apiKey) {
+                showStatus('ElevenLabs API key not configured', 'error');
+                return;
+            }
+            
+            if (!voiceId) {
+                showStatus('Please select an ElevenLabs voice', 'error');
+                return;
+            }
+            
+            try {
+                // Stop any currently playing audio
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+                
+                console.log('Generating speech with ElevenLabs...', {
+                    voiceId,
+                    stability,
+                    clarity,
+                    textLength: text.length
+                });
+                
+                const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+                    method: 'POST',
+                    headers: {
+                        'xi-api-key': apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        model_id: "eleven_monolingual_v1",
+                        voice_settings: {
+                            stability: stability,
+                            similarity_boost: clarity
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Invalid API key');
+                    } else if (response.status === 429) {
+                        throw new Error('Rate limit exceeded');
+                    } else if (response.status === 422) {
+                        throw new Error('Text too long or invalid parameters');
+                    } else {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                }
+                
+                // Get audio blob
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                // Create and play audio
+                currentAudio = new Audio(audioUrl);
+                currentAudio.play();
+                
+                // Clean up URL when audio ends
+                currentAudio.addEventListener('ended', () => {
+                    URL.revokeObjectURL(audioUrl);
+                });
+                
+                console.log('ElevenLabs speech generated and playing');
+                
+            } catch (error) {
+                console.error('ElevenLabs TTS error:', error);
+                showStatus(`ElevenLabs error: ${error.message}`, 'error');
+                
+                // Fallback to browser TTS
+                console.log('Falling back to browser TTS');
+                speakWithBrowser(text);
+            }
+
+        }
+        
+        function previewElevenLabsVoice() {
+            const sampleText = "Hello, I'm here to help you with your pharmacy consultation. How can I assist you today?";
+            speakWithElevenLabs(sampleText);
+        }
+        
+        // ===== SPEECH RECOGNITION SETUP =====
+        // Configure the browser's speech recognition API
+        
+        function initializeSpeechRecognition() {
+            // Check if browser supports speech recognition
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                // Use webkit prefix for Chrome, standard for others
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                // Configure recognition settings
+                recognition.continuous = true;       // CHANGED: Keep listening until manually stopped
+                recognition.interimResults = true;   // Show interim results for live transcription
+                recognition.lang = 'en-US';         // Set language
+                
+                // Handle speech recognition results
+                recognition.onresult = function(event) {
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+                    
+                    // Process all results
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript + ' ';
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    
+                    // Update the full transcript with any new final results
+                    if (finalTranscript) {
+                        fullTranscript += finalTranscript;
+                    }
+                    
+                    // Update live transcription display
+                    const transcriptionBox = document.getElementById('transcriptionBox');
+                    let displayText = '';
+                    
+                    // Show accumulated final transcript in black
+                    if (fullTranscript) {
+                        displayText += `<span style="color: black;">${fullTranscript.trim()}</span>`;
+                    }
+                    
+                    // Show interim transcript in gray
+                    if (interimTranscript) {
+                        if (fullTranscript) {
+                            displayText += ' ';
+                        }
+                        displayText += `<span style="color: #6b7280; font-style: italic;">${interimTranscript}</span>`;
+                    }
+                    
+                    transcriptionBox.innerHTML = displayText || '<span style="color: var(--text-secondary);">Listening...</span>';
+                    
+                    console.log('Full transcript:', fullTranscript, 'Interim:', interimTranscript);
+                };
+                
+                // Handle recognition errors
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    
+                    // Don't show error for aborted recognition (expected when we stop)
+                    if (event.error !== 'aborted') {
+                        showStatus('Speech recognition error: ' + event.error, 'error');
+                    }
+                    
+                    isRecording = false;
+                    updateTalkButton();
+                };
+                
+                // Handle when recognition ends
+                recognition.onend = function() {
+                    console.log('Recognition ended. Force stop:', forceStopRecognition);
+                    
+                    // If we're forcing a stop (user released button), process the transcript
+                    if (forceStopRecognition && fullTranscript.trim()) {
+                        console.log('Sending full transcript:', fullTranscript);
+                        addMessage(fullTranscript.trim(), 'user');
+                        sendToWebhook(fullTranscript.trim());
+                    }
+                    
+                    // Reset state
+                    isRecording = false;
+                    forceStopRecognition = false;
+                    updateTalkButton();
+                    
+                    // If recording should still be active (continuous mode), restart
+                    if (isRecording && !forceStopRecognition) {
+                        try {
+                            recognition.start();
+                        } catch (e) {
+                            console.log('Could not restart recognition:', e);
+                        }
+                    }
+                };
+            } else {
+                showStatus('Speech recognition not supported in this browser', 'error');
+            }
+        }
+        
+        // ===== VOICE SYNTHESIS SETUP =====
+        // Load available voices for text-to-speech
+        
+        function loadVoices() {
+            // Get available voices
+            const voices = synthesis.getVoices();
+            const voiceSelect = document.getElementById('voiceSelect');
+            
+            // Clear existing options
+            voiceSelect.innerHTML = '';
+            
+            // Add voice options
+            voices.forEach((voice, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(option);
+            });
+            
+            // Chrome loads voices asynchronously
+            if (voices.length === 0) {
+                synthesis.onvoiceschanged = loadVoices;
+            }
+        }
+        
+        // ===== EVENT LISTENERS =====
+        // Set up various UI interactions
+        
+        function setupEventListeners() {
+            // Speech rate slider
+            document.getElementById('speechRate').addEventListener('input', function(e) {
+                document.getElementById('rateValue').textContent = e.target.value;
+            });
+            
+            // ElevenLabs sliders
+            document.getElementById('elevenlabsStability').addEventListener('input', function(e) {
+                document.getElementById('stabilityValue').textContent = e.target.value;
+            });
+            
+            document.getElementById('elevenlabsClarity').addEventListener('input', function(e) {
+                document.getElementById('clarityValue').textContent = e.target.value;
+            });
+            
+            // Save configuration when changed
+            document.getElementById('webhookUrl').addEventListener('change', saveConfig);
+            document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
+            document.getElementById('sheetId').addEventListener('change', saveConfig);
+            document.getElementById('elevenlabsApiKey').addEventListener('change', saveConfig);
+            document.getElementById('deepgramApiKey').addEventListener('change', saveConfig);
+        }
+        
+        // ===== RECORDING FUNCTIONS =====
+        // Handle push-to-talk functionality
+        
+        function startRecording() {
+            if (!document.getElementById('webhookUrl').value) {
+                showStatus('Please enter webhook URL first', 'error');
+                return;
+            }
+            
+            if (!currentScenario) {
+                showStatus('Please select a patient scenario first', 'error');
+                return;
+            }
+            
+            // Stop any currently playing audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            
+            // Cancel any browser speech synthesis
+            synthesis.cancel();
+            
+            // Clear previous transcript and reset state
+            fullTranscript = '';
+            forceStopRecognition = false;
+            
+            // Clear transcription box
+            document.getElementById('transcriptionBox').innerHTML = '<span style="color: var(--text-secondary);">Listening...</span>';
+            
+            // Choose STT provider
+            if (currentSttProvider === 'deepgram') {
+                startDeepgramRecording();
+            } else {
+                startBrowserRecording();
+            }
+        }
+        
+        async function startDeepgramRecording() {
+            if (!await initializeDeepgram()) {
+                return;
+            }
+            
+            try {
+                // Get microphone access
+                audioStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        sampleRate: 16000,
+                        channelCount: 1,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    } 
+                });
+                
+                // Create MediaRecorder
+                mediaRecorder = new MediaRecorder(audioStream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0 && deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
+                        deepgramSocket.send(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = () => {
+                    console.log('Deepgram MediaRecorder stopped');
+                    // Send any remaining transcript
+                    if (fullTranscript.trim()) {
+                        addMessage(fullTranscript.trim(), 'user');
+                        sendToWebhook(fullTranscript.trim());
+                    }
+                };
+                
+                mediaRecorder.start(100); // Send data every 100ms
+                
+                isRecording = true;
+                updateTalkButton();
+                showStatus('Listening with Deepgram...', 'info');
+                
+            } catch (error) {
+                console.error('Error starting Deepgram recording:', error);
+                showStatus('Microphone access denied or Deepgram error', 'error');
+                cleanupDeepgram();
+            }
+        }
+        
+        function startBrowserRecording() {
+            if (!recognition) {
+                showStatus('Speech recognition not available', 'error');
+                return;
+            }
+            
+            isRecording = true;
+            updateTalkButton();
+            
+            try {
+                recognition.start();
+                showStatus('Listening with Browser STT...', 'info');
+            } catch (error) {
+                console.error('Error starting recognition:', error);
+                showStatus('Error starting recording', 'error');
+                isRecording = false;
+                updateTalkButton();
+            }
+        }
+        
+        function stopRecording() {
+            if (isRecording) {
+                if (currentSttProvider === 'deepgram') {
+                    stopDeepgramRecording();
+                } else {
+                    stopBrowserRecording();
+                }
+            }
+        }
+        
+        function stopDeepgramRecording() {
+            console.log('Stopping Deepgram recording...');
+            isRecording = false;
+            updateTalkButton();
+            
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            
+            // Close WebSocket connection to signal end of stream
+            if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
+                deepgramSocket.send(JSON.stringify({type: "CloseStream"}));
+            }
+            
+            showStatus('Processing with Deepgram...', 'info');
+            
+            // Cleanup after a short delay to allow final results
+            setTimeout(() => {
+                cleanupDeepgram();
+            }, 1000);
+        }
+        
+        function stopBrowserRecording() {
+            if (recognition) {
+                console.log('Stopping browser recording...');
+                forceStopRecognition = true;
+                recognition.stop();
+                showStatus('Processing...', 'info');
+            }
+        }
+        
+        function updateTalkButton() {
+            const button = document.getElementById('talkButton');
+            if (isRecording) {
+                button.classList.add('recording');
+                button.innerHTML = '🔴 Recording...';
+            } else {
+                button.classList.remove('recording');
+                button.innerHTML = 'Push to Talk';
+            }
+        }
+
+// ===== GOOGLE SHEETS INTEGRATION =====
+        // Load sheet names from Google Sheets
+        
+        async function loadSheetNames() {
+            const sheetId = document.getElementById('sheetId').value;
+            
+            if (!sheetId) {
+                showStatus('Please enter Sheet ID first', 'error');
+                return;
+            }
+            
+            showStatus('Loading sheet names...', 'info');
+            
+            try {
+                // NOTE: You need to replace YOUR_API_KEY with your actual Google Sheets API key
+                // Get your API key from: https://console.cloud.google.com/apis/credentials
+                const apiKey = 'AIzaSyDCrWAPXe6eYugvmnO1eJb7-S4QXQj3EgQ'; // REPLACE THIS!
+                
+                // Make API call to get spreadsheet metadata including sheet names
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties.title&key=${apiKey}`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Extract sheet names from the response
+                const sheetNames = data.sheets.map(sheet => sheet.properties.title);
+                console.log('Found sheets:', sheetNames);
+                
+                populateSheetNameDropdown(sheetNames);
+                showStatus(`Found ${sheetNames.length} sheets`, 'success');
+                
+            } catch (error) {
+                console.error('Error loading sheet names:', error);
+                
+                // If API call fails, show manual input option
+                showStatus('Could not load sheet names automatically. Enter manually below.', 'error');
+                
+                // Enable the dropdown and add a manual entry option
+                const select = document.getElementById('sheetName');
+                select.disabled = false;
+                select.innerHTML = '<option value="">Enter sheet name manually below...</option>';
+            }
+        }
+        
+        // Populate sheet name dropdown
+        function populateSheetNameDropdown(sheetNames) {
+            const select = document.getElementById('sheetName');
+            select.innerHTML = '<option value="">Select a sheet...</option>';
+            select.disabled = false;
+            
+            sheetNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+            
+            // Auto-load sheet data when selection changes
+            select.addEventListener('change', function() {
+                if (this.value) {
+                    saveConfig(); // Save the selection
+                    loadSheetData(); // Automatically load the data
+                }
+            });
+        }
+        
+        // Get selected sheet name (from dropdown only)
+        function getSelectedSheetName() {
+            const dropdown = document.getElementById('sheetName');
+            return dropdown.value;
+        }
+        
+        // Load data from Google Sheets
+        async function loadSheetData() {
+            const sheetId = document.getElementById('sheetId').value;
+            const sheetName = getSelectedSheetName();
+            
+            if (!sheetId || !sheetName) {
+                showStatus('Please enter Sheet ID and select/enter Sheet Name', 'error');
+                return;
+            }
+            
+            showStatus(`Loading data from sheet: ${sheetName}...`, 'info');
+            
+            try {
+                // NOTE: You need to replace YOUR_API_KEY with your actual Google Sheets API key
+                const apiKey = 'AIzaSyDCrWAPXe6eYugvmnO1eJb7-S4QXQj3EgQ'; // REPLACE THIS!
+                
+                // Construct Google Sheets API URL for the specific sheet
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${apiKey}`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Process the actual sheet data
+                if (data.values && data.values.length > 0) {
+                    sheetData = data.values;
+                    populateScenarioDropdown();
+                    showStatus(`Loaded ${data.values.length - 1} scenarios from ${sheetName}`, 'success');
+                } else {
+                    showStatus('No data found in the selected sheet', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error loading sheet:', error);
+                showStatus('Error loading sheet data. Check console for details.', 'error');
+                
+                // For demo purposes, fall back to simulated data
+                if (error.message.includes('YOUR_API_KEY')) {
+                    showStatus('Using demo data. Replace YOUR_API_KEY to use real data.', 'info');
+                    simulateSheetData();
+                }
+            }
+        }
+        
+              
+        // Populate the scenario selection dropdown
+        function populateScenarioDropdown() {
+            const select = document.getElementById('scenarioSelect');
+            select.innerHTML = '<option value="">Select a scenario...</option>';
+            select.disabled = false;
+            
+            // Skip header row, process all data rows
+            for (let i = 1; i < sheetData.length; i++) {
+                const row = sheetData[i];
+                const option = document.createElement('option');
+                option.value = i;
+                // Use column A (index 0) for the scenario name
+                option.textContent = `${i}. ${row[0]}`;
+                select.appendChild(option);
+            }
+            
+            // Clear any existing event listeners
+            select.removeEventListener('change', handleScenarioChange);
+            
+            // Add change event listener
+            select.addEventListener('change', handleScenarioChange);
+        }
+        
+        function handleScenarioChange(e) {
+            if (e.target.value) {
+                selectScenario(parseInt(e.target.value));
+            }
+        }
+        
+        // Handle scenario selection
+        function selectScenario(rowIndex) {
+            const headers = sheetData[0];
+            const row = sheetData[rowIndex];
+            
+            // Create scenario object
+            currentScenario = {};
+            headers.forEach((header, index) => {
+                currentScenario[header] = row[index];
+            });
+            
+            console.log('Selected scenario:', currentScenario);
+            showStatus(`Scenario loaded: ${currentScenario['Patient Name']}`, 'success');
+            
+            // Update patient image button based on image availability
+            updatePatientImageButton();
+            
+            // Clear previous conversation
+            clearChat();
+            
+            // Add initial message
+            addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
+        }
+        
+        // Update patient image button state based on scenario
+        function updatePatientImageButton() {
+            const button = document.getElementById('patientImageBtn');
+            
+            if (!currentScenario) {
+                // No scenario selected
+                button.className = 'patient-image-btn disabled';
+                button.textContent = '📷 No Scenario Selected';
+                button.disabled = true;
+                return;
+            }
+            
+            // Check for image URL in various possible column names
+            const imageUrl = currentScenario['Patient Image'] || 
+                           currentScenario['Image URL'] || 
+                           currentScenario['Photo URL'] || 
+                           currentScenario['Image'] || 
+                           currentScenario['Photo'] ||
+                           currentScenario['Picture URL'] ||
+                           currentScenario['Picture'];
+            
+            if (imageUrl && imageUrl.trim() !== '') {
+                // Image available
+                button.className = 'patient-image-btn available';
+                button.innerHTML = '👁️ View Patient Image';
+                button.disabled = false;
+            } else {
+                // No image URL
+                button.className = 'patient-image-btn unavailable';
+                button.innerHTML = '❌ No Patient Image';
+                button.disabled = true;
+            }
+        }
+        
+        // Helper function to convert Google Drive share links to direct image URLs
+        function convertGoogleDriveUrl(url) {
+            if (!url || typeof url !== 'string') {
+                return url;
+            }
+            
+            // Check if it's a Google Drive share link
+            if (url.includes('drive.google.com/file/d/')) {
+                const fileIdMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                if (fileIdMatch && fileIdMatch[1]) {
+                    const fileId = fileIdMatch[1];
+                    // Use the thumbnail format which is more reliable for embedding
+                    const directUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w3000`;
+                    console.log('Converted Google Drive URL:', url, '->', directUrl);
+                    return directUrl;
+                }
+            }
+            
+            // Return original URL if not a Google Drive link or conversion failed
+            return url;
+        }
+        
+        // Show patient image modal
+        function showPatientImage() {
+            if (!currentScenario) {
+                showStatus('No scenario selected', 'error');
+                return;
+            }
+            
+            // Get image URL from scenario data
+            const imageUrl = currentScenario['Patient Image'] || 
+                           currentScenario['Image URL'] || 
+                           currentScenario['Photo URL'] || 
+                           currentScenario['Image'] || 
+                           currentScenario['Photo'] ||
+                           currentScenario['Picture URL'] ||
+                           currentScenario['Picture'];
+            
+            if (!imageUrl || imageUrl.trim() === '') {
+                showStatus('No image URL available for this patient', 'error');
+                return;
+            }
+            
+            // Convert Google Drive share links to direct image URLs
+            const convertedImageUrl = convertGoogleDriveUrl(imageUrl.trim());
+            
+            // Log URL conversion for debugging
+            if (convertedImageUrl !== imageUrl.trim()) {
+                console.log('Original URL:', imageUrl.trim());
+                console.log('Converted URL:', convertedImageUrl);
+            }
+            
+            // Set modal title
+            const patientName = currentScenario['Patient Name'] || 'Patient';
+            document.getElementById('imageModalTitle').textContent = `${patientName} - Patient Image`;
+            
+            // Show modal
+            const modal = document.getElementById('imageModal');
+            const modalBody = document.getElementById('imageModalBody');
+            
+            // Show loading state
+            modalBody.innerHTML = `
+                <div class="image-loading">
+                    <div class="spinner"></div>
+                    Loading image...
+                </div>
+            `;
+            
+            modal.classList.add('show');
+            
+            // Create image element
+            const img = new Image();
+            
+            img.onload = function() {
+                // Image loaded successfully
+                modalBody.innerHTML = `<img src="${convertedImageUrl}" alt="${patientName}" class="patient-image">`;
+            };
+            
+            img.onerror = function() {
+                // Image failed to load - try alternative Google Drive formats
+                if (imageUrl.includes('drive.google.com') && !img.hasTriedAlternative) {
+                    console.log('First Google Drive format failed, trying alternative...');
+                    img.hasTriedAlternative = true;
+                    
+                    // Extract file ID and try different format
+                    const fileIdMatch = imageUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                    if (fileIdMatch && fileIdMatch[1]) {
+                        const fileId = fileIdMatch[1];
+                        // Try the uc format as backup
+                        const alternativeUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                        console.log('Trying alternative URL:', alternativeUrl);
+                        img.src = alternativeUrl;
+                        return;
+                    }
+                }
+                
+                // Image failed to load completely
+                modalBody.innerHTML = `
+                    <div class="image-error">
+                        <h4>Failed to Load Image</h4>
+                        <p>The image could not be loaded. This might be due to:</p>
+                        <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
+                            <li>The image is not set to "Anyone with the link can view"</li>
+                            <li>Google Drive is blocking the image embedding</li>
+                            <li>The file is not an image format</li>
+                            <li>The URL is incorrect or the file was deleted</li>
+                        </ul>
+                        
+                        <p><strong>Attempted URL:</strong></p>
+                        <p style="word-break: break-all; font-family: monospace; background: #f3f4f6; padding: 10px; border-radius: 4px; margin: 10px 0;">${convertedImageUrl}</p>
+                        
+                        ${convertedImageUrl !== imageUrl.trim() ? `<p><strong>Original URL:</strong></p><p style="word-break: break-all; font-family: monospace; background: #f3f4f6; padding: 10px; border-radius: 4px; margin: 10px 0;">${imageUrl.trim()}</p>` : ''}
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 6px; border-left: 4px solid #f59e0b;">
+                            <h5 style="margin: 0 0 10px 0; color: #92400e;">💡 Solutions:</h5>
+                            <p style="margin: 5px 0; color: #92400e;"><strong>For Google Drive:</strong></p>
+                            <ol style="margin: 5px 0 10px 20px; color: #92400e;">
+                                <li>Right-click the image → "Get link"</li>
+                                <li>Change to "Anyone with the link"</li>
+                                <li>Use a direct image hosting service instead</li>
+                            </ol>
+                            <p style="margin: 5px 0; color: #92400e;"><strong>Alternatives:</strong> Try imgur.com, dropbox.com, or any direct image URL</p>
+                        </div>
+                        
+                        <button onclick="window.open('${imageUrl.trim()}', '_blank')" style="margin-top: 15px; padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            🔗 Open Original Link
+                        </button>
+                    </div>
+                `;
+            };
+            
+            // Start loading the image
+            img.src = convertedImageUrl;
+        }
+
+// Close patient image modal
+        function closeImageModal(event) {
+            // If event is passed and it's not the backdrop click, ignore
+            if (event && event.target !== event.currentTarget && event.type === 'click') {
+                return;
+            }
+            
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
+        }
+        
+        // Add keyboard support for modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+        
+        // Select a random scenario
+        function selectRandomScenario() {
+            if (sheetData.length <= 1) {
+                showStatus('Please load sheet data first', 'error');
+                return;
+            }
+            
+            // Generate random index (skip header row at index 0)
+            const randomIndex = Math.floor(Math.random() * (sheetData.length - 1)) + 1;
+            
+            // Update dropdown to show selected scenario
+            document.getElementById('scenarioSelect').value = randomIndex;
+            
+            // Select the scenario
+            selectScenario(randomIndex);
+            
+            showStatus(`Randomly selected: ${sheetData[randomIndex][0]}`, 'success');
+        }
+       
+        // ===== EXPORT CONVERSATION FUNCTION =====
+        // New function to export conversation as a downloadable text file
+        
+        function exportConversation() {
+            if (conversationHistory.length === 0) {
+                showStatus('No conversation to export', 'error');
+                return;
+            }
+            
+            try {
+                // Create formatted text content
+                let exportText = '';
+                
+                // Add header information
+                exportText += '='.repeat(60) + '\n';
+                exportText += 'PHARMACY CONSULTATION TRAINING - CONVERSATION EXPORT\n';
+                exportText += '='.repeat(60) + '\n\n';
+                
+                // Add session information
+                exportText += `Session ID: ${sessionId}\n`;
+                exportText += `Export Date: ${new Date().toLocaleString()}\n`;
+                exportText += `Session Start: ${new Date(parseInt(sessionId.split('_')[1])).toLocaleString()}\n`;
+                exportText += `TTS Provider: ${currentTtsProvider}\n\n`;
+                
+                // Add scenario information if available
+                if (currentScenario) {
+                    exportText += 'SCENARIO DETAILS:\n';
+                    exportText += '-'.repeat(20) + '\n';
+                    Object.keys(currentScenario).forEach(key => {
+                        if (currentScenario[key] && currentScenario[key].toString().trim() !== '') {
+                            exportText += `${key}: ${currentScenario[key]}\n`;
+                        }
+                    });
+                    exportText += '\n';
+                }
+                
+                // Add conversation statistics
+                const userMessages = conversationHistory.filter(h => h.sender === 'user').length;
+                const aiMessages = conversationHistory.filter(h => h.sender === 'ai').length;
+                const sessionDuration = Date.now() - parseInt(sessionId.split('_')[1]);
+                const durationMinutes = Math.floor(sessionDuration / 60000);
+                const durationSeconds = Math.floor((sessionDuration % 60000) / 1000);
+                
+                exportText += 'CONVERSATION STATISTICS:\n';
+                exportText += '-'.repeat(25) + '\n';
+                exportText += `Total Messages: ${conversationHistory.length}\n`;
+                exportText += `Student Messages: ${userMessages}\n`;
+                exportText += `AI Patient Messages: ${aiMessages}\n`;
+                exportText += `Session Duration: ${durationMinutes}m ${durationSeconds}s\n\n`;
+                
+                // Add full conversation - capture everything displayed in the chat
+                exportText += 'FULL CONVERSATION:\n';
+                exportText += '-'.repeat(20) + '\n\n';
+                
+                // Get all messages from the chat container
+                const chatContainer = document.getElementById('chatContainer');
+                const messageElements = chatContainer.getElementsByClassName('message');
+                
+                for (let i = 0; i < messageElements.length; i++) {
+                    const messageElement = messageElements[i];
+                    const messageClass = messageElement.className;
+                    
+                    // Determine speaker type from CSS class
+                    let speaker = 'UNKNOWN';
+                    if (messageClass.includes('user')) {
+                        speaker = 'STUDENT';
+                    } else if (messageClass.includes('ai')) {
+                        speaker = 'AI PATIENT';
+                    } else if (messageClass.includes('system')) {
+                        speaker = 'SYSTEM';
+                    }
+                    
+                    // Get the message content and clean it up
+                    let messageContent = messageElement.innerHTML
+                        .replace(/<br\s*\/?>/g, '\n') // Convert <br> to newlines
+                        .replace(/<\/p><p[^>]*>/g, '\n\n') // Convert paragraph breaks
+                        .replace(/<p[^>]*>/g, '') // Remove opening p tags
+                        .replace(/<\/p>/g, '') // Remove closing p tags
+                        .replace(/<h[1-3][^>]*>/g, '\n') // Convert headers to newlines
+                        .replace(/<\/h[1-3]>/g, ':\n') // Add colon after headers
+                        .replace(/<strong>/g, '**') // Convert bold to markdown
+                        .replace(/<\/strong>/g, '**')
+                        .replace(/<em>/g, '*') // Convert italic to markdown
+                        .replace(/<\/em>/g, '*')
+                        .replace(/<ul[^>]*>/g, '\n') // Convert lists
+                        .replace(/<\/ul>/g, '')
+                        .replace(/<li[^>]*>/g, '  • ') // Convert list items to bullets
+                        .replace(/<\/li>/g, '\n')
+                        .replace(/<[^>]*>/g, '') // Remove any remaining HTML tags
+                        .replace(/&nbsp;/g, ' ') // Replace non-breaking spaces
+                        .replace(/&amp;/g, '&') // Replace HTML entities
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&quot;/g, '"')
+                        .replace(/\n\s*\n\s*\n/g, '\n\n') // Remove excessive line breaks
+                        .trim();
+                    
+                    // Skip empty messages or spinner messages
+                    if (!messageContent || messageContent.includes('spinner')) {
+                        continue;
+                    }
+                    
+                    // Add speaker and message
+                    exportText += `${speaker}:\n`;
+                    
+                    // Add message with proper formatting
+                    const lines = messageContent.split('\n');
+                    lines.forEach(line => {
+                        if (line.trim()) {
+                            exportText += `  ${line.trim()}\n`;
+                        } else {
+                            exportText += '\n';
+                        }
+                    });
+                    
+                    exportText += '\n'; // Add space between messages
+                }
+                
+                // Add export footer
+                exportText += '='.repeat(60) + '\n';
+                exportText += 'End of Conversation Export\n';
+                exportText += `Generated by Pharmacy Training System v1.1\n`;
+                exportText += '='.repeat(60) + '\n';
+                
+                // Create and download the file
+                const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
+                
+                // Create download link
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                
+                // Generate filename with timestamp and scenario info
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+                const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+                const scenarioName = currentScenario && currentScenario['Scenario Name'] 
+                    ? currentScenario['Scenario Name'].replace(/[^a-zA-Z0-9]/g, '_') 
+                    : 'Unknown_Scenario';
+                
+                downloadLink.download = `Pharmacy_Training_${scenarioName}_${dateStr}_${timeStr}.txt`;
+                
+                // Trigger download
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                // Clean up URL object
+                window.URL.revokeObjectURL(url);
+                
+                showStatus('✅ Conversation exported successfully!', 'success');
+                console.log('Conversation exported:', downloadLink.download);
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                showStatus(`❌ Export failed: ${error.message}`, 'error');
+            }
+        }
+
+// ===== WEBHOOK COMMUNICATION =====
+        // Send data to n8n webhook
+        
+        async function sendToWebhook(message) {
+            const webhookUrl = document.getElementById('webhookUrl').value;
+            
+            if (!webhookUrl) {
+                showStatus('Webhook URL not configured', 'error');
+                return;
+            }
+            
+            // Show loading spinner
+            addMessage('<div class="spinner"></div>', 'ai');
+            
+            try {
+                // Prepare data to send
+                const payload = {
+                    sessionId: sessionId,  // Include unique session ID
+                    message: message,
+                    scenario: currentScenario,
+                    timestamp: new Date().toISOString(),
+                    conversationHistory: conversationHistory,
+                    studentInfo: {
+                        sessionStartTime: new Date(parseInt(sessionId.split('_')[1])).toISOString(),
+                        messageCount: conversationHistory.filter(h => h.sender === 'user').length + 1,
+                        ttsProvider: currentTtsProvider
+                    }
+                };
+                
+                console.log('Sending to webhook:', webhookUrl);
+                console.log('Payload:', payload);
+                
+                // Send POST request to webhook
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    mode: 'cors', // Explicitly set CORS mode
+                    body: JSON.stringify(payload)
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Try to get response as text first to see what we're getting
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+                
+                let data;
+                try {
+                    // Try to parse as JSON
+                    data = JSON.parse(responseText);
+                    console.log('Parsed response:', data);
+                } catch (parseError) {
+                    console.error('Failed to parse response as JSON:', parseError);
+                    // If not JSON, treat the text as the response
+                    data = { response: responseText };
+                }
+                
+                // Remove loading spinner
+                removeLastMessage();
+                
+                // Check various possible response formats
+                let aiResponse = null;
+                
+                // Common n8n response formats
+                if (data.response) {
+                    aiResponse = data.response;
+                } else if (data.message) {
+                    aiResponse = data.message;
+                } else if (data.text) {
+                    aiResponse = data.text;
+                } else if (data.output) {
+                    aiResponse = data.output;
+                } else if (typeof data === 'string') {
+                    aiResponse = data;
+                } else if (Array.isArray(data) && data.length > 0) {
+                    // Sometimes n8n returns an array
+                    aiResponse = data[0].response || data[0].message || data[0];
+                }
+                
+                if (aiResponse) {
+                    addMessage(aiResponse, 'ai');
+                    
+                    // Speak the response using selected TTS provider
+                    speakText(aiResponse);
+                } else {
+                    console.error('Could not find response in data:', data);
+                    showStatus('Unexpected response format from webhook', 'error');
+                    addMessage('Received response but could not parse it. Check console for details.', 'ai');
+                }
+                
+            } catch (error) {
+                console.error('Webhook error:', error);
+                removeLastMessage();
+                
+                // More specific error messages
+                if (error.message.includes('Failed to fetch')) {
+                    showStatus('Cannot reach webhook - check URL and CORS settings', 'error');
+                    addMessage('Connection failed. Make sure your n8n webhook is accessible and CORS is enabled.', 'ai');
+                } else {
+                    showStatus(`Error: ${error.message}`, 'error');
+                    addMessage(`Error: ${error.message}`, 'ai');
+                }
+            }
+        }
+
+        // ===== SUBMIT CONVERSATION FUNCTION =====
+        // Function to submit conversation history to a separate webhook
+        
+        async function submitConversation() {
+            const submitWebhookUrl = document.getElementById('submitWebhookUrl').value;
+            
+            if (!submitWebhookUrl) {
+                showStatus('Submit webhook URL not configured', 'error');
+                return;
+            }
+            
+            if (conversationHistory.length === 0) {
+                showStatus('No conversation to submit', 'error');
+                return;
+            }
+            
+            showStatus('Submitting conversation...', 'info');
+            
+            // Add submitting message to chat
+            addMessage('📤 Submitting conversation for evaluation...', 'system');
+            
+            try {
+                // Prepare comprehensive data for submission
+                const submissionPayload = {
+                    sessionId: sessionId,
+                    scenario: currentScenario,
+                    conversationHistory: conversationHistory,
+                    submissionTime: new Date().toISOString(),
+                    sessionInfo: {
+                        sessionStartTime: new Date(parseInt(sessionId.split('_')[1])).toISOString(),
+                        totalMessages: conversationHistory.length,
+                        userMessages: conversationHistory.filter(h => h.sender === 'user').length,
+                        aiMessages: conversationHistory.filter(h => h.sender === 'ai').length,
+                        duration: Date.now() - parseInt(sessionId.split('_')[1]), // Duration in milliseconds
+                        ttsProvider: currentTtsProvider
+                    },
+                    metadata: {
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        type: 'conversation_submission'
+                    }
+                };
+                
+                console.log('Submitting conversation:', submissionPayload);
+                
+                // Send POST request to submit webhook with enhanced headers
+                const response = await fetch(submitWebhookUrl,
+                                             {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        'Cache-Control': 'no-cache',
+                        'User-Agent': 'PharmacyTraining/1.1'
+                    },
+                    mode: 'cors',
+                    credentials: 'omit',
+                    body: JSON.stringify(submissionPayload)
+                });
+                
+                console.log('Submit response status:', response.status);
+                console.log('Submit response headers:', Object.fromEntries(response.headers.entries()));
+                console.log('Submit response ok:', response.ok);
+                console.log('Submit response type:', response.type);
+                
+                // Log response details for debugging
+                const contentType = response.headers.get('content-type');
+                const contentLength = response.headers.get('content-length');
+                console.log('Content-Type:', contentType);
+                console.log('Content-Length:', contentLength);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response body:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+                }
+                
+                // Get response from submission webhook
+                const responseText = await response.text();
+                console.log('Submit raw response text:', responseText);
+                console.log('Response text length:', responseText.length);
+                console.log('Response text type:', typeof responseText);
+                
+                // Check if response is empty
+                if (!responseText || responseText.trim() === '') {
+                    console.warn('Empty response received from webhook');
+                    addMessage('📋 Evaluation Complete:\n\nConversation submitted successfully, but no feedback was returned. The evaluation may be processing in the background.', 'system');
+                    showStatus('✅ Conversation submitted (no feedback received)', 'success');
+                    return;
+                }
+                
+                let responseData;
+                let feedbackMessage = '';
+                
+                try {
+                    // Try to parse as JSON first
+                    responseData = JSON.parse(responseText);
+                    console.log('Parsed JSON response:', responseData);
+                    
+                    // Check various possible response formats for feedback
+                    if (responseData.feedback) {
+                        feedbackMessage = responseData.feedback;
+                    } else if (responseData.evaluation) {
+                        feedbackMessage = responseData.evaluation;
+                    } else if (responseData.response) {
+                        feedbackMessage = responseData.response;
+                    } else if (responseData.message) {
+                        feedbackMessage = responseData.message;
+                    } else if (responseData.data && responseData.data.feedback) {
+                        feedbackMessage = responseData.data.feedback;
+                    } else if (responseData.data && responseData.data.response) {
+                        feedbackMessage = responseData.data.response;
+                    } else if (responseData.result) {
+                        feedbackMessage = responseData.result;
+                    } else {
+                        // If JSON but no recognizable feedback field, stringify the object
+                        feedbackMessage = `Raw response: ${JSON.stringify(responseData, null, 2)}`;
+                    }
+                    
+                } catch (parseError) {
+                    console.log('Not JSON, treating as plain text');
+                    // Check if it looks like HTML (common n8n issue)
+                    if (responseText.trim().startsWith('<') && responseText.trim().includes('html')) {
+                        console.warn('Received HTML response instead of JSON - this usually means the workflow returned HTML');
+                        feedbackMessage = 'Received HTML response instead of expected feedback. Check your n8n workflow output format.';
+                    } else {
+                        // Plain text response
+                        feedbackMessage = responseText.trim();
+                    }
+                }
+                
+                console.log('Final feedback message:', feedbackMessage);
+                
+                // Format the feedback message for better display
+                function formatFeedback(text) {
+                    if (!text) return text;
+                    
+                    // Convert markdown-style formatting to HTML
+                    let formatted = text
+                        // Convert **bold** to <strong>bold</strong>
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        // Convert *italic* to <em>italic</em>
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        // Convert ### Heading to <h3>Heading</h3>
+                        .replace(/^### (.*$)/gm, '<h3 style="margin: 15px 0 10px 0; color: var(--primary-color); font-size: 1.1em;">$1</h3>')
+                        // Convert ## Heading to <h2>Heading</h2>
+                        .replace(/^## (.*$)/gm, '<h2 style="margin: 20px 0 10px 0; color: var(--primary-color); font-size: 1.2em;">$1</h2>')
+                        // Convert # Heading to <h1>Heading</h1>
+                        .replace(/^# (.*$)/gm, '<h1 style="margin: 20px 0 15px 0; color: var(--primary-color); font-size: 1.3em;">$1</h1>')
+                        // Convert - bullet points to proper list items
+                        .replace(/^- (.*$)/gm, '<li style="margin: 5px 0; padding-left: 5px;">$1</li>')
+                        // Convert 1. numbered lists to proper list items
+                        .replace(/^\d+\. (.*$)/gm, '<li style="margin: 5px 0; padding-left: 5px;">$1</li>')
+                        // Convert double line breaks to paragraph breaks
+                        .replace(/\n\n/g, '</p><p style="margin: 10px 0; line-height: 1.5;">')
+                        // Convert single line breaks to <br>
+                        .replace(/\n/g, '<br>');
+                    
+                    // Wrap in paragraph tags if not already wrapped
+                    if (!formatted.includes('<p>') && !formatted.includes('<h')) {
+                        formatted = `<p style="margin: 10px 0; line-height: 1.5;">${formatted}</p>`;
+                    } else if (formatted.includes('<p>')) {
+                        // Ensure it starts with a paragraph
+                        if (!formatted.startsWith('<p>') && !formatted.startsWith('<h')) {
+                            formatted = `<p style="margin: 10px 0; line-height: 1.5;">${formatted}`;
+                        }
+                        // Ensure it ends with a closing paragraph
+                        if (!formatted.endsWith('</p>') && !formatted.endsWith('</h3>') && !formatted.endsWith('</h2>') && !formatted.endsWith('</h1>')) {
+                            formatted = `${formatted}</p>`;
+                        }
+                    }
+                    
+                    // Wrap list items in proper ul tags
+                    if (formatted.includes('<li>')) {
+                        formatted = formatted
+                            .replace(/(<li>.*?<\/li>)/gs, '<ul style="margin: 10px 0; padding-left: 20px;">$1</ul>')
+                            .replace(/<\/ul>\s*<ul[^>]*>/g, ''); // Merge consecutive lists
+                    }
+                    
+                    return formatted;
+                }
+                
+                // Display the feedback/response
+                if (feedbackMessage) {
+                    const formattedFeedback = formatFeedback(feedbackMessage);
+                    addMessage(`📋 Evaluation Feedback:<br><br>${formattedFeedback}`, 'system');
+                    showStatus('✅ Conversation submitted and evaluated successfully!', 'success');
+                } else {
+                    addMessage('📋 Evaluation Complete:\n\nConversation submitted successfully, but the feedback format was not recognized. Check console for raw response.', 'system');
+                    showStatus('✅ Conversation submitted (feedback format issue)', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Submit conversation error:', error);
+                console.error('Error stack:', error.stack);
+                
+                // More specific error messages
+                if (error.message.includes('Failed to fetch')) {
+                    showStatus('Cannot reach submit webhook - check URL and CORS settings', 'error');
+                    addMessage('❌ Submission failed. Make sure your n8n submit webhook is accessible and CORS is enabled.', 'system');
+                } else if (error.message.includes('NetworkError')) {
+                    showStatus('Network error - check n8n webhook configuration', 'error');
+                    addMessage('❌ Network error. Check that your n8n webhook is running and accessible.', 'system');
+                } else {
+                    showStatus(`❌ Submission error: ${error.message}`, 'error');
+                    addMessage(`❌ Submission failed: ${error.message}`, 'system');
+                }
+            }
+        }
+
+// Format the feedback message for better display
+                function formatFeedback(text) {
+                    if (!text) return text;
+                    
+                    // Convert markdown-style formatting to HTML
+                    let formatted = text
+                        // Convert **bold** to <strong>bold</strong>
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        // Convert *italic* to <em>italic</em>
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        // Convert ### Heading to <h3>Heading</h3>
+                        .replace(/^### (.*$)/gm, '<h3 style="margin: 15px 0 10px 0; color: var(--primary-color); font-size: 1.1em;">$1</h3>')
+                        // Convert ## Heading to <h2>Heading</h2>
+                        .replace(/^## (.*$)/gm, '<h2 style="margin: 20px 0 10px 0; color: var(--primary-color); font-size: 1.2em;">$1</h2>')
+                        // Convert # Heading to <h1>Heading</h1>
+                        .replace(/^# (.*$)/gm, '<h1 style="margin: 20px 0 15px 0; color: var(--primary-color); font-size: 1.3em;">$1</h1>')
+                        // Convert - bullet points to proper list items
+                        .replace(/^- (.*$)/gm, '<li style="margin: 5px 0; padding-left: 5px;">$1</li>')
+                        // Convert 1. numbered lists to proper list items
+                        .replace(/^\d+\. (.*$)/gm, '<li style="margin: 5px 0; padding-left: 5px;">$1</li>')
+                        // Convert double line breaks to paragraph breaks
+                        .replace(/\n\n/g, '</p><p style="margin: 10px 0; line-height: 1.5;">')
+                        // Convert single line breaks to <br>
+                        .replace(/\n/g, '<br>');
+                    
+                    // Wrap in paragraph tags if not already wrapped
+                    if (!formatted.includes('<p>') && !formatted.includes('<h')) {
+                        formatted = `<p style="margin: 10px 0; line-height: 1.5;">${formatted}</p>`;
+                    } else if (formatted.includes('<p>')) {
+                        // Ensure it starts with a paragraph
+                        if (!formatted.startsWith('<p>') && !formatted.startsWith('<h')) {
+                            formatted = `<p style="margin: 10px 0; line-height: 1.5;">${formatted}`;
+                        }
+                        // Ensure it ends with a closing paragraph
+                        if (!formatted.endsWith('</p>') && !formatted.endsWith('</h3>') && !formatted.endsWith('</h2>') && !formatted.endsWith('</h1>')) {
+                            formatted = `${formatted}</p>`;
+                        }
+                    }
+                    
+                    // Wrap list items in proper ul tags
+                    if (formatted.includes('<li>')) {
+                        formatted = formatted
+                            .replace(/(<li>.*?<\/li>)/gs, '<ul style="margin: 10px 0; padding-left: 20px;">$1</ul>')
+                            .replace(/<\/ul>\s*<ul[^>]*>/g, ''); // Merge consecutive lists
+                    }
+                    
+                    return formatted;
+                }
+                
+                // Display the feedback/response
+                if (feedbackMessage) {
+                    const formattedFeedback = formatFeedback(feedbackMessage);
+                    addMessage(`📋 Evaluation Feedback:<br><br>${formattedFeedback}`, 'system');
+                    showStatus('✅ Conversation submitted and evaluated successfully!', 'success');
+                } else {
+                    addMessage('📋 Evaluation Complete:\n\nConversation submitted successfully, but the feedback format was not recognized. Check console for raw response.', 'system');
+                    showStatus('✅ Conversation submitted (feedback format issue)', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Submit conversation error:', error);
+                console.error('Error stack:', error.stack);
+                
+                // More specific error messages
+                if (error.message.includes('Failed to fetch')) {
+                    showStatus('Cannot reach submit webhook - check URL and CORS settings', 'error');
+                    addMessage('❌ Submission failed. Make sure your n8n submit webhook is accessible and CORS is enabled.', 'system');
+                } else if (error.message.includes('NetworkError')) {
+                    showStatus('Network error - check n8n webhook configuration', 'error');
+                    addMessage('❌ Network error. Check that your n8n webhook is running and accessible.', 'system');
+                } else {
+                    showStatus(`❌ Submission error: ${error.message}`, 'error');
+                    addMessage(`❌ Submission failed: ${error.message}`, 'system');
+                }
+            }
+        }
+
+        // ===== TEXT TO SPEECH =====
+        // Convert AI response to speech using selected provider
+        
+        function speakText(text) {
+            console.log('Speaking text with provider:', currentTtsProvider, 'Text:', text);
+            
+            if (currentTtsProvider === 'elevenlabs') {
+                speakWithElevenLabs(text);
+            } else {
+                speakWithBrowser(text);
+            }
+        }
+        
+        function speakWithBrowser(text) {
+            console.log('Speaking with browser TTS:', text);
+            
+            // Cancel any ongoing speech
+            synthesis.cancel();
+            
+            // Stop any ElevenLabs audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            
+            // Check if speech synthesis is available
+            if (!synthesis) {
+                console.error('Speech synthesis not available');
+                return;
+            }
+            
+            // Create utterance
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Set voice
+            const voiceSelect = document.getElementById('voiceSelect');
+            const voices = synthesis.getVoices();
+            console.log('Available voices:', voices.length);
+            
+            if (voiceSelect.value && voices[voiceSelect.value]) {
+                utterance.voice = voices[voiceSelect.value];
+                console.log('Using voice:', voices[voiceSelect.value].name);
+            }
+            
+            // Set rate
+            utterance.rate = parseFloat(document.getElementById('speechRate').value);
+            console.log('Speech rate:', utterance.rate);
+            
+            // Add event listeners for debugging
+            utterance.onstart = function() {
+                console.log('Browser speech started');
+            };
+            
+            utterance.onend = function() {
+                console.log('Browser speech ended');
+            };
+            
+            utterance.onerror = function(event) {
+                console.error('Browser speech error:', event);
+            };
+            
+            // Speak
+            synthesis.speak(utterance);
+        }
+        
+        // ===== CHAT MANAGEMENT =====
+        // Handle chat display and messages
+        
+        function addMessage(text, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = text;
+            
+            // Add to container
+            chatContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Add to history (excluding loading spinners and system messages for submission)
+            if (!text.includes('spinner') && sender !== 'system') {
+                conversationHistory.push({
+                    sender: sender,
+                    message: text,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+        
+        function removeLastMessage() {
+            const chatContainer = document.getElementById('chatContainer');
+            const messages = chatContainer.getElementsByClassName('message');
+            if (messages.length > 0) {
+                messages[messages.length - 1].remove();
+            }
+        }
+        
+        function clearChat() {
+            document.getElementById('chatContainer').innerHTML = '';
+            conversationHistory = [];
+            
+            // Stop any playing audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            synthesis.cancel();
+            
+            // Reset patient image button if no scenario is selected
+            if (!currentScenario) {
+                const button = document.getElementById('patientImageBtn');
+                button.className = 'patient-image-btn disabled';
+                button.textContent = '📷 No Scenario Selected';
+                button.disabled = true;
+            }
+        }
+        
+        // ===== UTILITY FUNCTIONS =====
+        // Helper functions
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function saveConfig() {
+            const config = {
+                webhookUrl: document.getElementById('webhookUrl').value,
+                submitWebhookUrl: document.getElementById('submitWebhookUrl').value,
+                sheetId: document.getElementById('sheetId').value,
+                sheetName: getSelectedSheetName(),
+                sttProvider: currentSttProvider,
+                ttsProvider: currentTtsProvider,
+                elevenlabsApiKey: document.getElementById('elevenlabsApiKey').value,
+                elevenlabsVoice: document.getElementById('elevenlabsVoice').value,
+                deepgramApiKey: document.getElementById('deepgramApiKey').value,
+                deepgramModel: document.getElementById('deepgramModel').value,
+                deepgramLanguage: document.getElementById('deepgramLanguage').value
+            };
+            localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
+        }
+        
+        function loadSavedConfig() {
+            const saved = localStorage.getItem('pharmacyChatConfig');
+            if (saved) {
+                const config = JSON.parse(saved);
+                document.getElementById('webhookUrl').value = config.webhookUrl || '';
+                document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl || '';
+                document.getElementById('sheetId').value = config.sheetId || '';
+                document.getElementById('elevenlabsApiKey').value = config.elevenlabsApiKey || '';
+                document.getElementById('deepgramApiKey').value = config.deepgramApiKey || '';
+                
+                // Set dropdowns
+                if (config.deepgramModel) {
+                    document.getElementById('deepgramModel').value = config.deepgramModel;
+                }
+                if (config.deepgramLanguage) {
+                    document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
+                }
+                
+                // Try to set sheet name in dropdown first
+                const sheetNameDropdown = document.getElementById('sheetName');
+                if (config.sheetName) {
+                    // If dropdown has options, try to select the saved value
+                    if (sheetNameDropdown.options.length > 1) {
+                        sheetNameDropdown.value = config.sheetName;
+                    }
+                }
+                
+                // Set STT provider
+                if (config.sttProvider) {
+                    selectSttProvider(config.sttProvider);
+                }
+                
+                // Set TTS provider
+                if (config.ttsProvider) {
+                    selectTtsProvider(config.ttsProvider);
+                }
+                
+                // Set ElevenLabs voice if saved
+                if (config.elevenlabsVoice) {
+                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoice;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
