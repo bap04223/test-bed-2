@@ -630,14 +630,14 @@
                     >
                 </div>
                 
-                <!-- Google Sheets configuration -->
+                <!--  configuration -->
                 <div class="form-group">
                     <label for="sheetId">Google Sheet ID:</label>
                     <input 
                         type="text" 
                         id="sheetId" 
                         placeholder="1ABC...xyz"
-                        title="The ID from your Google Sheets URL"
+                        title="The ID from your  URL"
                     >
                     <button 
                         class="btn-secondary" 
@@ -910,7 +910,7 @@
         let isRecording = false;          // Track if we're currently recording
         let currentScenario = null;       // Store the selected patient scenario
         let conversationHistory = [];     // Store all messages in the conversation
-        let sheetData = [];              // Store data loaded from Google Sheets
+        let sheetData = [];              // Store data loaded from 
         let sessionId = '';              // Unique session identifier for this training session
         let fullTranscript = '';         // Store the complete transcript during recording
         let forceStopRecognition = false; // Flag to force stop recognition
@@ -1790,8 +1790,8 @@
             // Start loading the image
             img.src = convertedImageUrl;
         }
-
-// Close patient image modal
+        
+        // Close patient image modal
         function closeImageModal(event) {
             // If event is passed and it's not the backdrop click, ignore
             if (event && event.target !== event.currentTarget && event.type === 'click') {
@@ -2585,4 +2585,5 @@
         }
     </script>
 </body>
+
 </html>
