@@ -523,7 +523,7 @@
         }
         
        
-   </style>
+  </style>
 </head>
 
     <body>
@@ -792,6 +792,9 @@
                 
                 <!-- Control buttons with improved layout -->
                 <div class="button-group">
+                    <button class="btn-warning" onclick="newSession()">
+                        🆕 New Session
+                    </button>
                     <button class="btn-secondary" onclick="clearChat()">
                         🔄 Clear Chat
                     </button>
@@ -934,6 +937,95 @@
             sessionInfo.innerHTML = `Session ID: <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">${sessionId}</code>`;
             header.appendChild(sessionInfo);
         }
+
+        // ===== NEW SESSION FUNCTION =====
+// Function to start a new session without page refresh
+
+function newSession() {
+    console.log('Starting new session...');
+    
+    // Generate new session ID
+    generateSessionId();
+    
+    // Clear conversation history and chat display
+    clearChat();
+    
+    // Clear transcription box
+    const transcriptionBox = document.getElementById('transcriptionBox');
+    transcriptionBox.innerHTML = '<span style="color: var(--text-secondary);">Transcription will appear here when you speak...</span>';
+    
+    // Reset recording state
+    if (isRecording) {
+        if (currentSttProvider === 'deepgram') {
+            stopDeepgramRecording();
+        } else if (recognition) {
+            forceStopRecognition = true;
+            recognition.stop();
+        }
+    }
+    
+    // Reset recording variables
+    isRecording = false;
+    fullTranscript = '';
+    forceStopRecognition = false;
+    
+    // Update talk button
+    updateTalkButton();
+    
+    // Stop any playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    synthesis.cancel();
+    
+    // Close any WebSocket connections
+    if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
+        deepgramSocket.close();
+        deepgramSocket = null;
+    }
+    
+    // Stop any media streams
+    if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        audioStream = null;
+    }
+    
+    // Stop media recorder
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        mediaRecorder = null;
+    }
+    
+    // Update session info display
+    updateSessionInfo();
+    
+    // Show confirmation
+    showStatus(`✅ New session started! Session ID: ${sessionId}`, 'success');
+    
+    // Add welcome message if scenario is selected
+    if (currentScenario) {
+        addMessage('New session started. Press and hold the talk button to begin the consultation.', 'ai');
+    } else {
+        addMessage('New session started. Select a scenario and press the talk button to begin.', 'ai');
+    }
+    
+    console.log('New session created:', sessionId);
+}
+
+// Helper function to update session info display
+function updateSessionInfo() {
+    // Find and update the existing session info paragraph
+    const header = document.querySelector('.header');
+    const existingSessionInfo = header.querySelector('p:last-child');
+    
+    if (existingSessionInfo && existingSessionInfo.innerHTML.includes('Session ID:')) {
+        existingSessionInfo.innerHTML = `Session ID: <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">${sessionId}</code>`;
+    } else {
+        // If not found, create new one (fallback)
+        displaySessionInfo();
+    }
+}
         
         // ===== TTS PROVIDER MANAGEMENT =====
         // Handle switching between browser and ElevenLabs TTS
@@ -2637,6 +2729,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
