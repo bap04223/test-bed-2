@@ -195,23 +195,7 @@
             background-color: #d97706;
         }
         
-        /* Start/Stop button styling */
-.talk-button {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    font-size: 18px;
-    margin: 20px auto;
-    display: block;
-    position: relative;
-    overflow: hidden;
-}
-
-.talk-button.recording {
-    animation: pulse 1.5s infinite;
-    background-color: var(--danger-color);
-}
-
+        
 /* Review section styling */
 .review-section {
     margin-top: 20px;
@@ -253,9 +237,9 @@
 
 .review-buttons button {
     flex: 1;
-    max-width: 150px;
-    padding: 10px 20px;
-    font-size: 16px;
+    max-width: 120px;
+    padding: 8px 16px;
+    font-size: 14px;
     font-weight: 500;
 }
         
@@ -871,19 +855,7 @@
                     </div>
                 </div>
                 
-                <!-- Start/Stop recording button -->
-<button 
-    class="talk-button btn-success" 
-    id="talkButton"
-    onclick="toggleRecording()"
-    style="margin-top: 15px;"
->
-    🎤 Start Recording
-</button>
-
-<p style="text-align: center; color: var(--text-secondary); margin-top: 10px;">
-    Click to start/stop recording
-</p>
+                
 
 <!-- Review section for transcript before sending -->
 <div class="review-section" id="reviewSection">
@@ -897,16 +869,22 @@
     </div>
     
     <div class="review-buttons">
-        <button class="btn-success" onclick="sendReviewedMessage()" disabled id="sendBtn">
-            ✅ Send Message
-        </button>
-        <button class="btn-warning" onclick="editTranscript()" disabled id="editBtn">
-            ✏️ Edit
-        </button>
-        <button class="btn-danger" onclick="deleteTranscript()" disabled id="deleteBtn">
-            🗑️ Delete & Retry
-        </button>
-    </div>
+    <button 
+        class="btn-success" 
+        id="talkButton"
+        onclick="toggleRecording()"
+    >
+        🎤 Start Recording
+    </button>
+    <button class="btn-success" onclick="sendReviewedMessage()" disabled id="sendBtn">
+        ✅ Send Message
+    </button>
+    <button class="btn-warning" onclick="editTranscript()" disabled id="editBtn">
+        ✏️ Edit
+    </button>
+    <button class="btn-danger" onclick="deleteTranscript()" disabled id="deleteBtn">
+        🗑️ Delete & Retry
+    </button>
 </div>
                 
                 <!-- Status display area for system messages -->
@@ -1761,26 +1739,28 @@ function updateTalkButton() {
     switch (recordingState) {
         case 'stopped':
             button.classList.remove('recording');
-            button.className = 'talk-button btn-success';
+            button.className = 'btn-success';
             button.innerHTML = '🎤 Start Recording';
+            button.disabled = false;
             break;
             
         case 'recording':
             button.classList.add('recording');
-            button.className = 'talk-button btn-danger recording';
+            button.className = 'btn-danger recording';
             button.innerHTML = '⏹️ Stop Recording';
+            button.disabled = false;
             break;
             
         case 'processing':
             button.classList.remove('recording');
-            button.className = 'talk-button btn-warning';
+            button.className = 'btn-warning';
             button.innerHTML = '⏳ Processing...';
             button.disabled = true;
             break;
             
         case 'reviewing':
             button.classList.remove('recording');
-            button.className = 'talk-button btn-info';
+            button.className = 'btn-info';
             button.innerHTML = '📝 Reviewing...';
             button.disabled = true;
             break;
@@ -2951,6 +2931,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
