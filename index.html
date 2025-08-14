@@ -523,7 +523,7 @@
         }
         
        
-    </style>
+   </style>
 </head>
 
     <body>
@@ -779,9 +779,7 @@
         </select>
     </div>
 </div>
-                
-               
-           
+            </div>
             
             <!-- Chat display area -->
             <div class="card">
@@ -805,7 +803,7 @@
                     </button>
                 </div>  
                 
-                 <!-- Live transcription within voice control -->
+                 <!-- Live transcription moved to conversation panel -->
                 <div class="form-group" style="margin-top: 20px;">
                     <label for="transcriptionBox">📝 Live Transcription:</label>
                     <div id="transcriptionBox" style="
@@ -823,7 +821,7 @@
                     </div>
                 </div>
                 
-                <!-- Push to talk button -->
+                <!-- Push to talk button moved to conversation panel -->
                 <button 
                     class="talk-button btn-danger" 
                     id="talkButton"
@@ -832,17 +830,17 @@
                     onmouseleave="stopRecording()"
                     ontouchstart="startRecording()"
                     ontouchend="stopRecording()"
-                    style="margin-top: 60px;"
+                    style="margin-top: 15px; width: 100%;"
                 >
                     Push to Talk
                 </button>
                 
-                <p style="text-align: center; color: var(--text-secondary);">
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 10px;">
                     Hold down the button to speak
                 </p>
-                    <!-- Status display area for system messages -->
-        <div id="status" class="status info" style="display: none;"></div>
-                </div>
+                
+                <!-- Status display area for system messages -->
+                <div id="status" class="status info" style="display: none; margin-top: 15px;"></div>
             </div>
         </div>
     </div>
@@ -2639,6 +2637,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
