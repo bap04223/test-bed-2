@@ -219,11 +219,14 @@
     background-color: #f9fafb;
     border: 2px solid var(--warning-color);
     border-radius: 8px;
-    display: none;
+    display: block;
+    opacity: 0.5;
 }
 
-.review-section.show {
-    display: block;
+.review-section.active {
+    opacity: 1;
+    border-color: var(--primary-color);
+    background-color: #f0f9ff;
 }
 
 .review-transcript {
@@ -886,21 +889,21 @@
 <div class="review-section" id="reviewSection">
     <h3 style="margin: 0 0 10px 0; color: var(--primary-color); text-align: center;">📝 Review Your Message</h3>
     <p style="margin: 0 0 10px 0; color: var(--text-secondary); text-align: center;">
-        Review your transcription below. You can edit it before sending or delete it to try again.
+        Your transcribed message will appear below for review before sending.
     </p>
     
-    <div class="review-transcript" id="reviewTranscript" contenteditable="true">
-        <!-- Transcript will appear here -->
+    <div class="review-transcript" id="reviewTranscript" contenteditable="true" placeholder="Your transcribed message will appear here...">
+        No message to review yet
     </div>
     
     <div class="review-buttons">
-        <button class="btn-success" onclick="sendReviewedMessage()">
+        <button class="btn-success" onclick="sendReviewedMessage()" disabled id="sendBtn">
             ✅ Send Message
         </button>
-        <button class="btn-warning" onclick="editTranscript()">
+        <button class="btn-warning" onclick="editTranscript()" disabled id="editBtn">
             ✏️ Edit
         </button>
-        <button class="btn-danger" onclick="deleteTranscript()">
+        <button class="btn-danger" onclick="deleteTranscript()" disabled id="deleteBtn">
             🗑️ Delete & Retry
         </button>
     </div>
@@ -1071,6 +1074,9 @@ function newSession() {
     pendingTranscript = '';
     
     // Hide review section
+    hideReviewSection();
+
+    // Reset review section
     hideReviewSection();
     
     // Show confirmation
@@ -1790,8 +1796,13 @@ function showReviewSection(transcript) {
     // Update review transcript
     document.getElementById('reviewTranscript').textContent = transcript;
     
-    // Show review section
-    document.getElementById('reviewSection').classList.add('show');
+    // Activate review section
+    document.getElementById('reviewSection').classList.add('active');
+    
+    // Enable buttons
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('editBtn').disabled = false;
+    document.getElementById('deleteBtn').disabled = false;
     
     // Scroll to review section
     document.getElementById('reviewSection').scrollIntoView({ 
@@ -1855,7 +1866,14 @@ function deleteTranscript() {
 }
 
 function hideReviewSection() {
-    document.getElementById('reviewSection').classList.remove('show');
+    document.getElementById('reviewSection').classList.remove('active');
+    document.getElementById('reviewTranscript').textContent = 'No message to review yet';
+    
+    // Disable buttons
+    document.getElementById('sendBtn').disabled = true;
+    document.getElementById('editBtn').disabled = true;
+    document.getElementById('deleteBtn').disabled = true;
+    
     document.getElementById('talkButton').disabled = false;
 }
 
@@ -2933,4 +2951,5 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
