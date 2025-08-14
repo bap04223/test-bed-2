@@ -195,22 +195,66 @@
             background-color: #d97706;
         }
         
-        /* Push to talk button special styling */
-        .talk-button {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            font-size: 18px;
-            margin: 20px auto;
-            display: block;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .talk-button.recording {
-            animation: pulse 1.5s infinite;
-            background-color: var(--danger-color);
-        }
+        /* Start/Stop button styling */
+.talk-button {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    font-size: 18px;
+    margin: 20px auto;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.talk-button.recording {
+    animation: pulse 1.5s infinite;
+    background-color: var(--danger-color);
+}
+
+/* Review section styling */
+.review-section {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9fafb;
+    border: 2px solid var(--warning-color);
+    border-radius: 8px;
+    display: none;
+}
+
+.review-section.show {
+    display: block;
+}
+
+.review-transcript {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 15px;
+    min-height: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.review-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.review-buttons button {
+    flex: 1;
+    max-width: 150px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+}
         
         /* Animation for recording state */
         @keyframes pulse {
@@ -824,23 +868,43 @@
                     </div>
                 </div>
                 
-                <!-- Push to talk button moved to conversation panel -->
-                <button 
-                    class="talk-button btn-danger" 
-                    id="talkButton"
-                    onmousedown="startRecording()"
-                    onmouseup="stopRecording()"
-                    onmouseleave="stopRecording()"
-                    ontouchstart="startRecording()"
-                    ontouchend="stopRecording()"
-                    style="margin-top: 15px;"
-                >
-                    Push to Talk
-                </button>
-                
-                <p style="text-align: center; color: var(--text-secondary); margin-top: 10px;">
-                    Hold down the button to speak
-                </p>
+                <!-- Start/Stop recording button -->
+<button 
+    class="talk-button btn-success" 
+    id="talkButton"
+    onclick="toggleRecording()"
+    style="margin-top: 15px;"
+>
+    🎤 Start Recording
+</button>
+
+<p style="text-align: center; color: var(--text-secondary); margin-top: 10px;">
+    Click to start/stop recording
+</p>
+
+<!-- Review section for transcript before sending -->
+<div class="review-section" id="reviewSection">
+    <h3 style="margin: 0 0 10px 0; color: var(--primary-color); text-align: center;">📝 Review Your Message</h3>
+    <p style="margin: 0 0 10px 0; color: var(--text-secondary); text-align: center;">
+        Review your transcription below. You can edit it before sending or delete it to try again.
+    </p>
+    
+    <div class="review-transcript" id="reviewTranscript" contenteditable="true">
+        <!-- Transcript will appear here -->
+    </div>
+    
+    <div class="review-buttons">
+        <button class="btn-success" onclick="sendReviewedMessage()">
+            ✅ Send Message
+        </button>
+        <button class="btn-warning" onclick="editTranscript()">
+            ✏️ Edit
+        </button>
+        <button class="btn-danger" onclick="deleteTranscript()">
+            🗑️ Delete & Retry
+        </button>
+    </div>
+</div>
                 
                 <!-- Status display area for system messages -->
                 <div id="status" class="status info" style="display: none; margin-top: 15px;"></div>
@@ -882,6 +946,8 @@
         let elevenlabsVoices = [];       // Store ElevenLabs voices
         let currentAudio = null;         // Current playing audio for ElevenLabs
         let currentSttProvider = 'browser'; // Current STT provider (browser or deepgram)
+        let recordingState = 'stopped'; // 'stopped', 'recording', 'reviewing'
+        let pendingTranscript = ''; // Store transcript for review
         let deepgramSocket = null; // WebSocket connection to Deepgram
         let deepgramApiKey = ''; // Deepgram API key
         let mediaRecorder = null; // MediaRecorder for Deepgram streaming
@@ -999,6 +1065,13 @@ function newSession() {
     
     // Update session info display
     updateSessionInfo();
+
+     // Reset recording state
+    recordingState = 'stopped';
+    pendingTranscript = '';
+    
+    // Hide review section
+    hideReviewSection();
     
     // Show confirmation
     showStatus(`✅ New session started! Session ID: ${sessionId}`, 'success');
@@ -1461,31 +1534,31 @@ function stopDeepgramRecording() {
                     updateTalkButton();
                 };
                 
-                // Handle when recognition ends
-                recognition.onend = function() {
-                    console.log('Recognition ended. Force stop:', forceStopRecognition);
-                    
-                    // If we're forcing a stop (user released button), process the transcript
-                    if (forceStopRecognition && fullTranscript.trim()) {
-                        console.log('Sending full transcript:', fullTranscript);
-                        addMessage(fullTranscript.trim(), 'user');
-                        sendToWebhook(fullTranscript.trim());
-                    }
-                    
-                    // Reset state
-                    isRecording = false;
-                    forceStopRecognition = false;
-                    updateTalkButton();
-                    
-                    // If recording should still be active (continuous mode), restart
-                    if (isRecording && !forceStopRecognition) {
-                        try {
-                            recognition.start();
-                        } catch (e) {
-                            console.log('Could not restart recognition:', e);
-                        }
-                    }
-                };
+               // Handle when recognition ends
+    recognition.onend = function() {
+    console.log('Recognition ended. Force stop:', forceStopRecognition, 'State:', recordingState);
+    
+    // If we were recording and stopped intentionally
+    if (recordingState === 'processing' && fullTranscript.trim()) {
+        console.log('Showing review for transcript:', fullTranscript);
+        showReviewSection(fullTranscript.trim());
+    } else if (recordingState === 'processing') {
+        // No transcript captured
+        showStatus('No speech detected. Please try again.', 'error');
+        recordingState = 'stopped';
+        updateTalkButton();
+    }
+    
+    // Reset recognition state
+    forceStopRecognition = false;
+    
+    // If recording was interrupted unexpectedly, reset state
+    if (recordingState === 'recording') {
+        showStatus('Recording was interrupted. Please try again.', 'error');
+        recordingState = 'stopped';
+        updateTalkButton();
+    }
+};
             } else {
                 showStatus('Speech recognition not supported in this browser', 'error');
             }
@@ -1541,10 +1614,18 @@ function stopDeepgramRecording() {
             document.getElementById('elevenlabsApiKey').addEventListener('change', saveConfig);
         }
         
-        // ===== RECORDING FUNCTIONS =====
-        // Handle push-to-talk functionality
-        
-        function startRecording() {
+        // ===== NEW RECORDING FUNCTIONS =====
+// Toggle recording start/stop functionality
+
+function toggleRecording() {
+    if (recordingState === 'stopped') {
+        startRecording();
+    } else if (recordingState === 'recording') {
+        stopRecording();
+    }
+}
+
+function startRecording() {
     if (currentSttProvider === 'deepgram') {
         // Use Deepgram
         if (!document.getElementById('deepgramApiKey').value) {
@@ -1569,22 +1650,23 @@ function stopDeepgramRecording() {
         }
         synthesis.cancel();
         
-        // Clear previous transcript
+        // Clear previous data
         fullTranscript = '';
+        pendingTranscript = '';
         document.getElementById('transcriptionBox').innerHTML = '<span style="color: var(--text-secondary);">Connecting to Deepgram...</span>';
         
-        isRecording = true;
+        recordingState = 'recording';
         updateTalkButton();
         
         startDeepgramRecording().then(success => {
             if (!success) {
-                isRecording = false;
+                recordingState = 'stopped';
                 updateTalkButton();
             }
         });
         
     } else {
-        // Use browser STT - COMPLETE CODE
+        // Use browser STT
         if (!recognition) {
             showStatus('Speech recognition not available', 'error');
             return;
@@ -1605,62 +1687,176 @@ function stopDeepgramRecording() {
             currentAudio.pause();
             currentAudio = null;
         }
-        
-        // Cancel any browser speech synthesis
         synthesis.cancel();
         
-        // Clear previous transcript and reset state
+        // Clear previous data
         fullTranscript = '';
+        pendingTranscript = '';
         forceStopRecognition = false;
         
         // Clear transcription box
         document.getElementById('transcriptionBox').innerHTML = '<span style="color: var(--text-secondary);">Listening...</span>';
         
-        isRecording = true;
+        recordingState = 'recording';
         updateTalkButton();
         
         try {
             recognition.start();
-            showStatus('Listening...', 'info');
+            showStatus('Recording... Click "Stop Recording" when finished', 'info');
         } catch (error) {
             console.error('Error starting recognition:', error);
             showStatus('Error starting recording', 'error');
-            isRecording = false;
+            recordingState = 'stopped';
             updateTalkButton();
         }
     }
 }
-        
-        function stopRecording() {
+
+function stopRecording() {
+    if (recordingState !== 'recording') {
+        return;
+    }
+    
     if (currentSttProvider === 'deepgram') {
-        if (isRecording) {
-            console.log('Stopping Deepgram recording...');
-            stopDeepgramRecording();
-            isRecording = false;
-            updateTalkButton();
-            showStatus('Processing...', 'info');
-        }
+        console.log('Stopping Deepgram recording...');
+        stopDeepgramRecording();
+        recordingState = 'processing';
+        updateTalkButton();
+        showStatus('Processing... Please wait', 'info');
+        
+        // Wait a moment for final transcript, then show review
+        setTimeout(() => {
+            if (fullTranscript.trim()) {
+                showReviewSection(fullTranscript.trim());
+            } else {
+                showStatus('No speech detected. Please try again.', 'error');
+                recordingState = 'stopped';
+                updateTalkButton();
+            }
+        }, 1000);
+        
     } else {
-        // Use existing browser STT code
-        if (isRecording && recognition) {
-            console.log('Stopping recording...');
+        // Browser STT
+        if (recognition) {
+            console.log('Stopping browser recording...');
             forceStopRecognition = true;
             recognition.stop();
-            showStatus('Processing...', 'info');
+            recordingState = 'processing';
+            updateTalkButton();
+            showStatus('Processing... Please wait', 'info');
         }
     }
 }
-        
-        function updateTalkButton() {
-            const button = document.getElementById('talkButton');
-            if (isRecording) {
-                button.classList.add('recording');
-                button.innerHTML = '🔴 Recording...';
-            } else {
-                button.classList.remove('recording');
-                button.innerHTML = 'Push to Talk';
-            }
-        }
+
+function updateTalkButton() {
+    const button = document.getElementById('talkButton');
+    
+    switch (recordingState) {
+        case 'stopped':
+            button.classList.remove('recording');
+            button.className = 'talk-button btn-success';
+            button.innerHTML = '🎤 Start Recording';
+            break;
+            
+        case 'recording':
+            button.classList.add('recording');
+            button.className = 'talk-button btn-danger recording';
+            button.innerHTML = '⏹️ Stop Recording';
+            break;
+            
+        case 'processing':
+            button.classList.remove('recording');
+            button.className = 'talk-button btn-warning';
+            button.innerHTML = '⏳ Processing...';
+            button.disabled = true;
+            break;
+            
+        case 'reviewing':
+            button.classList.remove('recording');
+            button.className = 'talk-button btn-info';
+            button.innerHTML = '📝 Reviewing...';
+            button.disabled = true;
+            break;
+    }
+}
+
+// ===== REVIEW SECTION FUNCTIONS =====
+function showReviewSection(transcript) {
+    pendingTranscript = transcript;
+    recordingState = 'reviewing';
+    updateTalkButton();
+    
+    // Update review transcript
+    document.getElementById('reviewTranscript').textContent = transcript;
+    
+    // Show review section
+    document.getElementById('reviewSection').classList.add('show');
+    
+    // Scroll to review section
+    document.getElementById('reviewSection').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+    });
+    
+    showStatus('Review your message above. Edit if needed, then click "Send Message"', 'info');
+}
+
+function sendReviewedMessage() {
+    const reviewedText = document.getElementById('reviewTranscript').textContent.trim();
+    
+    if (!reviewedText) {
+        showStatus('Message is empty. Please add some text or delete to try again.', 'error');
+        return;
+    }
+    
+    // Hide review section
+    hideReviewSection();
+    
+    // Add message to chat and send to webhook
+    addMessage(reviewedText, 'user');
+    sendToWebhook(reviewedText);
+    
+    // Reset state
+    recordingState = 'stopped';
+    updateTalkButton();
+    pendingTranscript = '';
+}
+
+function editTranscript() {
+    // Focus on the editable transcript
+    const transcriptElement = document.getElementById('reviewTranscript');
+    transcriptElement.focus();
+    
+    // Select all text for easy editing
+    const range = document.createRange();
+    range.selectNodeContents(transcriptElement);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    showStatus('Edit your message in the text box above, then click "Send Message"', 'info');
+}
+
+function deleteTranscript() {
+    // Hide review section
+    hideReviewSection();
+    
+    // Reset state for new recording
+    recordingState = 'stopped';
+    updateTalkButton();
+    pendingTranscript = '';
+    fullTranscript = '';
+    
+    // Clear transcription box
+    document.getElementById('transcriptionBox').innerHTML = '<span style="color: var(--text-secondary);">Transcription will appear here when you speak...</span>';
+    
+    showStatus('Message deleted. Click "Start Recording" to try again.', 'info');
+}
+
+function hideReviewSection() {
+    document.getElementById('reviewSection').classList.remove('show');
+    document.getElementById('talkButton').disabled = false;
+}
 
         // ===== GOOGLE SHEETS INTEGRATION =====
         // Load sheet names from Google Sheets
@@ -2631,6 +2827,13 @@ function stopDeepgramRecording() {
         }
         
         function clearChat() {
+            // Reset recording state and hide review
+            recordingState = 'stopped';
+            pendingTranscript = '';
+            hideReviewSection();
+    
+            document.getElementById('chatContainer').innerHTML = '';
+            conversationHistory = [];
             document.getElementById('chatContainer').innerHTML = '';
             conversationHistory = [];
             
@@ -2729,14 +2932,3 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
