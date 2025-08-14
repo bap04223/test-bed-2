@@ -1305,12 +1305,12 @@ function stopDeepgramRecording() {
             deepgramSocket = null;
         }
         
-        // Process final transcript
-        if (fullTranscript.trim()) {
-            console.log('Sending Deepgram transcript:', fullTranscript);
-            addMessage(fullTranscript.trim(), 'user');
-            sendToWebhook(fullTranscript.trim());
-        }
+        // Process final transcript - DO NOT auto-send, let the review process handle it
+if (fullTranscript.trim()) {
+    console.log('Deepgram transcript ready for review:', fullTranscript);
+    // The timeout in stopRecording() will call showReviewSection()
+    // Do NOT call addMessage or sendToWebhook here
+}
     }, 500);
 }
         
@@ -1535,13 +1535,14 @@ function stopDeepgramRecording() {
                 };
                 
                // Handle when recognition ends
-    recognition.onend = function() {
+recognition.onend = function() {
     console.log('Recognition ended. Force stop:', forceStopRecognition, 'State:', recordingState);
     
     // If we were recording and stopped intentionally
     if (recordingState === 'processing' && fullTranscript.trim()) {
         console.log('Showing review for transcript:', fullTranscript);
         showReviewSection(fullTranscript.trim());
+        // REMOVED: Do NOT send to webhook here - only show review
     } else if (recordingState === 'processing') {
         // No transcript captured
         showStatus('No speech detected. Please try again.', 'error');
@@ -2932,3 +2933,4 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
