@@ -937,6 +937,8 @@
         let connectionReady = false;
         let reconnectAttempts = 0;
         const MAX_RECONNECT_ATTEMPTS = 3;
+        let keepaliveInterval = null;
+        let connectionIdleTimeout = null;
         
         // ===== INITIALIZATION =====
         // This runs when the page loads
@@ -1336,25 +1338,31 @@ async function initializePersistentDeepgramConnection() {
         persistentDeepgramSocket.close();
     }
     
+    // Clear any existing intervals
+    if (keepaliveInterval) {
+        clearInterval(keepaliveInterval);
+        keepaliveInterval = null;
+    }
+    
+    if (connectionIdleTimeout) {
+        clearTimeout(connectionIdleTimeout);
+        connectionIdleTimeout = null;
+    }
+    
     const model = document.getElementById('deepgramModel').value;
     const language = document.getElementById('deepgramLanguage').value;
     
-    // Construct Deepgram WebSocket URL with optimized parameters for conversation
-const deepgramUrl = `wss://api.deepgram.com/v1/listen?` + 
-    `model=${model}&` +
-    `language=${language}&` +
-    `punctuate=true&` +
-    `interim_results=true&` +
-    `endpointing=false&` +        // Disable automatic endpointing to prevent timeouts
-    `vad_events=true&` +
-    `smart_format=true&` +
-    `filler_words=false&` +
-    `numerals=true&` +
-    `keep_alive=true&` +          // Keep connection alive
-    `utterance_end_ms=2000&` +    // Wait 2 seconds of silence before finalizing
-    `interim_results_frequency=200`; // Update interim results every 200ms
+    // Simplified Deepgram URL - remove problematic parameters
+    const deepgramUrl = `wss://api.deepgram.com/v1/listen?` + 
+        `model=${model}&` +
+        `language=${language}&` +
+        `punctuate=true&` +
+        `interim_results=true&` +
+        `smart_format=true&` +
+        `filler_words=false&` +
+        `numerals=true`;
     
-    console.log('Creating persistent Deepgram connection:', deepgramUrl);
+    console.log('Creating persistent Deepgram connection with simplified settings:', deepgramUrl);
     
     return new Promise((resolve, reject) => {
         try {
@@ -1365,6 +1373,20 @@ const deepgramUrl = `wss://api.deepgram.com/v1/listen?` +
                 console.log('Persistent Deepgram WebSocket connected');
                 connectionReady = true;
                 reconnectAttempts = 0;
+                
+                // Start keepalive ping every 10 seconds
+                keepaliveInterval = setInterval(() => {
+                    if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
+                        // Send a simple text keepalive message
+                        try {
+                            persistentDeepgramSocket.send(JSON.stringify({ type: 'KeepAlive' }));
+                            console.log('Sent keepalive to Deepgram');
+                        } catch (error) {
+                            console.error('Failed to send keepalive:', error);
+                        }
+                    }
+                }, 10000); // Every 10 seconds
+                
                 showStatus('Deepgram connected! Future recordings will start instantly.', 'success');
                 resolve(true);
             };
@@ -1386,6 +1408,7 @@ const deepgramUrl = `wss://api.deepgram.com/v1/listen?` +
                                 // Add to full transcript
                                 fullTranscript += transcript + ' ';
                                 reviewBox.textContent = fullTranscript.trim();
+                                console.log('Final Deepgram transcript segment:', transcript);
                             } else {
                                 // Show interim results
                                 let displayText = '';
@@ -1394,9 +1417,8 @@ const deepgramUrl = `wss://api.deepgram.com/v1/listen?` +
                                 }
                                 displayText += transcript;
                                 reviewBox.textContent = displayText;
+                                console.log('Interim Deepgram transcript:', transcript);
                             }
-                            
-                            console.log('Deepgram transcript:', transcript, 'Final:', isFinal);
                         }
                     } else if (data.type === 'Metadata') {
                         console.log('Deepgram metadata:', data);
@@ -1409,6 +1431,13 @@ const deepgramUrl = `wss://api.deepgram.com/v1/listen?` +
             persistentDeepgramSocket.onerror = (error) => {
                 console.error('Persistent Deepgram WebSocket error:', error);
                 connectionReady = false;
+                
+                // Clear intervals on error
+                if (keepaliveInterval) {
+                    clearInterval(keepaliveInterval);
+                    keepaliveInterval = null;
+                }
+                
                 showStatus('Deepgram connection error', 'error');
                 reject(error);
             };
@@ -1417,24 +1446,38 @@ const deepgramUrl = `wss://api.deepgram.com/v1/listen?` +
                 console.log('Persistent Deepgram WebSocket closed:', event.code, event.reason);
                 connectionReady = false;
                 
+                // Clear intervals on close
+                if (keepaliveInterval) {
+                    clearInterval(keepaliveInterval);
+                    keepaliveInterval = null;
+                }
+                
+                if (connectionIdleTimeout) {
+                    clearTimeout(connectionIdleTimeout);
+                    connectionIdleTimeout = null;
+                }
+                
                 // Auto-reconnect if not intentionally closed and within retry limit
-                if (event.code !== 1000 && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                if (event.code !== 1000 && event.code !== 1001 && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                     reconnectAttempts++;
                     console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+                    showStatus(`Reconnecting to Deepgram (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`, 'info');
                     setTimeout(() => {
                         initializePersistentDeepgramConnection();
-                    }, 2000 * reconnectAttempts); // Exponential backoff
+                    }, 2000 * reconnectAttempts);
                 } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
                     showStatus('Deepgram connection failed after multiple attempts', 'error');
+                } else {
+                    console.log('Deepgram connection closed intentionally');
                 }
             };
             
-            // Timeout after 10 seconds
+            // Timeout after 15 seconds
             setTimeout(() => {
                 if (!connectionReady) {
-                    reject(new Error('Connection timeout'));
+                    reject(new Error('Connection timeout - Deepgram took too long to respond'));
                 }
-            }, 10000);
+            }, 15000);
             
         } catch (error) {
             reject(error);
@@ -1444,13 +1487,13 @@ const deepgramUrl = `wss://api.deepgram.com/v1/listen?` +
 
 async function startOptimizedDeepgramRecording() {
     try {
-        // Check if connection is ready, if not, establish it (lazy loading)
+        // Check connection health first
         if (!persistentDeepgramSocket || persistentDeepgramSocket.readyState !== WebSocket.OPEN || !connectionReady) {
-            console.log('First-time Deepgram connection - establishing...');
-            showStatus('Connecting to Deepgram for the first time...', 'info');
-            await ensureDeepgramConnection(); // Use the updated ensureDeepgramConnection
+            console.log('Establishing new Deepgram connection...');
+            showStatus('Connecting to Deepgram...', 'info');
+            await ensureDeepgramConnection();
         } else {
-            console.log('Using existing persistent Deepgram connection');
+            console.log('Using existing healthy Deepgram connection');
         }
         
         // Clear any previous transcript data for this new recording
@@ -1475,26 +1518,22 @@ async function startOptimizedDeepgramRecording() {
             audioBitsPerSecond: 16000
         });
         
-        // Send audio data to Deepgram (connection already established!)
+        // Send audio data to Deepgram
         mediaRecorder.ondataavailable = (event) => {
             if (event.data.size > 0 && persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
                 persistentDeepgramSocket.send(event.data);
             }
         };
         
-        // Start recording immediately (after first connection, this will be instant!)
+        // Start recording
         mediaRecorder.start(100);
         
-        if (persistentDeepgramSocket && connectionReady) {
-            console.log('Deepgram recording started (connection was already ready)');
-        } else {
-            console.log('Deepgram recording started (new connection established)');
-        }
+        console.log('Deepgram recording started - connection will stay alive');
         
         return true;
     } catch (error) {
-        console.error('Error starting optimized Deepgram recording:', error);
-        showStatus('Error accessing microphone or connecting to Deepgram: ' + error.message, 'error');
+        console.error('Error starting Deepgram recording:', error);
+        showStatus('Error starting recording: ' + error.message, 'error');
         return false;
     }
 }
@@ -1514,18 +1553,32 @@ function stopOptimizedDeepgramRecording() {
         audioStream = null;
     }
     
-    // DON'T close the WebSocket and DON'T send CloseStream
-    // Just let Deepgram's endpointing handle the silence detection
-    // The connection stays open for the next recording session
+    // DON'T close the WebSocket - keepalive will maintain it
+    console.log('Audio recording stopped, WebSocket connection maintained with keepalive');
     
-    console.log('Audio recording stopped, WebSocket connection maintained for next use');
+    // Set a timeout to automatically close connection if idle for too long (5 minutes)
+    if (connectionIdleTimeout) {
+        clearTimeout(connectionIdleTimeout);
+    }
     
-    // Process final transcript after a small delay to ensure final results arrive
+    connectionIdleTimeout = setTimeout(() => {
+        console.log('Closing Deepgram connection due to 5 minutes of inactivity');
+        closeDeepgramConnection();
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    // Process final transcript after a delay
     setTimeout(() => {
         if (fullTranscript.trim()) {
-            console.log('Optimized Deepgram transcript ready for review:', fullTranscript);
+            console.log('Deepgram transcript ready for review:', fullTranscript);
+            // FIXED: Make sure showReviewSection is called properly
+            showReviewSection(fullTranscript.trim());
+        } else {
+            console.log('No transcript captured during this recording session');
+            showStatus('No speech detected. Please try again.', 'error');
+            recordingState = 'stopped';
+            updateTalkButton();
         }
-    }, 500);
+    }, 1000);
 }
 
 function ensureDeepgramConnection() {
@@ -1541,11 +1594,37 @@ function ensureDeepgramConnection() {
 }
 
 function closeDeepgramConnection() {
-    // Call this when changing providers or ending session
+    console.log('Closing Deepgram connection...');
+    
+    // Clear all intervals and timeouts
+    if (keepaliveInterval) {
+        clearInterval(keepaliveInterval);
+        keepaliveInterval = null;
+    }
+    
+    if (connectionIdleTimeout) {
+        clearTimeout(connectionIdleTimeout);
+        connectionIdleTimeout = null;
+    }
+    
+    // Stop any ongoing recording first
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        mediaRecorder = null;
+    }
+    
+    // Stop audio stream
+    if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        audioStream = null;
+    }
+    
+    // Close the persistent connection
     if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
         connectionReady = false;
-        persistentDeepgramSocket.close(1000, 'Provider changed or session ended');
+        persistentDeepgramSocket.close(1000, 'Connection intentionally closed');
         persistentDeepgramSocket = null;
+        console.log('Deepgram connection closed');
     }
 }
         
@@ -1957,22 +2036,14 @@ function stopRecording() {
     }
     
     if (currentSttProvider === 'deepgram') {
-        console.log('Stopping optimized Deepgram recording...');
-        stopOptimizedDeepgramRecording();
-        recordingState = 'processing';
-        updateTalkButton();
-        showStatus('Processing... Please wait', 'info');
-        
-        // Wait a moment for final transcript, then show review
-        setTimeout(() => {
-            if (fullTranscript.trim()) {
-                showReviewSection(fullTranscript.trim());
-            } else {
-                showStatus('No speech detected. Please try again.', 'error');
-                recordingState = 'stopped';
-                updateTalkButton();
-            }
-        }, 1000);
+    console.log('Stopping Deepgram recording...');
+    recordingState = 'processing';
+    updateTalkButton();
+    showStatus('Processing... Please wait', 'info');
+    
+    // Stop the recording (this will handle showing the review section)
+    stopOptimizedDeepgramRecording();
+}
         
     } else {
         // Browser STT
@@ -3192,6 +3263,7 @@ window.addEventListener('beforeunload', function() {
     </script>
 </body>
 </html>
+
 
 
 
