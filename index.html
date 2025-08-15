@@ -1339,18 +1339,20 @@ async function initializePersistentDeepgramConnection() {
     const model = document.getElementById('deepgramModel').value;
     const language = document.getElementById('deepgramLanguage').value;
     
-    // Construct Deepgram WebSocket URL with keep_alive parameter
-    const deepgramUrl = `wss://api.deepgram.com/v1/listen?` + 
-        `model=${model}&` +
-        `language=${language}&` +
-        `punctuate=true&` +
-        `interim_results=true&` +
-        `endpointing=300&` +
-        `vad_events=true&` +
-        `smart_format=true&` +
-        `filler_words=false&` +
-        `numerals=true&` +
-        `keep_alive=true`; // Important: keeps connection alive
+    // Construct Deepgram WebSocket URL with optimized parameters for conversation
+const deepgramUrl = `wss://api.deepgram.com/v1/listen?` + 
+    `model=${model}&` +
+    `language=${language}&` +
+    `punctuate=true&` +
+    `interim_results=true&` +
+    `endpointing=false&` +        // Disable automatic endpointing to prevent timeouts
+    `vad_events=true&` +
+    `smart_format=true&` +
+    `filler_words=false&` +
+    `numerals=true&` +
+    `keep_alive=true&` +          // Keep connection alive
+    `utterance_end_ms=2000&` +    // Wait 2 seconds of silence before finalizing
+    `interim_results_frequency=200`; // Update interim results every 200ms
     
     console.log('Creating persistent Deepgram connection:', deepgramUrl);
     
@@ -3190,6 +3192,7 @@ window.addEventListener('beforeunload', function() {
     </script>
 </body>
 </html>
+
 
 
 
