@@ -297,12 +297,29 @@
         
         /* Status indicator */
         .status {
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            margin-top: 10px;
-            text-align: center;
-        }
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 300px;
+    max-width: 90%;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+}
+
+.status[style*="block"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
         
         .status.success {
             background-color: #d1fae5;
@@ -2912,6 +2929,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
