@@ -931,34 +931,47 @@
         let deepgramApiKey = ''; // Deepgram API key
         let mediaRecorder = null; // MediaRecorder for Deepgram streaming
         let audioStream = null; // Audio stream from microphone
+
+        // ===== PERSISTENT DEEPGRAM CONNECTION VARIABLES =====
+        let persistentDeepgramSocket = null;
+        let connectionReady = false;
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 3;
         
         // ===== INITIALIZATION =====
         // This runs when the page loads
         
         window.onload = function() {
-            // Generate unique session ID for this training session
-            generateSessionId();
-            
-            // Initialize speech recognition if available
-            initializeSpeechRecognition();
-            
-            // Load available voices for text-to-speech
-            loadVoices();
-            
-            // Set up event listeners
-            setupEventListeners();
-            
-            // Load saved configuration from localStorage
-            loadSavedConfig();
-            
-            // Display session info
-            displaySessionInfo();
+    // Generate unique session ID for this training session
+    generateSessionId();
+    
+    // Initialize speech recognition if available
+    initializeSpeechRecognition();
+    
+    // Load available voices for text-to-speech
+    loadVoices();
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Load saved configuration from localStorage
+    loadSavedConfig();
+    
+    // Display session info
+    displaySessionInfo();
 
-            // Add this to setupEventListeners function:
-          document.getElementById('deepgramApiKey').addEventListener('change', saveConfig);
-          document.getElementById('deepgramModel').addEventListener('change', saveConfig);
-          document.getElementById('deepgramLanguage').addEventListener('change', saveConfig);
-        };
+    // Add this to setupEventListeners function:
+    document.getElementById('deepgramApiKey').addEventListener('change', saveConfig);
+    document.getElementById('deepgramModel').addEventListener('change', saveConfig);
+    document.getElementById('deepgramLanguage').addEventListener('change', saveConfig);
+    
+    // Initialize Deepgram connection if it's the saved provider
+    setTimeout(() => {
+        if (currentSttProvider === 'deepgram') {
+            ensureDeepgramConnection();
+        }
+    }, 1000); // Small delay to ensure DOM is fully loaded
+};
         
         // ===== SESSION MANAGEMENT =====
         // Generate and manage unique session IDs
@@ -1000,35 +1013,38 @@ function newSession() {
     transcriptionBox.innerHTML = '<span style="color: var(--text-secondary);">Transcription will appear here when you speak...</span>';
     
     // Reset recording state
-    if (isRecording) {
-        if (currentSttProvider === 'deepgram') {
-            stopDeepgramRecording();
-        } else if (recognition) {
-            forceStopRecognition = true;
-            recognition.stop();
-        }
+    // Reset recording state
+if (isRecording) {
+    if (currentSttProvider === 'deepgram') {
+        stopOptimizedDeepgramRecording(); // This keeps connection open
+    } else if (recognition) {
+        forceStopRecognition = true;
+        recognition.stop();
     }
-    
-    // Reset recording variables
-    isRecording = false;
-    fullTranscript = '';
-    forceStopRecognition = false;
-    
-    // Update talk button
-    updateTalkButton();
-    
-    // Stop any playing audio
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
-    synthesis.cancel();
-    
-    // Close any WebSocket connections
-    if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
-        deepgramSocket.close();
-        deepgramSocket = null;
-    }
+}
+
+// Reset recording variables
+isRecording = false;
+fullTranscript = '';
+forceStopRecognition = false;
+
+// Update talk button
+updateTalkButton();
+
+// Stop any playing audio
+if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+}
+synthesis.cancel();
+
+// Keep Deepgram connection alive - don't close it!
+// Only close the old deepgramSocket if it exists
+if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
+    deepgramSocket.close();
+    deepgramSocket = null;
+}
+// Note: persistentDeepgramSocket stays open for instant next recording
     
     // Stop any media streams
     if (audioStream) {
@@ -1056,7 +1072,12 @@ function newSession() {
     hideReviewSection();
     
     // Show confirmation
+    // Show confirmation with connection status
+if (currentSttProvider === 'deepgram' && persistentDeepgramSocket && connectionReady) {
+    showStatus(`✅ New session started! Deepgram ready for instant recording.`, 'success');
+} else {
     showStatus(`✅ New session started! Session ID: ${sessionId}`, 'success');
+}
     
     // Add welcome message if scenario is selected
     if (currentScenario) {
@@ -1104,6 +1125,11 @@ function updateSessionInfo() {
 
         // ===== STT PROVIDER MANAGEMENT =====
 function selectSttProvider(provider) {
+    // Close existing Deepgram connection if switching away
+    if (currentSttProvider === 'deepgram' && provider !== 'deepgram') {
+        closeDeepgramConnection();
+    }
+    
     currentSttProvider = provider;
     
     // Update UI
@@ -1112,6 +1138,11 @@ function selectSttProvider(provider) {
     
     // Show/hide settings
     document.getElementById('deepgramSettings').style.display = provider === 'deepgram' ? 'block' : 'none';
+    
+    // Establish connection if switching to Deepgram
+    if (provider === 'deepgram') {
+        ensureDeepgramConnection();
+    }
     
     // Save preference
     saveConfig();
@@ -1294,6 +1325,223 @@ if (fullTranscript.trim()) {
     // Do NOT call addMessage or sendToWebhook here
 }
     }, 500);
+}
+
+// ===== PERSISTENT DEEPGRAM CONNECTION FUNCTIONS =====
+async function initializePersistentDeepgramConnection() {
+    const apiKey = document.getElementById('deepgramApiKey').value;
+    
+    if (!apiKey) {
+        showStatus('Please enter your Deepgram API key first', 'error');
+        return false;
+    }
+    
+    // Close existing connection if any
+    if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
+        persistentDeepgramSocket.close();
+    }
+    
+    const model = document.getElementById('deepgramModel').value;
+    const language = document.getElementById('deepgramLanguage').value;
+    
+    // Construct Deepgram WebSocket URL with keep_alive parameter
+    const deepgramUrl = `wss://api.deepgram.com/v1/listen?` + 
+        `model=${model}&` +
+        `language=${language}&` +
+        `punctuate=true&` +
+        `interim_results=true&` +
+        `endpointing=300&` +
+        `vad_events=true&` +
+        `smart_format=true&` +
+        `filler_words=false&` +
+        `numerals=true&` +
+        `keep_alive=true`; // Important: keeps connection alive
+    
+    console.log('Creating persistent Deepgram connection:', deepgramUrl);
+    
+    return new Promise((resolve, reject) => {
+        try {
+            persistentDeepgramSocket = new WebSocket(deepgramUrl, ['token', apiKey]);
+            connectionReady = false;
+            
+            persistentDeepgramSocket.onopen = () => {
+                console.log('Persistent Deepgram WebSocket connected');
+                connectionReady = true;
+                reconnectAttempts = 0;
+                showStatus('Deepgram ready for instant recording', 'success');
+                resolve(true);
+            };
+            
+            persistentDeepgramSocket.onmessage = (message) => {
+                try {
+                    const data = JSON.parse(message.data);
+                    
+                    if (data.type === 'Results') {
+                        const transcript = data.channel.alternatives[0].transcript;
+                        
+                        if (transcript && transcript.trim() !== '') {
+                            const isFinal = data.is_final;
+                            
+                            // Update transcription display
+                            const reviewBox = document.getElementById('reviewTranscript');
+                            
+                            if (isFinal) {
+                                // Add to full transcript
+                                fullTranscript += transcript + ' ';
+                                reviewBox.textContent = fullTranscript.trim();
+                            } else {
+                                // Show interim results
+                                let displayText = '';
+                                if (fullTranscript) {
+                                    displayText += fullTranscript.trim() + ' ';
+                                }
+                                displayText += transcript;
+                                reviewBox.textContent = displayText;
+                            }
+                            
+                            console.log('Deepgram transcript:', transcript, 'Final:', isFinal);
+                        }
+                    } else if (data.type === 'Metadata') {
+                        console.log('Deepgram metadata:', data);
+                    }
+                } catch (error) {
+                    console.error('Error parsing Deepgram message:', error);
+                }
+            };
+            
+            persistentDeepgramSocket.onerror = (error) => {
+                console.error('Persistent Deepgram WebSocket error:', error);
+                connectionReady = false;
+                showStatus('Deepgram connection error', 'error');
+                reject(error);
+            };
+            
+            persistentDeepgramSocket.onclose = (event) => {
+                console.log('Persistent Deepgram WebSocket closed:', event.code, event.reason);
+                connectionReady = false;
+                
+                // Auto-reconnect if not intentionally closed and within retry limit
+                if (event.code !== 1000 && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    reconnectAttempts++;
+                    console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+                    setTimeout(() => {
+                        initializePersistentDeepgramConnection();
+                    }, 2000 * reconnectAttempts); // Exponential backoff
+                } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+                    showStatus('Deepgram connection failed after multiple attempts', 'error');
+                }
+            };
+            
+            // Timeout after 10 seconds
+            setTimeout(() => {
+                if (!connectionReady) {
+                    reject(new Error('Connection timeout'));
+                }
+            }, 10000);
+            
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+async function startOptimizedDeepgramRecording() {
+    try {
+        // Check if connection is ready, if not, establish it
+        if (!persistentDeepgramSocket || persistentDeepgramSocket.readyState !== WebSocket.OPEN || !connectionReady) {
+            console.log('Establishing Deepgram connection...');
+            showStatus('Connecting to Deepgram...', 'info');
+            await initializePersistentDeepgramConnection();
+        }
+        
+        // Get microphone access
+        audioStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                channelCount: 1,
+                sampleRate: 16000,
+                sampleSize: 16,
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            } 
+        });
+        
+        // Create MediaRecorder to capture audio
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/wav';
+        mediaRecorder = new MediaRecorder(audioStream, { 
+            mimeType: mimeType,
+            audioBitsPerSecond: 16000
+        });
+        
+        // Send audio data to Deepgram (connection already established!)
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0 && persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
+                persistentDeepgramSocket.send(event.data);
+            }
+        };
+        
+        // Start recording immediately - no connection delay!
+        mediaRecorder.start(100);
+        console.log('Optimized Deepgram recording started instantly');
+        
+        return true;
+    } catch (error) {
+        console.error('Error starting optimized Deepgram recording:', error);
+        showStatus('Error accessing microphone: ' + error.message, 'error');
+        return false;
+    }
+}
+
+function stopOptimizedDeepgramRecording() {
+    console.log('Stopping optimized Deepgram recording...');
+    
+    // Stop media recorder
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        mediaRecorder = null;
+    }
+    
+    // Stop audio stream
+    if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        audioStream = null;
+    }
+    
+    // DON'T close the WebSocket - keep it open for next recording!
+    // Just send a finalize message if supported
+    if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
+        try {
+            // Send finalize message to indicate end of current stream
+            persistentDeepgramSocket.send(JSON.stringify({type: 'CloseStream'}));
+        } catch (error) {
+            console.log('Could not send CloseStream message:', error);
+        }
+    }
+    
+    // Process final transcript after a small delay
+    setTimeout(() => {
+        if (fullTranscript.trim()) {
+            console.log('Optimized Deepgram transcript ready for review:', fullTranscript);
+        }
+    }, 500);
+}
+
+function ensureDeepgramConnection() {
+    // Call this when STT provider is changed to Deepgram
+    if (currentSttProvider === 'deepgram') {
+        initializePersistentDeepgramConnection().catch(error => {
+            console.error('Failed to establish persistent connection:', error);
+        });
+    }
+}
+
+function closeDeepgramConnection() {
+    // Call this when changing providers or ending session
+    if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
+        connectionReady = false;
+        persistentDeepgramSocket.close(1000, 'Provider changed or session ended');
+        persistentDeepgramSocket = null;
+    }
 }
         
         // ===== ELEVENLABS INTEGRATION =====
@@ -1610,7 +1858,7 @@ function toggleRecording() {
 
 function startRecording() {
     if (currentSttProvider === 'deepgram') {
-        // Use Deepgram
+        // Use optimized Deepgram with persistent connection
         if (!document.getElementById('deepgramApiKey').value) {
             showStatus('Please enter Deepgram API key first', 'error');
             return;
@@ -1636,13 +1884,16 @@ function startRecording() {
         // Clear previous data
         fullTranscript = '';
         pendingTranscript = '';
-        document.getElementById('reviewTranscript').innerHTML = 'Connecting to Deepgram...';
+        document.getElementById('reviewTranscript').innerHTML = 'Listening...';
         
         recordingState = 'recording';
         updateTalkButton();
         
-        startDeepgramRecording().then(success => {
-            if (!success) {
+        // Start recording with optimized connection
+        startOptimizedDeepgramRecording().then(success => {
+            if (success) {
+                showStatus('Recording started instantly!', 'success');
+            } else {
                 recordingState = 'stopped';
                 updateTalkButton();
             }
@@ -1701,8 +1952,8 @@ function stopRecording() {
     }
     
     if (currentSttProvider === 'deepgram') {
-        console.log('Stopping Deepgram recording...');
-        stopDeepgramRecording();
+        console.log('Stopping optimized Deepgram recording...');
+        stopOptimizedDeepgramRecording();
         recordingState = 'processing';
         updateTalkButton();
         showStatus('Processing... Please wait', 'info');
@@ -2929,6 +3180,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
