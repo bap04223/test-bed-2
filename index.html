@@ -2036,14 +2036,13 @@ function stopRecording() {
     }
     
     if (currentSttProvider === 'deepgram') {
-    console.log('Stopping Deepgram recording...');
-    recordingState = 'processing';
-    updateTalkButton();
-    showStatus('Processing... Please wait', 'info');
-    
-    // Stop the recording (this will handle showing the review section)
-    stopOptimizedDeepgramRecording();
-}
+        console.log('Stopping Deepgram recording...');
+        recordingState = 'processing';
+        updateTalkButton();
+        showStatus('Processing... Please wait', 'info');
+        
+        // Stop the recording (this will handle showing the review section)
+        stopOptimizedDeepgramRecording();
         
     } else {
         // Browser STT
@@ -3263,6 +3262,7 @@ window.addEventListener('beforeunload', function() {
     </script>
 </body>
 </html>
+
 
 
 
