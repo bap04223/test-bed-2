@@ -965,12 +965,6 @@
     document.getElementById('deepgramModel').addEventListener('change', saveConfig);
     document.getElementById('deepgramLanguage').addEventListener('change', saveConfig);
     
-    // Initialize Deepgram connection if it's the saved provider
-    setTimeout(() => {
-        if (currentSttProvider === 'deepgram') {
-            ensureDeepgramConnection();
-        }
-    }, 1000); // Small delay to ensure DOM is fully loaded
 };
         
         // ===== SESSION MANAGEMENT =====
@@ -1139,9 +1133,10 @@ function selectSttProvider(provider) {
     // Show/hide settings
     document.getElementById('deepgramSettings').style.display = provider === 'deepgram' ? 'block' : 'none';
     
-    // Establish connection if switching to Deepgram
+    // DON'T establish connection here - wait until user actually starts recording
+    // Just show that Deepgram is selected
     if (provider === 'deepgram') {
-        ensureDeepgramConnection();
+        showStatus('Deepgram selected - connection will be established when you start recording', 'info');
     }
     
     // Save preference
@@ -1368,7 +1363,7 @@ async function initializePersistentDeepgramConnection() {
                 console.log('Persistent Deepgram WebSocket connected');
                 connectionReady = true;
                 reconnectAttempts = 0;
-                showStatus('Deepgram ready for instant recording', 'success');
+                showStatus('Deepgram connected! Future recordings will start instantly.', 'success');
                 resolve(true);
             };
             
@@ -1447,14 +1442,17 @@ async function initializePersistentDeepgramConnection() {
 
 async function startOptimizedDeepgramRecording() {
     try {
-        // Check if connection is ready, if not, establish it
+        // Check if connection is ready, if not, establish it (lazy loading)
         if (!persistentDeepgramSocket || persistentDeepgramSocket.readyState !== WebSocket.OPEN || !connectionReady) {
-            console.log('Establishing Deepgram connection...');
-            showStatus('Connecting to Deepgram...', 'info');
-            await initializePersistentDeepgramConnection();
-            // Clear any previous transcript data for this new recording
-            fullTranscript = '';
+            console.log('First-time Deepgram connection - establishing...');
+            showStatus('Connecting to Deepgram for the first time...', 'info');
+            await ensureDeepgramConnection(); // Use the updated ensureDeepgramConnection
+        } else {
+            console.log('Using existing persistent Deepgram connection');
         }
+        
+        // Clear any previous transcript data for this new recording
+        fullTranscript = '';
         
         // Get microphone access
         audioStream = await navigator.mediaDevices.getUserMedia({ 
@@ -1482,14 +1480,19 @@ async function startOptimizedDeepgramRecording() {
             }
         };
         
-        // Start recording immediately - no connection delay!
+        // Start recording immediately (after first connection, this will be instant!)
         mediaRecorder.start(100);
-        console.log('Optimized Deepgram recording started instantly');
+        
+        if (persistentDeepgramSocket && connectionReady) {
+            console.log('Deepgram recording started (connection was already ready)');
+        } else {
+            console.log('Deepgram recording started (new connection established)');
+        }
         
         return true;
     } catch (error) {
         console.error('Error starting optimized Deepgram recording:', error);
-        showStatus('Error accessing microphone: ' + error.message, 'error');
+        showStatus('Error accessing microphone or connecting to Deepgram: ' + error.message, 'error');
         return false;
     }
 }
@@ -1524,12 +1527,15 @@ function stopOptimizedDeepgramRecording() {
 }
 
 function ensureDeepgramConnection() {
-    // Call this when STT provider is changed to Deepgram
-    if (currentSttProvider === 'deepgram') {
-        initializePersistentDeepgramConnection().catch(error => {
+    // Only establish connection if Deepgram is selected and no connection exists
+    if (currentSttProvider === 'deepgram' && (!persistentDeepgramSocket || persistentDeepgramSocket.readyState !== WebSocket.OPEN)) {
+        console.log('Lazy loading Deepgram connection on first use...');
+        return initializePersistentDeepgramConnection().catch(error => {
             console.error('Failed to establish persistent connection:', error);
+            throw error; // Re-throw so calling code can handle it
         });
     }
+    return Promise.resolve(true); // Connection already exists
 }
 
 function closeDeepgramConnection() {
@@ -3184,6 +3190,7 @@ window.addEventListener('beforeunload', function() {
     </script>
 </body>
 </html>
+
 
 
 
