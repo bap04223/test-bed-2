@@ -1452,6 +1452,8 @@ async function startOptimizedDeepgramRecording() {
             console.log('Establishing Deepgram connection...');
             showStatus('Connecting to Deepgram...', 'info');
             await initializePersistentDeepgramConnection();
+            // Clear any previous transcript data for this new recording
+            fullTranscript = '';
         }
         
         // Get microphone access
@@ -1507,18 +1509,13 @@ function stopOptimizedDeepgramRecording() {
         audioStream = null;
     }
     
-    // DON'T close the WebSocket - keep it open for next recording!
-    // Just send a finalize message if supported
-    if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
-        try {
-            // Send finalize message to indicate end of current stream
-            persistentDeepgramSocket.send(JSON.stringify({type: 'CloseStream'}));
-        } catch (error) {
-            console.log('Could not send CloseStream message:', error);
-        }
-    }
+    // DON'T close the WebSocket and DON'T send CloseStream
+    // Just let Deepgram's endpointing handle the silence detection
+    // The connection stays open for the next recording session
     
-    // Process final transcript after a small delay
+    console.log('Audio recording stopped, WebSocket connection maintained for next use');
+    
+    // Process final transcript after a small delay to ensure final results arrive
     setTimeout(() => {
         if (fullTranscript.trim()) {
             console.log('Optimized Deepgram transcript ready for review:', fullTranscript);
@@ -3177,9 +3174,17 @@ if (config.deepgramLanguage) {
                 }
             }
         }
+
+        // Add cleanup when page is unloaded
+window.addEventListener('beforeunload', function() {
+    console.log('Page unloading, cleaning up Deepgram connection...');
+    closeDeepgramConnection();
+});
+        
     </script>
 </body>
 </html>
+
 
 
 
