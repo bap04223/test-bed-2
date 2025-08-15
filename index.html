@@ -587,29 +587,29 @@
         <div class="header">
             <h2>📋 Instructions</h2>
             <div class="instructions-container">
-                <div class="instructions-column">
-                    <ol>
-            <li>Enter your n8n webhook URLs in the Configuration section</li>
-            <li>Load your Google Sheet with patient scenarios</li>
-            <li>Select a patient scenario from the dropdown (or choose random)</li>
-        </ol>
-    </div>
-    <div class="instructions-column" style="flex: 1;">
-        <ol start="4">
-            <li>Choose your TTS provider (Browser or ElevenLabs)</li>
-            <li>Adjust voice settings as needed</li>
-            <li>Hold down the "Push to Talk" button and speak your consultation</li>
-        </ol>
-    </div>
-    <div class="instructions-column" style="flex: 1;">
-        <ol start="7">
-            <li>The AI patient will respond both in text and speech</li>
-            <li>Use "Submit Conversation" to get evaluation feedback</li>
-            <li>IMPORTANT - refresh the browser after each scenario to generate a new session id</li>
-        </ol>
-                </div>
+    <div class="instructions-column">
+        <ol>
+<li>Enter your n8n webhook URLs in the Configuration section</li>
+<li>Load your Google Sheet with patient scenarios</li>
+<li>Select a patient scenario from the dropdown (or choose random)</li>
+</ol>
+</div>
+<div class="instructions-column" style="flex: 1;">
+    <ol start="4">
+        <li>Choose your TTS and STT providers (Browser or ElevenLabs/Deepgram)</li>
+        <li>Adjust voice and speech recognition settings as needed</li>
+        <li>Click "Start Recording" to begin speaking your consultation</li>
+    </ol>
+</div>
+<div class="instructions-column" style="flex: 1;">
+    <ol start="7">
+        <li>Live transcription appears in the review box as you speak</li>
+        <li>Review, edit if needed, then click "Send Message"</li>
+        <li>Use "Submit Conversation" to get evaluation feedback</li>
+    </ol>
+</div>
             </div>
-            <p><strong>Tips:</strong> Speak clearly, ask open-ended questions, and practice active listening skills!</p>
+            <p><strong>Tips:</strong> Speak slowly and clearly, review your transcriptions before sending, ask open-ended questions, and practice active listening skills!</p>
         </div>
         
            
@@ -2929,6 +2929,7 @@ if (config.deepgramLanguage) {
     </script>
 </body>
 </html>
+
 
 
 
