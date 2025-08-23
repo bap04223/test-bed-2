@@ -3024,61 +3024,52 @@ document.addEventListener('keydown', function(event) {
 // ===== KEYBOARD SHORTCUTS =====
 // Global keyboard event handler for shortcuts
 document.addEventListener('keydown', function(event) {
-    console.log('Key pressed:', event.key, 'Code:', event.code, 'Active element:', document.activeElement.tagName);
+    console.log('Key pressed:', event.key, 'Code:', event.code, 'Active element:', document.activeElement.tagName, 'ID:', document.activeElement.id);
     
-    // Check if user is typing in an input field or content-editable area
+    // Check if user is typing in a text input field (but allow shortcuts for dropdowns)
     const activeElement = document.activeElement;
-    const isInputField = activeElement.tagName === 'INPUT' || 
-                       activeElement.tagName === 'TEXTAREA' || 
-                       activeElement.tagName === 'SELECT' ||
+    const isTextInput = (activeElement.tagName === 'INPUT' && 
+                        (activeElement.type === 'text' || 
+                         activeElement.type === 'password' || 
+                         activeElement.type === 'email' || 
+                         activeElement.type === 'search')) || 
+                       activeElement.tagName === 'TEXTAREA' ||
                        activeElement.contentEditable === 'true';
     
-    console.log('Is input field:', isInputField, 'Recording state:', recordingState);
+    console.log('Is text input:', isTextInput, 'Recording state:', recordingState);
     
-    // Space bar for start/stop recording (only when not typing in input fields)
-    if (event.code === 'Space' && !isInputField) {
+    // Space bar for start/stop recording (allow when not typing in text inputs)
+    if (event.code === 'Space' && !isTextInput) {
         console.log('Spacebar detected - attempting to toggle recording');
         event.preventDefault(); // Prevent page scrolling
         const talkButton = document.getElementById('talkButton');
         
         if (talkButton) {
             console.log('Talk button found, disabled:', talkButton.disabled);
-            // Only handle if talk button is enabled
             if (!talkButton.disabled) {
                 console.log('Calling toggleRecording()');
                 toggleRecording();
-            } else {
-                console.log('Talk button is disabled');
             }
-        } else {
-            console.log('Talk button not found!');
         }
         return;
     }
     
-    // Enter key for sending message (only when reviewing transcript)
+    // Enter key for sending message
     if (event.key === 'Enter' && !event.shiftKey) {
         console.log('Enter key detected, recording state:', recordingState);
         const sendButton = document.getElementById('sendBtn');
         
-        if (sendButton) {
-            console.log('Send button found, disabled:', sendButton.disabled);
-            // Only send if we're in review mode and button is enabled
-            if (recordingState === 'reviewing' && !sendButton.disabled) {
-                console.log('Calling sendReviewedMessage()');
-                event.preventDefault();
-                sendReviewedMessage();
-                return;
-            } else {
-                console.log('Not in reviewing state or button disabled');
-            }
-        } else {
-            console.log('Send button not found!');
-        }
-        
-        // If editing transcript and Enter is pressed, allow normal behavior
+        // Special case: if editing the review transcript, allow Enter for line breaks
         if (activeElement.id === 'reviewTranscript') {
             console.log('In transcript editing mode - allowing normal Enter behavior');
+            return;
+        }
+        
+        // Send message if in review mode and not typing in a text input
+        if (recordingState === 'reviewing' && sendButton && !sendButton.disabled && !isTextInput) {
+            console.log('Calling sendReviewedMessage()');
+            event.preventDefault();
+            sendReviewedMessage();
             return;
         }
     }
@@ -3988,6 +3979,7 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
+
 
 
 
