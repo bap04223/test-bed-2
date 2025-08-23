@@ -2107,13 +2107,16 @@ function showReviewSection(transcript) {
     document.getElementById('editBtn').disabled = false;
     document.getElementById('deleteBtn').disabled = false;
     
+    // Show keyboard shortcuts hint
+    showKeyboardHints();
+    
     // Scroll to review section
     document.getElementById('reviewSection').scrollIntoView({ 
         behavior: 'smooth', 
         block: 'center' 
     });
     
-    showStatus('Review your message above. Edit if needed, then click "Send Message"', 'info');
+    showStatus('Review your message above. Edit if needed, then click "Send Message" or press ENTER', 'info');
 }
 
 function sendReviewedMessage() {
@@ -2171,6 +2174,12 @@ document.getElementById('reviewTranscript').textContent = 'No message to review 
 function hideReviewSection() {
     document.getElementById('reviewSection').classList.remove('active');
     document.getElementById('reviewTranscript').textContent = 'No message to review yet';
+    
+    // Remove keyboard hints if they exist
+    const hintsDiv = document.querySelector('.keyboard-hints');
+    if (hintsDiv) {
+        hintsDiv.remove();
+    }
     
     // Disable buttons
     document.getElementById('sendBtn').disabled = true;
@@ -3005,12 +3014,74 @@ function updatePatientImageButton() {
             modal.classList.remove('show');
         }
         
-        // Add keyboard support for modal
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeImageModal();
-            }
-        });
+        // Add keyboard support for modal and shortcuts
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeImageModal();
+    }
+});
+
+// ===== KEYBOARD SHORTCUTS =====
+// Global keyboard event handler for shortcuts
+document.addEventListener('keydown', function(event) {
+    // Check if user is typing in an input field or content-editable area
+    const activeElement = document.activeElement;
+    const isInputField = activeElement.tagName === 'INPUT' || 
+                       activeElement.tagName === 'TEXTAREA' || 
+                       activeElement.tagName === 'SELECT' ||
+                       activeElement.contentEditable === 'true';
+    
+    // Space bar for start/stop recording (only when not typing in input fields)
+    if (event.code === 'Space' && !isInputField) {
+        event.preventDefault(); // Prevent page scrolling
+        const talkButton = document.getElementById('talkButton');
+        
+        // Only handle if talk button is enabled
+        if (!talkButton.disabled) {
+            toggleRecording();
+        }
+        return;
+    }
+    
+    // Enter key for sending message (only when reviewing transcript)
+    if (event.key === 'Enter' && !event.shiftKey) {
+        const sendButton = document.getElementById('sendBtn');
+        
+        // Only send if we're in review mode and button is enabled
+        if (recordingState === 'reviewing' && !sendButton.disabled) {
+            event.preventDefault();
+            sendReviewedMessage();
+            return;
+        }
+        
+        // If editing transcript and Enter is pressed, allow normal behavior
+        // (new line in contenteditable)
+        if (activeElement.id === 'reviewTranscript') {
+            // Allow Enter for line breaks in transcript editing
+            return;
+        }
+    }
+});
+
+// Show keyboard shortcuts in UI
+function showKeyboardHints() {
+    const reviewSection = document.getElementById('reviewSection');
+    if (reviewSection && !reviewSection.querySelector('.keyboard-hints')) {
+        const hintsDiv = document.createElement('div');
+        hintsDiv.className = 'keyboard-hints';
+        hintsDiv.style.cssText = `
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 4px;
+        `;
+        hintsDiv.innerHTML = '💡 <strong>Shortcuts:</strong> SPACEBAR = Start/Stop Recording • ENTER = Send Message';
+        reviewSection.appendChild(hintsDiv);
+    }
+}
         
         // Select a random scenario
         function selectRandomScenario() {
@@ -3916,6 +3987,7 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
+
 
 
 
