@@ -194,6 +194,34 @@
         .btn-warning:hover {
             background-color: #d97706;
         }
+
+         .btn-warning:hover {
+            background-color: #d97706;
+        }
+        
+        /* ElevenLabs Load Voices button states */
+        .btn-voice-load-pending {
+            background-color: var(--danger-color) !important;
+            color: white !important;
+        }
+
+        .btn-voice-load-pending:hover {
+            background-color: #dc2626 !important;
+        }
+
+        .btn-voice-load-success {
+            background-color: var(--success-color) !important;
+            color: white !important;
+        }
+
+        .btn-voice-load-success:hover {
+            background-color: #047857 !important;
+        }
+
+        .btn-voice-load-success::after {
+            content: " ✓";
+            font-weight: bold;
+        }
         
         
 /* Review section styling */
@@ -456,6 +484,31 @@
             color: white;
             cursor: not-allowed;
         }
+
+/* Status Button States - Add after existing button styles */
+.btn-status-pending {
+    background-color: var(--danger-color) !important;
+    color: white !important;
+    position: relative;
+}
+
+.btn-status-pending:hover {
+    background-color: #dc2626 !important;
+}
+
+.btn-status-completed {
+    background-color: var(--success-color) !important;
+    color: white !important;
+}
+
+.btn-status-completed:hover {
+    background-color: #047857 !important;
+}
+
+.btn-status-completed::after {
+    content: " ✓";
+    font-weight: bold;
+}
         
         /* Image Modal Styling */
         .image-modal {
@@ -553,6 +606,102 @@
             color: var(--danger-color);
             text-align: center;
         }
+
+                /* Image Gallery Styles */
+        .image-gallery {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            z-index: 10;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .gallery-nav:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .gallery-nav:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(-50%) scale(1);
+        }
+        
+        .gallery-nav-prev {
+            left: 10px;
+        }
+        
+        .gallery-nav-next {
+            right: 10px;
+        }
+        
+        /* Gallery Indicators (Dots) */
+        .gallery-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 10px;
+        }
+        
+        .gallery-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-dot:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+        
+        .gallery-dot.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        /* Mobile Responsive Gallery */
+        @media (max-width: 768px) {
+            .gallery-nav {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .gallery-nav-prev {
+                left: 5px;
+            }
+            
+            .gallery-nav-next {
+                right: 5px;
+            }
+            
+            .gallery-dot {
+                width: 10px;
+                height: 10px;
+            }
+        }
         
         /* Modal Animations */
         @keyframes fadeIn {
@@ -570,6 +719,187 @@
                 transform: scale(1) translateY(0);
             }
         }
+
+        /* COLLAPSIBLE CONFIGURATION PANEL */
+.collapse-btn {
+    float: right;
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    margin-left: 10px;
+}
+
+.collapse-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Collapsed state for configuration card */
+.card.collapsed {
+    width: 40px !important;
+    min-width: 40px !important;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card.collapsed .card-content {
+    display: none;
+}
+
+.card.collapsed h2 {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    margin: 0;
+    padding: 60px 0 10px 0;
+    text-align: center;
+    font-size: 16px;
+    white-space: nowrap;
+    position: relative;
+    cursor: pointer;
+    margin-left: -13px;
+}
+
+.card.collapsed .collapse-btn {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: auto;
+    padding: 4px 8px;
+    font-size: 12px;
+    background: none;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card.collapsed .collapse-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateX(-50%) scale(1);
+}
+
+/* Make entire collapsed header clickable */
+.card.collapsed h2:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* Hover expansion for collapsed configuration */
+.card.collapsed:hover {
+    width: 80px !important;
+    transition: width 0.2s ease;
+}
+
+.card.collapsed:hover h2 {
+    font-size: 12px;
+}
+
+.card.collapsed:hover .collapse-btn {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.05);
+}
+
+/* Voice Control Panel Collapsible Styles */
+.card.voice-collapsed {
+    width: 40px !important;
+    min-width: 40px !important;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card.voice-collapsed .card-content {
+    display: none;
+}
+
+.card.voice-collapsed h2 {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    margin: 0;
+    padding: 60px 0 10px 0;
+    text-align: center;
+    font-size: 16px;
+    white-space: nowrap;
+    position: relative;
+    cursor: pointer;
+    margin-left: -13px;
+}
+
+.card.voice-collapsed .collapse-btn {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: auto;
+    padding: 4px 8px;
+    font-size: 12px;
+    background: none;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card.voice-collapsed .collapse-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateX(-50%) scale(1);
+}
+
+/* Make entire collapsed header clickable */
+.card.voice-collapsed h2:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* Hover expansion for collapsed voice control */
+.card.voice-collapsed:hover {
+    width: 80px !important;
+    transition: width 0.2s ease;
+}
+
+.card.voice-collapsed:hover h2 {
+    font-size: 12px;
+}
+
+.card.voice-collapsed:hover .collapse-btn {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.05);
+}
+
+/* Adjust grid when panels are collapsed */
+.grid.config-collapsed {
+    grid-template-columns: 40px 1fr 2.5fr;
+    transition: all 0.3s ease;
+}
+
+.grid.voice-collapsed {
+    grid-template-columns: 1fr 40px 2.5fr;
+    transition: all 0.3s ease;
+}
+
+.grid.config-collapsed.voice-collapsed {
+    grid-template-columns: 40px 40px 3fr;
+    transition: all 0.3s ease;
+}
+
+/* Ensure smooth transitions */
+.card {
+    transition: all 0.3s ease;
+}
         
        
   </style>
@@ -581,127 +911,78 @@
         <div class="header">
             <h1>Pharmacy Consultation Training</h1>
             <p>Practice your consultation skills with an AI-powered patient simulator</p>
-        </div>
-        
-        <!-- Instructions box -->
-        <div class="header">
-            <h2>📋 Instructions</h2>
-            <div class="instructions-container">
-    <div class="instructions-column">
-        <ol>
-<li>Enter your n8n webhook URLs in the Configuration section</li>
-<li>Load your Google Sheet with patient scenarios</li>
-<li>Select a patient scenario from the dropdown (or choose random)</li>
-</ol>
-</div>
-<div class="instructions-column" style="flex: 1;">
-    <ol start="4">
-        <li>Choose your TTS and STT providers (Browser or ElevenLabs/Deepgram)</li>
-        <li>Adjust voice and speech recognition settings as needed</li>
-        <li>Click "Start Recording" to begin speaking and "Stop Recording" to end</li>
-    </ol>
-</div>
-<div class="instructions-column" style="flex: 1;">
-    <ol start="7">
-        <li>Live transcription appears in the review box as you speak</li>
-        <li>Review, edit if needed, then click "Send Message"</li>
-        <li>Use "Submit Conversation" to get evaluation feedback</li>
-    </ol>
-</div>
-            </div>
-            <p><strong>Tips:</strong> Speak slowly and clearly, review your transcriptions before sending, ask open-ended questions, and practice active listening skills!</p>
-        </div>
-        
+        </div>       
            
         <!-- Main content grid -->
         <div class="grid">
+    <!-- Grid should close HERE -->
+
+        
             <!-- Configuration section -->
-            <div class="card">
-                <h2>⚙️ Configuration</h2>
-                
-                <!-- n8n webhook URL input -->
-                <div class="form-group">
-                    <label for="webhookUrl">n8n Webhook URL (Chat):</label>
-                    <input 
-                        type="url" 
-                        id="webhookUrl" 
-                        placeholder="https://your-n8n-instance.com/webhook/..."
-                        title="Enter your n8n webhook URL that will receive the messages"
-                    >
-                </div>
-                
-                <!-- Submit webhook URL input -->
-                <div class="form-group">
-                    <label for="submitWebhookUrl">n8n Submit Webhook URL:</label>
-                    <input 
-                        type="url" 
-                        id="submitWebhookUrl" 
-                        placeholder="https://your-n8n-instance.com/webhook/submit..."
-                        title="Enter your n8n webhook URL for submitting conversation history"
-                    >
-                </div>
-                
-                <!-- Google Sheets configuration -->
-                <div class="form-group">
-                    <label for="sheetId">Google Sheet ID:</label>
-                    <input 
-                        type="text" 
-                        id="sheetId" 
-                        placeholder="1ABC...xyz"
-                        title="The ID from your Google Sheets URL"
-                    >
-                    <button 
-                        class="btn-secondary" 
-                        onclick="loadSheetNames()" 
-                        style="margin-top: 10px; width: 100%;"
-                    >
-                        📋 Get Sheet Names
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <label for="sheetName">Sheet Name:</label>
-                    <select id="sheetName" disabled>
-                        <option value="">Get sheet names first...</option>
-                    </select>
-                </div>
-                
-                <!-- Scenario selection dropdown -->
-                <div class="form-group" style="margin-top: 20px;">
-                    <label for="scenarioSelect">Select Scenario:</label>
-                    <select id="scenarioSelect" disabled>
-                        <option value="">Load sheet data first...</option>
-                    </select>
-                </div>
-                
-                <button class="btn-secondary" onclick="selectRandomScenario()" style="margin-top: 10px;">
-                    🎲 Random Scenario
-                </button>
-                
-                <!-- Patient Image Button -->
-                <button 
-                    class="patient-image-btn disabled" 
-                    id="patientImageBtn"
-                    onclick="showPatientImage()"
-                    disabled
-                >
-                    📷 No Scenario Selected
-                </button>
-            </div>
-            
-            <!-- Voice control section -->
-            <div class="card">
-                <h2>🎙️ Voice Control</h2>
-                
-                <!-- TTS Provider Selection -->
+            <div class="card" id="configCard">
+    <h2 onclick="handleConfigHeaderClick(event)">Configuration
+    <button class="collapse-btn" onclick="toggleConfigCollapse()" id="configCollapseBtn">
+        ◀
+    </button>
+</h2>
+                <div class="card-content">
+    
+    <!-- Chatbot Configuration Section - NEW -->
+    <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
+        <label for="configSheetId">Chatbot ID's:</label>
+        <input 
+            type="password" 
+            id="configSheetId" 
+            placeholder="Google Sheet ID containing chatbot configurations"
+            title="The Google Sheet ID containing your chatbot configurations"
+            autocomplete="new-password"
+            style="font-size: 14px;"
+        >
+        <button 
+            class="btn-secondary btn-status-pending" 
+            onclick="loadChatbotConfigurations()" 
+            style="width: 100%; margin-top: 10px; font-size: 14px;"
+            id="loadChatbotBtn"
+        >
+            Load Chatbot Configurations
+        </button>
+    </div>
+        
+    
+    <!-- Hidden webhook fields - populated by chatbot configuration -->
+    <input type="hidden" id="webhookUrl" />
+    <input type="hidden" id="submitWebhookUrl" />
+    
+    <!-- Scenario Sets Management Section - NEW -->
+    <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
+        <label for="scenarioSetsId">Scenario Sets List:</label>
+        <input 
+            type="password" 
+            id="scenarioSetsId" 
+            placeholder="Google Sheet ID containing list of scenario sets"
+            title="The Google Sheet ID containing your scenario sets list"
+            autocomplete="new-password"
+            style="font-size: 14px;"
+        >
+        <button 
+            class="btn-secondary btn-status-pending" 
+            onclick="loadScenarioSets()" 
+            style="width: 100%; margin-top: 10px; font-size: 14px;"
+            id="loadSetsBtn"
+        >
+            Load Scenario Sets
+        </button>
+</div>
+        
+<!-- TTS Provider Selection -->
                 <div class="form-group">
                     <label>Text-to-Speech Provider:</label>
                     <div class="tts-provider-group">
                         <button class="tts-provider-btn active" id="browserTtsBtn" onclick="selectTtsProvider('browser')">
-                            🌐 Browser TTS
+                            Browser TTS
                         </button>
                         <button class="tts-provider-btn" id="elevenlabsTtsBtn" onclick="selectTtsProvider('elevenlabs')">
-                            🎵 ElevenLabs
+                            ElevenLabs
                         </button>
                     </div>
                 </div>
@@ -734,7 +1015,7 @@
                     <div class="form-group">
                         <label for="elevenlabsApiKey">ElevenLabs API Key:</label>
                         <input 
-                            type="password" 
+                            type="text" 
                             id="elevenlabsApiKey" 
                             placeholder="Enter your ElevenLabs API key"
                             title="Get your API key from elevenlabs.io"
@@ -749,8 +1030,8 @@
                         <select id="elevenlabsVoice" disabled>
                             <option value="">Enter API key to load voices...</option>
                         </select>
-                        <button class="btn-warning" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;">
-                            🔄 Load Voices
+                        <button class="btn-voice-load-pending" id="loadVoicesBtn" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;">
+                            Load Voices
                         </button>
                     </div>
                     
@@ -785,10 +1066,10 @@
     <label>Speech Recognition Provider:</label>
     <div class="tts-provider-group">
         <button class="tts-provider-btn active" id="browserSttBtn" onclick="selectSttProvider('browser')">
-            🌐 Browser STT
+            Browser STT
         </button>
         <button class="tts-provider-btn" id="deepgramSttBtn" onclick="selectSttProvider('deepgram')">
-            🎯 Deepgram (Medical)
+            Deepgram (Medical)
         </button>
     </div>
 </div>
@@ -798,7 +1079,7 @@
     <div class="form-group">
         <label for="deepgramApiKey">Deepgram API Key:</label>
         <input 
-            type="password" 
+            type="text" 
             id="deepgramApiKey" 
             placeholder="Enter your Deepgram API key"
             title="Get your API key from deepgram.com"
@@ -828,11 +1109,73 @@
         </select>
     </div>
 </div>
-            </div>
+</div>
+                </div>
+
+            
+            <!-- Scenario Management -->
+            <div class="card" id="voiceCard">
+                <h2 onclick="handleVoiceHeaderClick(event)">Scenario Managment
+    <button class="collapse-btn" onclick="toggleVoiceCollapse()" id="voiceCollapseBtn">
+        ◀
+    </button>
+</h2>
+                <div class="card-content">
+
+                <div class="form-group" style="margin-top: 15px;">
+            <label for="chatbotSelect">Select Chatbot:</label>
+            <select id="chatbotSelect" disabled style="font-size: 14px;">
+                <option value="">Load configurations first...</option>
+            </select>
+        </div>
+   
+                
+             <div class="form-group" style="margin-top: 15px;">
+            <label for="scenarioSetSelect">Select Scenario Set:</label>
+            <select id="scenarioSetSelect" disabled style="font-size: 14px;">
+                <option value="">Load scenario sets first...</option>
+            </select>
+        </div>
+        
+        <!-- Hidden field - automatically populated from scenario set selection -->
+        <input type="hidden" id="sheetId">
+
+    
+    <!-- Google Sheets configuration - MODIFIED -->
+    <div class="form-group">
+        <label for="sheetName">Sheet Name:</label>
+        <select id="sheetName" disabled>
+            <option value="">Select scenario set first</option>
+        </select>
+    </div>
+    
+    <!-- Scenario selection dropdown -->
+    <div class="form-group" style="margin-top: 20px;">
+        <label for="scenarioSelect">Select Scenario:</label>
+        <select id="scenarioSelect" disabled>
+            <option value="">Load sheet data first...</option>
+        </select>
+    </div>
+    
+    <button class="btn-secondary" onclick="selectRandomScenario()" style="width: 100%; margin-top: 10px;">
+        Random Scenario
+    </button>
+    
+            <!-- Patient Image Button -->
+            <button 
+                class="patient-image-btn disabled" 
+                id="patientImageBtn"
+                onclick="showPatientImage()"
+                disabled
+            >
+                📷 No Scenario Selected
+            </button>   
+</div>
+                </div>
             
             <!-- Chat display area -->
             <div class="card">
-                <h2>💬 Conversation</h2>
+                <h2>Conversation</h2>
                 <div class="chat-container" id="chatContainer">
                     <p style="text-align: center; color: var(--text-secondary);">
                         Select a scenario and start speaking to begin the consultation...
@@ -842,16 +1185,16 @@
                 <!-- Control buttons with improved layout -->
                 <div class="button-group">
                     <button class="btn-warning" onclick="newSession()">
-                        🆕 New Session
+                        New Session
                     </button>
                     <button class="btn-secondary" onclick="clearChat()">
-                        🔄 Clear Chat
+                        Clear Chat
                     </button>
                     <button class="btn-danger" onclick="submitConversation()">
-                        📤 Submit Chat
+                        Submit Chat
                     </button>
                     <button class="btn-info" onclick="exportConversation()">
-                        📥 Export Chat
+                        Export Chat
                     </button>
                 </div>  
                 
@@ -875,13 +1218,13 @@
         🎤 Start Recording
     </button>
     <button class="btn-success" onclick="sendReviewedMessage()" disabled id="sendBtn">
-        ✅ Send Message
+        Send Message
     </button>
     <button class="btn-warning" onclick="editTranscript()" disabled id="editBtn">
-        ✏️ Edit
+        Edit
     </button>
     <button class="btn-danger" onclick="deleteTranscript()" disabled id="deleteBtn">
-        🗑️ Delete & Retry
+        Delete & Retry
     </button>
 </div>
                 
@@ -932,42 +1275,52 @@
         let mediaRecorder = null; // MediaRecorder for Deepgram streaming
         let audioStream = null; // Audio stream from microphone
 
-        // ===== PERSISTENT DEEPGRAM CONNECTION VARIABLES =====
-        let persistentDeepgramSocket = null;
-        let connectionReady = false;
-        let reconnectAttempts = 0;
-        const MAX_RECONNECT_ATTEMPTS = 3;
-        let keepaliveInterval = null;
-        let connectionIdleTimeout = null;
+                // ===== CHATBOT CONFIGURATION VARIABLES =====
+        let chatbotConfigurations = [];     // Store loaded chatbot configurations
+        let currentChatbotConfig = null;    // Currently selected chatbot configuration
+        
+        // ===== SCENARIO SETS VARIABLES =====
+        let scenarioSets = [];              // Store loaded scenario sets
+        let currentScenarioSet = null;      // Currently selected scenario set
+
+        // ===== MULTI-IMAGE GALLERY VARIABLES =====
+        let currentImageIndex = 0;
+        let patientImages = [];
         
         // ===== INITIALIZATION =====
         // This runs when the page loads
         
         window.onload = function() {
-    // Generate unique session ID for this training session
-    generateSessionId();
-    
-    // Initialize speech recognition if available
-    initializeSpeechRecognition();
-    
-    // Load available voices for text-to-speech
-    loadVoices();
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Load saved configuration from localStorage
-    loadSavedConfig();
-    
-    // Display session info
-    displaySessionInfo();
+            // Generate unique session ID for this training session
+            generateSessionId();
+            
+            // Initialize speech recognition if available
+            initializeSpeechRecognition();
+            
+            // Load available voices for text-to-speech
+            loadVoices();
+            
+            // Set up event listeners
+            setupEventListeners();
+                        // ADD THESE NEW LINES in setupEventListeners():
+            document.getElementById('configSheetId').addEventListener('change', saveConfig);
+            document.getElementById('scenarioSetsId').addEventListener('change', saveConfig);
+            
+            // Load saved configuration from localStorage
+            loadSavedConfig();
+            
+            // Display session info
+            displaySessionInfo();
 
-    // Add this to setupEventListeners function:
-    document.getElementById('deepgramApiKey').addEventListener('change', saveConfig);
-    document.getElementById('deepgramModel').addEventListener('change', saveConfig);
-    document.getElementById('deepgramLanguage').addEventListener('change', saveConfig);
-    
-};
+            // Add this to setupEventListeners function:
+          document.getElementById('deepgramApiKey').addEventListener('change', saveConfig);
+          document.getElementById('deepgramModel').addEventListener('change', saveConfig);
+          document.getElementById('deepgramLanguage').addEventListener('change', saveConfig);
+       // Load collapsed state for panels
+            loadCollapsedState();
+        };
+
+            
         
         // ===== SESSION MANAGEMENT =====
         // Generate and manage unique session IDs
@@ -1004,43 +1357,42 @@ function newSession() {
     // Clear conversation history and chat display
     clearChat();
     
-    // Clear transcription box
-    const transcriptionBox = document.getElementById('transcriptionBox');
-    transcriptionBox.innerHTML = '<span style="color: var(--text-secondary);">Transcription will appear here when you speak...</span>';
+    // Clear review transcript box
+const reviewTranscript = document.getElementById('reviewTranscript');
+if (reviewTranscript) {
+    reviewTranscript.textContent = 'No message to review yet';
+}
     
     // Reset recording state
-    // Reset recording state
-if (isRecording) {
-    if (currentSttProvider === 'deepgram') {
-        stopOptimizedDeepgramRecording(); // This keeps connection open
-    } else if (recognition) {
-        forceStopRecognition = true;
-        recognition.stop();
+    if (isRecording) {
+        if (currentSttProvider === 'deepgram') {
+            stopDeepgramRecording();
+        } else if (recognition) {
+            forceStopRecognition = true;
+            recognition.stop();
+        }
     }
-}
-
-// Reset recording variables
-isRecording = false;
-fullTranscript = '';
-forceStopRecognition = false;
-
-// Update talk button
-updateTalkButton();
-
-// Stop any playing audio
-if (currentAudio) {
-    currentAudio.pause();
-    currentAudio = null;
-}
-synthesis.cancel();
-
-// Keep Deepgram connection alive - don't close it!
-// Only close the old deepgramSocket if it exists
-if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
-    deepgramSocket.close();
-    deepgramSocket = null;
-}
-// Note: persistentDeepgramSocket stays open for instant next recording
+    
+    // Reset recording variables
+    isRecording = false;
+    fullTranscript = '';
+    forceStopRecognition = false;
+    
+    // Update talk button
+    updateTalkButton();
+    
+    // Stop any playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    synthesis.cancel();
+    
+    // Close any WebSocket connections
+    if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
+        deepgramSocket.close();
+        deepgramSocket = null;
+    }
     
     // Stop any media streams
     if (audioStream) {
@@ -1068,12 +1420,7 @@ if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
     hideReviewSection();
     
     // Show confirmation
-    // Show confirmation with connection status
-if (currentSttProvider === 'deepgram' && persistentDeepgramSocket && connectionReady) {
-    showStatus(`✅ New session started! Deepgram ready for instant recording.`, 'success');
-} else {
     showStatus(`✅ New session started! Session ID: ${sessionId}`, 'success');
-}
     
     // Add welcome message if scenario is selected
     if (currentScenario) {
@@ -1121,11 +1468,6 @@ function updateSessionInfo() {
 
         // ===== STT PROVIDER MANAGEMENT =====
 function selectSttProvider(provider) {
-    // Close existing Deepgram connection if switching away
-    if (currentSttProvider === 'deepgram' && provider !== 'deepgram') {
-        closeDeepgramConnection();
-    }
-    
     currentSttProvider = provider;
     
     // Update UI
@@ -1134,12 +1476,6 @@ function selectSttProvider(provider) {
     
     // Show/hide settings
     document.getElementById('deepgramSettings').style.display = provider === 'deepgram' ? 'block' : 'none';
-    
-    // DON'T establish connection here - wait until user actually starts recording
-    // Just show that Deepgram is selected
-    if (provider === 'deepgram') {
-        showStatus('Deepgram selected - connection will be established when you start recording', 'info');
-    }
     
     // Save preference
     saveConfig();
@@ -1282,7 +1618,7 @@ async function startDeepgramRecording() {
         };
         
         // Start recording with 100ms chunks
-        mediaRecorder.start(100);
+        mediaRecorder.start(200);
         console.log('Deepgram recording started');
         
         return true;
@@ -1321,311 +1657,7 @@ if (fullTranscript.trim()) {
     // The timeout in stopRecording() will call showReviewSection()
     // Do NOT call addMessage or sendToWebhook here
 }
-    }, 500);
-}
-
-// ===== PERSISTENT DEEPGRAM CONNECTION FUNCTIONS =====
-async function initializePersistentDeepgramConnection() {
-    const apiKey = document.getElementById('deepgramApiKey').value;
-    
-    if (!apiKey) {
-        showStatus('Please enter your Deepgram API key first', 'error');
-        return false;
-    }
-    
-    // Close existing connection if any
-    if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
-        persistentDeepgramSocket.close();
-    }
-    
-    // Clear any existing intervals
-    if (keepaliveInterval) {
-        clearInterval(keepaliveInterval);
-        keepaliveInterval = null;
-    }
-    
-    if (connectionIdleTimeout) {
-        clearTimeout(connectionIdleTimeout);
-        connectionIdleTimeout = null;
-    }
-    
-    const model = document.getElementById('deepgramModel').value;
-    const language = document.getElementById('deepgramLanguage').value;
-    
-    // Simplified Deepgram URL - remove problematic parameters
-    const deepgramUrl = `wss://api.deepgram.com/v1/listen?` + 
-        `model=${model}&` +
-        `language=${language}&` +
-        `punctuate=true&` +
-        `interim_results=true&` +
-        `smart_format=true&` +
-        `filler_words=false&` +
-        `numerals=true`;
-    
-    console.log('Creating persistent Deepgram connection with simplified settings:', deepgramUrl);
-    
-    return new Promise((resolve, reject) => {
-        try {
-            persistentDeepgramSocket = new WebSocket(deepgramUrl, ['token', apiKey]);
-            connectionReady = false;
-            
-            persistentDeepgramSocket.onopen = () => {
-                console.log('Persistent Deepgram WebSocket connected');
-                connectionReady = true;
-                reconnectAttempts = 0;
-                
-                // Start keepalive ping every 10 seconds
-                keepaliveInterval = setInterval(() => {
-                    if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
-                        // Send a simple text keepalive message
-                        try {
-                            persistentDeepgramSocket.send(JSON.stringify({ type: 'KeepAlive' }));
-                            console.log('Sent keepalive to Deepgram');
-                        } catch (error) {
-                            console.error('Failed to send keepalive:', error);
-                        }
-                    }
-                }, 10000); // Every 10 seconds
-                
-                showStatus('Deepgram connected! Future recordings will start instantly.', 'success');
-                resolve(true);
-            };
-            
-            persistentDeepgramSocket.onmessage = (message) => {
-                try {
-                    const data = JSON.parse(message.data);
-                    
-                    if (data.type === 'Results') {
-                        const transcript = data.channel.alternatives[0].transcript;
-                        
-                        if (transcript && transcript.trim() !== '') {
-                            const isFinal = data.is_final;
-                            
-                            // Update transcription display
-                            const reviewBox = document.getElementById('reviewTranscript');
-                            
-                            if (isFinal) {
-                                // Add to full transcript
-                                fullTranscript += transcript + ' ';
-                                reviewBox.textContent = fullTranscript.trim();
-                                console.log('Final Deepgram transcript segment:', transcript);
-                            } else {
-                                // Show interim results
-                                let displayText = '';
-                                if (fullTranscript) {
-                                    displayText += fullTranscript.trim() + ' ';
-                                }
-                                displayText += transcript;
-                                reviewBox.textContent = displayText;
-                                console.log('Interim Deepgram transcript:', transcript);
-                            }
-                        }
-                    } else if (data.type === 'Metadata') {
-                        console.log('Deepgram metadata:', data);
-                    }
-                } catch (error) {
-                    console.error('Error parsing Deepgram message:', error);
-                }
-            };
-            
-            persistentDeepgramSocket.onerror = (error) => {
-                console.error('Persistent Deepgram WebSocket error:', error);
-                connectionReady = false;
-                
-                // Clear intervals on error
-                if (keepaliveInterval) {
-                    clearInterval(keepaliveInterval);
-                    keepaliveInterval = null;
-                }
-                
-                showStatus('Deepgram connection error', 'error');
-                reject(error);
-            };
-            
-            persistentDeepgramSocket.onclose = (event) => {
-                console.log('Persistent Deepgram WebSocket closed:', event.code, event.reason);
-                connectionReady = false;
-                
-                // Clear intervals on close
-                if (keepaliveInterval) {
-                    clearInterval(keepaliveInterval);
-                    keepaliveInterval = null;
-                }
-                
-                if (connectionIdleTimeout) {
-                    clearTimeout(connectionIdleTimeout);
-                    connectionIdleTimeout = null;
-                }
-                
-                // Auto-reconnect if not intentionally closed and within retry limit
-                if (event.code !== 1000 && event.code !== 1001 && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                    reconnectAttempts++;
-                    console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
-                    showStatus(`Reconnecting to Deepgram (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`, 'info');
-                    setTimeout(() => {
-                        initializePersistentDeepgramConnection();
-                    }, 2000 * reconnectAttempts);
-                } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-                    showStatus('Deepgram connection failed after multiple attempts', 'error');
-                } else {
-                    console.log('Deepgram connection closed intentionally');
-                }
-            };
-            
-            // Timeout after 15 seconds
-            setTimeout(() => {
-                if (!connectionReady) {
-                    reject(new Error('Connection timeout - Deepgram took too long to respond'));
-                }
-            }, 15000);
-            
-        } catch (error) {
-            reject(error);
-        }
-    });
-}
-
-async function startOptimizedDeepgramRecording() {
-    try {
-        // Check connection health first
-        if (!persistentDeepgramSocket || persistentDeepgramSocket.readyState !== WebSocket.OPEN || !connectionReady) {
-            console.log('Establishing new Deepgram connection...');
-            showStatus('Connecting to Deepgram...', 'info');
-            await ensureDeepgramConnection();
-        } else {
-            console.log('Using existing healthy Deepgram connection');
-        }
-        
-        // Clear any previous transcript data for this new recording
-        fullTranscript = '';
-        
-        // Get microphone access
-        audioStream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                channelCount: 1,
-                sampleRate: 16000,
-                sampleSize: 16,
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            } 
-        });
-        
-        // Create MediaRecorder to capture audio
-        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/wav';
-        mediaRecorder = new MediaRecorder(audioStream, { 
-            mimeType: mimeType,
-            audioBitsPerSecond: 16000
-        });
-        
-        // Send audio data to Deepgram
-        mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0 && persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
-                persistentDeepgramSocket.send(event.data);
-            }
-        };
-        
-        // Start recording
-        mediaRecorder.start(100);
-        
-        console.log('Deepgram recording started - connection will stay alive');
-        
-        return true;
-    } catch (error) {
-        console.error('Error starting Deepgram recording:', error);
-        showStatus('Error starting recording: ' + error.message, 'error');
-        return false;
-    }
-}
-
-function stopOptimizedDeepgramRecording() {
-    console.log('Stopping optimized Deepgram recording...');
-    
-    // Stop media recorder
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-        mediaRecorder = null;
-    }
-    
-    // Stop audio stream
-    if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        audioStream = null;
-    }
-    
-    // DON'T close the WebSocket - keepalive will maintain it
-    console.log('Audio recording stopped, WebSocket connection maintained with keepalive');
-    
-    // Set a timeout to automatically close connection if idle for too long (5 minutes)
-    if (connectionIdleTimeout) {
-        clearTimeout(connectionIdleTimeout);
-    }
-    
-    connectionIdleTimeout = setTimeout(() => {
-        console.log('Closing Deepgram connection due to 5 minutes of inactivity');
-        closeDeepgramConnection();
-    }, 5 * 60 * 1000); // 5 minutes
-    
-    // Process final transcript after a delay
-    setTimeout(() => {
-        if (fullTranscript.trim()) {
-            console.log('Deepgram transcript ready for review:', fullTranscript);
-            // FIXED: Make sure showReviewSection is called properly
-            showReviewSection(fullTranscript.trim());
-        } else {
-            console.log('No transcript captured during this recording session');
-            showStatus('No speech detected. Please try again.', 'error');
-            recordingState = 'stopped';
-            updateTalkButton();
-        }
-    }, 1000);
-}
-
-function ensureDeepgramConnection() {
-    // Only establish connection if Deepgram is selected and no connection exists
-    if (currentSttProvider === 'deepgram' && (!persistentDeepgramSocket || persistentDeepgramSocket.readyState !== WebSocket.OPEN)) {
-        console.log('Lazy loading Deepgram connection on first use...');
-        return initializePersistentDeepgramConnection().catch(error => {
-            console.error('Failed to establish persistent connection:', error);
-            throw error; // Re-throw so calling code can handle it
-        });
-    }
-    return Promise.resolve(true); // Connection already exists
-}
-
-function closeDeepgramConnection() {
-    console.log('Closing Deepgram connection...');
-    
-    // Clear all intervals and timeouts
-    if (keepaliveInterval) {
-        clearInterval(keepaliveInterval);
-        keepaliveInterval = null;
-    }
-    
-    if (connectionIdleTimeout) {
-        clearTimeout(connectionIdleTimeout);
-        connectionIdleTimeout = null;
-    }
-    
-    // Stop any ongoing recording first
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-        mediaRecorder = null;
-    }
-    
-    // Stop audio stream
-    if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        audioStream = null;
-    }
-    
-    // Close the persistent connection
-    if (persistentDeepgramSocket && persistentDeepgramSocket.readyState === WebSocket.OPEN) {
-        connectionReady = false;
-        persistentDeepgramSocket.close(1000, 'Connection intentionally closed');
-        persistentDeepgramSocket = null;
-        console.log('Deepgram connection closed');
-    }
+    }, 1500);
 }
         
         // ===== ELEVENLABS INTEGRATION =====
@@ -1633,11 +1665,17 @@ function closeDeepgramConnection() {
         
         async function loadElevenLabsVoices() {
             const apiKey = document.getElementById('elevenlabsApiKey').value;
+            const loadBtn = document.getElementById('loadVoicesBtn');
             
             if (!apiKey) {
                 showStatus('Please enter your ElevenLabs API key first', 'error');
                 return;
             }
+            
+            // Set button to loading state
+            loadBtn.disabled = true;
+            loadBtn.innerHTML = '⏳ Loading...';
+            loadBtn.className = 'btn-voice-load-pending';
             
             showStatus('Loading ElevenLabs voices...', 'info');
             
@@ -1675,104 +1713,52 @@ function closeDeepgramConnection() {
                     voiceSelect.appendChild(option);
                 });
                 
+                // Set button to success state
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = 'Voices Loaded';
+                loadBtn.className = 'btn-voice-load-success';
+                
                 showStatus(`Loaded ${elevenlabsVoices.length} ElevenLabs voices`, 'success');
+                
+                // Reapply scenario voice settings after ElevenLabs voices are loaded
+                if (currentScenario) {
+                    applyScenarioVoiceSettings();
+                }
+                
                 console.log('ElevenLabs voices loaded:', elevenlabsVoices);
                 
             } catch (error) {
                 console.error('Error loading ElevenLabs voices:', error);
+                
+                // Set button back to pending state on error
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = 'Load Failed - Retry';
+                loadBtn.className = 'btn-voice-load-pending';
+                
                 showStatus(`Error loading voices: ${error.message}`, 'error');
             }
         }
-        
-        function previewElevenLabsVoice() {
-            const sampleText = "Hello, I'm here to help you with your pharmacy consultation. How can I assist you today?";
-            speakWithElevenLabs(sampleText);
-        }
-        
-        async function speakWithElevenLabs(text) {
-            const apiKey = document.getElementById('elevenlabsApiKey').value;
-            const voiceId = document.getElementById('elevenlabsVoice').value;
-            const stability = parseFloat(document.getElementById('elevenlabsStability').value);
-            const clarity = parseFloat(document.getElementById('elevenlabsClarity').value);
-            
-            if (!apiKey) {
-                showStatus('ElevenLabs API key not configured', 'error');
-                return;
-            }
-            
-            if (!voiceId) {
-                showStatus('Please select an ElevenLabs voice', 'error');
-                return;
-            }
-            
-            try {
-                // Stop any currently playing audio
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio = null;
-                }
-                
-                console.log('Generating speech with ElevenLabs...', {
-                    voiceId,
-                    stability,
-                    clarity,
-                    textLength: text.length
-                });
-                
-                const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-                    method: 'POST',
-                    headers: {
-                        'xi-api-key': apiKey,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        text: text,
-                        model_id: "eleven_monolingual_v1",
-                        voice_settings: {
-                            stability: stability,
-                            similarity_boost: clarity
-                        }
-                    })
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('Invalid API key');
-                    } else if (response.status === 429) {
-                        throw new Error('Rate limit exceeded');
-                    } else if (response.status === 422) {
-                        throw new Error('Text too long or invalid parameters');
-                    } else {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                }
-                
-                // Get audio blob
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                
-                // Create and play audio
-                currentAudio = new Audio(audioUrl);
-                currentAudio.play();
-                
-                // Clean up URL when audio ends
-                currentAudio.addEventListener('ended', () => {
-                    URL.revokeObjectURL(audioUrl);
-                });
-                
-                console.log('ElevenLabs speech generated and playing');
-                
-            } catch (error) {
-                console.error('ElevenLabs TTS error:', error);
-                showStatus(`ElevenLabs error: ${error.message}`, 'error');
-                
-                // Fallback to browser TTS
-                console.log('Falling back to browser TTS');
-                speakWithBrowser(text);
-            }
 
+        // Reset ElevenLabs button state when API key changes
+        function resetElevenLabsButtonState() {
+            const loadBtn = document.getElementById('loadVoicesBtn');
+            const apiKey = document.getElementById('elevenlabsApiKey').value;
+            
+            if (loadBtn) {
+                if (apiKey && apiKey.trim() !== '') {
+                    // API key present - set to pending state
+                    loadBtn.className = 'btn-voice-load-pending';
+                    loadBtn.innerHTML = '🔄 Load Voices';
+                    loadBtn.disabled = false;
+                } else {
+                    // No API key - keep red but disabled
+                    loadBtn.className = 'btn-voice-load-pending';
+                    loadBtn.innerHTML = '🔄 Load Voices';
+                    loadBtn.disabled = true;
+                }
+            }
         }
-        
+             
         function previewElevenLabsVoice() {
             const sampleText = "Hello, I'm here to help you with your pharmacy consultation. How can I assist you today?";
             speakWithElevenLabs(sampleText);
@@ -1899,10 +1885,16 @@ recognition.onend = function() {
             });
             
             // Chrome loads voices asynchronously
-            if (voices.length === 0) {
-                synthesis.onvoiceschanged = loadVoices;
-            }
-        }
+    if (voices.length === 0) {
+        synthesis.onvoiceschanged = loadVoices;
+    }
+    
+    // ADD THIS NEW CODE:
+    // Reapply scenario voice settings after voices are loaded
+    if (currentScenario) {
+        applyScenarioVoiceSettings();
+    }
+}
         
         // ===== EVENT LISTENERS =====
         // Set up various UI interactions
@@ -1927,6 +1919,7 @@ recognition.onend = function() {
             document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
             document.getElementById('sheetId').addEventListener('change', saveConfig);
             document.getElementById('elevenlabsApiKey').addEventListener('change', saveConfig);
+            document.getElementById('elevenlabsApiKey').addEventListener('input', resetElevenLabsButtonState);
         }
         
         // ===== NEW RECORDING FUNCTIONS =====
@@ -1942,7 +1935,7 @@ function toggleRecording() {
 
 function startRecording() {
     if (currentSttProvider === 'deepgram') {
-        // Use optimized Deepgram with persistent connection
+        // Use Deepgram
         if (!document.getElementById('deepgramApiKey').value) {
             showStatus('Please enter Deepgram API key first', 'error');
             return;
@@ -1968,16 +1961,13 @@ function startRecording() {
         // Clear previous data
         fullTranscript = '';
         pendingTranscript = '';
-        document.getElementById('reviewTranscript').innerHTML = 'Listening...';
+        document.getElementById('reviewTranscript').innerHTML = 'Connecting to Deepgram...';
         
         recordingState = 'recording';
         updateTalkButton();
         
-        // Start recording with optimized connection
-        startOptimizedDeepgramRecording().then(success => {
-            if (success) {
-                showStatus('Recording started instantly!', 'success');
-            } else {
+        startDeepgramRecording().then(success => {
+            if (!success) {
                 recordingState = 'stopped';
                 updateTalkButton();
             }
@@ -2037,12 +2027,21 @@ function stopRecording() {
     
     if (currentSttProvider === 'deepgram') {
         console.log('Stopping Deepgram recording...');
+        stopDeepgramRecording();
         recordingState = 'processing';
         updateTalkButton();
         showStatus('Processing... Please wait', 'info');
         
-        // Stop the recording (this will handle showing the review section)
-        stopOptimizedDeepgramRecording();
+        // Wait a moment for final transcript, then show review
+        setTimeout(() => {
+            if (fullTranscript.trim()) {
+                showReviewSection(fullTranscript.trim());
+            } else {
+                showStatus('No speech detected. Please try again.', 'error');
+                recordingState = 'stopped';
+                updateTalkButton();
+            }
+        }, 1000);
         
     } else {
         // Browser STT
@@ -2183,6 +2182,289 @@ function hideReviewSection() {
 
         // ===== GOOGLE SHEETS INTEGRATION =====
         // Load sheet names from Google Sheets
+        // ===== CHATBOT CONFIGURATION MANAGEMENT =====
+
+// Load chatbot configurations from Google Sheet
+async function loadChatbotConfigurations() {
+    const configSheetId = document.getElementById('configSheetId').value;
+    
+    if (!configSheetId) {
+        showStatus('Please enter Configuration Sheet ID first', 'error');
+        return;
+    }
+    
+    // Disable the load button and show loading state
+    const loadBtn = document.getElementById('loadChatbotBtn');
+    loadBtn.disabled = true;
+    loadBtn.innerHTML = '⏳ Loading...';
+    
+    showStatus('Loading chatbot configurations...', 'info');
+    
+    try {
+        const apiKey = 'AIzaSyDCrWAPXe6eYugvmnO1eJb7-S4QXQj3EgQ';
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${configSheetId}/values/Sheet1?key=${apiKey}`;
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.values && data.values.length > 1) {
+            chatbotConfigurations = [];
+            
+            for (let i = 1; i < data.values.length; i++) {
+                const row = data.values[i];
+                if (row.length >= 3 && row[0] && row[1] && row[2]) {
+                    chatbotConfigurations.push({
+                        name: row[0].trim(),
+                        webhookUrl: row[1].trim(),
+                        submitWebhookUrl: row[2].trim(),
+                        description: row[3] ? row[3].trim() : ''
+                    });
+                }
+            }
+            
+            populateChatbotDropdown();
+            showStatus(`Loaded ${chatbotConfigurations.length} chatbot configurations`, 'success');
+            setButtonCompleted('loadChatbotBtn', 'Configurations Loaded');
+            
+        } else {
+            showStatus('No configuration data found in the sheet', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error loading chatbot configurations:', error);
+        showStatus('Error loading configurations. Check console for details.', 'error');
+        setButtonStatus('loadChatbotBtn', 'pending', 'Load Failed - Retry');
+    }
+}
+
+// Populate the chatbot selection dropdown
+function populateChatbotDropdown() {
+    const select = document.getElementById('chatbotSelect');
+    select.innerHTML = '<option value="">Select a chatbot configuration...</option>';
+    select.disabled = false;
+    
+    chatbotConfigurations.forEach((config, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        
+        if (config.description) {
+            option.textContent = `${config.name} - ${config.description}`;
+        } else {
+            option.textContent = config.name;
+        }
+        
+        select.appendChild(option);
+    });
+    
+    select.addEventListener('change', function() {
+        if (this.value !== '') {
+            // Automatically apply the selected configuration
+            applyChatbotConfiguration();
+        }
+    });
+}
+
+// Apply the selected chatbot configuration
+function applyChatbotConfiguration() {
+    const selectElement = document.getElementById('chatbotSelect');
+    const selectedIndex = selectElement.value;
+    
+    if (selectedIndex === '' || !chatbotConfigurations[selectedIndex]) {
+        showStatus('Please select a chatbot configuration first', 'error');
+        return;
+    }
+    
+    const config = chatbotConfigurations[selectedIndex];
+    currentChatbotConfig = config;
+    
+    document.getElementById('webhookUrl').value = config.webhookUrl;
+    document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl;
+    
+    saveConfig();
+    
+    showStatus(`✅ Applied configuration: ${config.name}`, 'success');
+    // Update the dropdown to show applied status
+if (selectElement) {
+    selectElement.style.borderColor = 'var(--success-color)';
+    selectElement.style.backgroundColor = '#f0f9ff';
+}
+    
+    if (conversationHistory.length > 0) {
+        const shouldClear = confirm('Apply new chatbot configuration? This will clear the current conversation.');
+        if (shouldClear) {
+            clearChat();
+            addMessage(`Switched to: ${config.name}`, 'system');
+        }
+    } else {
+        addMessage(`Chatbot configured: ${config.name}`, 'system');
+    }
+    
+    console.log('Applied chatbot configuration:', config);
+}
+
+// ===== SCENARIO SETS MANAGEMENT =====
+
+// Load scenario sets from Google Sheet
+async function loadScenarioSets() {
+    const scenarioSetsId = document.getElementById('scenarioSetsId').value;
+    
+    if (!scenarioSetsId) {
+        showStatus('Please enter Scenario Sets Sheet ID first', 'error');
+        return;
+    }
+    
+    const loadBtn = document.getElementById('loadSetsBtn');
+    loadBtn.disabled = true;
+    loadBtn.innerHTML = '⏳ Loading...';
+    
+    showStatus('Loading scenario sets...', 'info');
+    
+    try {
+        const apiKey = 'AIzaSyDCrWAPXe6eYugvmnO1eJb7-S4QXQj3EgQ';
+        let url = `https://sheets.googleapis.com/v4/spreadsheets/${scenarioSetsId}/values/Sheet1?key=${apiKey}`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+            mode: 'cors'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.values && data.values.length > 1) {
+            scenarioSets = [];
+            
+            for (let i = 1; i < data.values.length; i++) {
+                const row = data.values[i];
+                if (row.length >= 2 && row[0] && row[1]) {
+                    scenarioSets.push({
+                        name: row[0].trim(),
+                        sheetId: row[1].trim(),
+                        description: row[2] ? row[2].trim() : ''
+                    });
+                }
+            }
+            
+            populateScenarioSetsDropdown();
+            showStatus(`Loaded ${scenarioSets.length} scenario sets`, 'success');
+            setButtonCompleted('loadSetsBtn', 'Sets Loaded');
+            
+        } else {
+            showStatus('No scenario sets data found in the sheet', 'error');
+            loadBtn.disabled = false;
+            loadBtn.innerHTML = '❌ No Data Found';
+        }
+        
+    } catch (error) {
+        console.error('Error loading scenario sets:', error);
+        
+        if (error.message.includes('Failed to fetch')) {
+            showStatus('CORS error: Please ensure your Google Sheet is publicly accessible (Anyone with link can view)', 'error');
+        } else {
+            showStatus('Error loading scenario sets. Check console for details.', 'error');
+        }
+        
+        setButtonStatus('loadSetsBtn', 'pending', 'Load Failed - Retry');
+    }
+}
+
+// Populate the scenario sets selection dropdown
+function populateScenarioSetsDropdown() {
+    const select = document.getElementById('scenarioSetSelect');
+    select.innerHTML = '<option value="">Select a scenario set...</option>';
+    select.disabled = false;
+    
+    scenarioSets.forEach((scenarioSet, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        
+        if (scenarioSet.description) {
+            option.textContent = `${scenarioSet.name} - ${scenarioSet.description}`;
+        } else {
+            option.textContent = scenarioSet.name;
+        }
+        
+        select.appendChild(option);
+    });
+    
+    select.addEventListener('change', function() {
+        if (this.value !== '') {
+            applyScenarioSet();
+        }
+    });
+}
+
+// Apply the selected scenario set
+function applyScenarioSet() {
+    const selectElement = document.getElementById('scenarioSetSelect');
+    const selectedIndex = selectElement.value;
+    
+    if (selectedIndex === '' || !scenarioSets[selectedIndex]) {
+        showStatus('Please select a scenario set first', 'error');
+        return;
+    }
+    
+    const scenarioSet = scenarioSets[selectedIndex];
+    currentScenarioSet = scenarioSet;
+    
+    document.getElementById('sheetId').value = scenarioSet.sheetId;
+    
+    sheetData = [];
+    document.getElementById('sheetName').innerHTML = '<option value="">Loading sheet names...</option>';
+    document.getElementById('sheetName').disabled = true;
+    document.getElementById('scenarioSelect').innerHTML = '<option value="">Load sheet data first...</option>';
+    document.getElementById('scenarioSelect').disabled = true;
+    
+    currentScenario = null;
+    updatePatientImageButton();
+    
+    saveConfig();
+    
+    showStatus(`✅ Applied scenario set: ${scenarioSet.name}`, 'success');
+    
+    console.log('Auto-loading sheet names for scenario set:', scenarioSet.name);
+    loadSheetNames();
+    
+    console.log('Applied scenario set:', scenarioSet);
+}
+
+// ===== BUTTON STATUS MANAGEMENT =====
+function setButtonStatus(buttonId, status, newText = null) {
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+    
+    button.classList.remove('btn-status-pending', 'btn-status-completed');
+    
+    if (status === 'pending') {
+        button.classList.add('btn-status-pending');
+    } else if (status === 'completed') {
+        button.classList.add('btn-status-completed');
+    }
+    
+    if (newText) {
+        button.innerHTML = newText;
+    }
+}
+
+function setButtonCompleted(buttonId, successText = null) {
+    setButtonStatus(buttonId, 'completed', successText);
+}
+
+function setButtonPending(buttonId, pendingText = null) {
+    setButtonStatus(buttonId, 'pending', pendingText);
+}
+
         
         async function loadSheetNames() {
             const sheetId = document.getElementById('sheetId').value;
@@ -2346,6 +2628,10 @@ function hideReviewSection() {
             headers.forEach((header, index) => {
                 currentScenario[header] = row[index];
             });
+
+                    // ADD THIS NEW CODE BLOCK:
+            // Apply scenario-specific voice settings
+            applyScenarioVoiceSettings();
             
             console.log('Selected scenario:', currentScenario);
             showStatus(`Scenario loaded: ${currentScenario['Patient Name']}`, 'success');
@@ -2359,39 +2645,136 @@ function hideReviewSection() {
             // Add initial message
             addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
         }
+            
+        // Apply voice settings from scenario data
+function applyScenarioVoiceSettings() {
+    if (!currentScenario) return;
+    
+    // Check for Browser TTS voice setting
+    const browserVoice = currentScenario['Browser TTS Voice'] || 
+                        currentScenario['Browser Voice'] || 
+                        currentScenario['TTS Voice Browser'];
+    
+    // Check for ElevenLabs voice setting
+    const elevenlabsVoice = currentScenario['ElevenLabs Voice'] || 
+                           currentScenario['ElevenLabs TTS Voice'] || 
+                           currentScenario['TTS Voice ElevenLabs'];
+    
+    // Apply browser TTS voice if specified
+    if (browserVoice && browserVoice.trim() !== '') {
+        const voiceSelect = document.getElementById('voiceSelect');
+        const voices = synthesis.getVoices();
+        
+        // Try to find matching voice by name (case-insensitive partial match)
+        for (let i = 0; i < voices.length; i++) {
+            if (voices[i].name.toLowerCase().includes(browserVoice.toLowerCase()) ||
+                browserVoice.toLowerCase().includes(voices[i].name.toLowerCase())) {
+                voiceSelect.value = i;
+                console.log(`Applied browser voice from scenario: ${voices[i].name}`);
+                showStatus(`Browser voice set to: ${voices[i].name}`, 'info');
+                break;
+            }
+        }
+    }
+    
+    // Apply ElevenLabs voice if specified and voices are loaded
+    if (elevenlabsVoice && elevenlabsVoice.trim() !== '' && elevenlabsVoices.length > 0) {
+        const elevenlabsSelect = document.getElementById('elevenlabsVoice');
+        
+        // Try to find matching voice by name or ID
+        for (let voice of elevenlabsVoices) {
+            if (voice.name.toLowerCase().includes(elevenlabsVoice.toLowerCase()) ||
+                voice.voice_id === elevenlabsVoice ||
+                elevenlabsVoice.toLowerCase().includes(voice.name.toLowerCase())) {
+                elevenlabsSelect.value = voice.voice_id;
+                console.log(`Applied ElevenLabs voice from scenario: ${voice.name}`);
+                showStatus(`ElevenLabs voice set to: ${voice.name}`, 'info');
+                break;
+            }
+        }
+    }
+    
+    // Save the updated configuration
+    saveConfig();
+}
         
         // Update patient image button state based on scenario
-        function updatePatientImageButton() {
-            const button = document.getElementById('patientImageBtn');
-            
-            if (!currentScenario) {
-                // No scenario selected
-                button.className = 'patient-image-btn disabled';
-                button.textContent = '📷 No Scenario Selected';
-                button.disabled = true;
+function updatePatientImageButton() {
+    const button = document.getElementById('patientImageBtn');
+    
+    if (!currentScenario) {
+        // No scenario selected
+        button.className = 'patient-image-btn disabled';
+        button.textContent = '📷 No Scenario Selected';
+        button.disabled = true;
+        return;
+    }
+    
+    // Check for image URL in various possible column names
+    const imageData = currentScenario['Patient Image'] || 
+                     currentScenario['Image URL'] || 
+                     currentScenario['Photo URL'] || 
+                     currentScenario['Image'] || 
+                     currentScenario['Photo'] ||
+                     currentScenario['Picture URL'] ||
+                     currentScenario['Picture'];
+    
+    if (imageData && imageData.trim() !== '') {
+        // Parse multiple image URLs (separated by comma, semicolon, or line breaks)
+        patientImages = imageData
+            .split(/[,;\n\r]+/)
+            .map(url => url.trim())
+            .filter(url => url !== '');
+        
+        if (patientImages.length > 0) {
+            // Images available
+            button.className = 'patient-image-btn available';
+            if (patientImages.length === 1) {
+                button.innerHTML = '👁️ View Patient Image';
+            } else {
+                button.innerHTML = `👁️ View Patient Images (${patientImages.length})`;
+            }
+            button.disabled = false;
+        } else {
+            // No valid images
+            button.className = 'patient-image-btn unavailable';
+            button.innerHTML = '❌ No Patient Image';
+            button.disabled = true;
+        }
+    } else {
+        // No image data
+        patientImages = [];
+        button.className = 'patient-image-btn unavailable';
+        button.innerHTML = '❌ No Patient Image';
+        button.disabled = true;
+    }
+}
+
+        // Show patient image modal with gallery functionality
+        function showPatientImage() {
+            if (!currentScenario || patientImages.length === 0) {
+                showStatus('No scenario selected or no images available', 'error');
                 return;
             }
             
-            // Check for image URL in various possible column names
-            const imageUrl = currentScenario['Patient Image'] || 
-                           currentScenario['Image URL'] || 
-                           currentScenario['Photo URL'] || 
-                           currentScenario['Image'] || 
-                           currentScenario['Photo'] ||
-                           currentScenario['Picture URL'] ||
-                           currentScenario['Picture'];
+            // Reset to first image
+            currentImageIndex = 0;
             
-            if (imageUrl && imageUrl.trim() !== '') {
-                // Image available
-                button.className = 'patient-image-btn available';
-                button.innerHTML = '👁️ View Patient Image';
-                button.disabled = false;
+            // Set modal title
+            const patientName = currentScenario['Patient Name'] || 'Patient';
+            const titleElement = document.getElementById('imageModalTitle');
+            if (patientImages.length === 1) {
+                titleElement.textContent = `${patientName} - Patient Image`;
             } else {
-                // No image URL
-                button.className = 'patient-image-btn unavailable';
-                button.innerHTML = '❌ No Patient Image';
-                button.disabled = true;
+                titleElement.textContent = `${patientName} - Image 1 of ${patientImages.length}`;
             }
+            
+            // Show modal
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('show');
+            
+            // Load the first image
+            loadImageAtIndex(0);
         }
         
         // Helper function to convert Google Drive share links to direct image URLs
@@ -2416,22 +2799,14 @@ function hideReviewSection() {
             return url;
         }
         
-        // Show patient image modal
-        function showPatientImage() {
-            if (!currentScenario) {
-                showStatus('No scenario selected', 'error');
-                return;
-            }
+        // Load image at specific index
+        function loadImageAtIndex(index) {
+            if (index < 0 || index >= patientImages.length) return;
             
-            // Get image URL from scenario data
-            const imageUrl = currentScenario['Patient Image'] || 
-                           currentScenario['Image URL'] || 
-                           currentScenario['Photo URL'] || 
-                           currentScenario['Image'] || 
-                           currentScenario['Photo'] ||
-                           currentScenario['Picture URL'] ||
-                           currentScenario['Picture'];
+            currentImageIndex = index;
+            const imageUrl = patientImages[index];
             
+            // Check for image URL - if somehow empty, skip
             if (!imageUrl || imageUrl.trim() === '') {
                 showStatus('No image URL available for this patient', 'error');
                 return;
@@ -2446,9 +2821,12 @@ function hideReviewSection() {
                 console.log('Converted URL:', convertedImageUrl);
             }
             
-            // Set modal title
+            // Update modal title with current image number
             const patientName = currentScenario['Patient Name'] || 'Patient';
-            document.getElementById('imageModalTitle').textContent = `${patientName} - Patient Image`;
+            const titleElement = document.getElementById('imageModalTitle');
+            if (patientImages.length > 1) {
+                titleElement.textContent = `${patientName} - Image ${index + 1} of ${patientImages.length}`;
+            }
             
             // Show modal
             const modal = document.getElementById('imageModal');
@@ -2458,18 +2836,18 @@ function hideReviewSection() {
             modalBody.innerHTML = `
                 <div class="image-loading">
                     <div class="spinner"></div>
-                    Loading image...
+                    Loading image ${index + 1} of ${patientImages.length}...
                 </div>
             `;
-            
-            modal.classList.add('show');
             
             // Create image element
             const img = new Image();
             
             img.onload = function() {
                 // Image loaded successfully
-                modalBody.innerHTML = `<img src="${convertedImageUrl}" alt="${patientName}" class="patient-image">`;
+                const galleryHTML = createGalleryHTML(convertedImageUrl, patientName);
+                modalBody.innerHTML = galleryHTML;
+                updateNavigationButtons();
             };
             
             img.onerror = function() {
@@ -2490,43 +2868,130 @@ function hideReviewSection() {
                     }
                 }
                 
-                // Image failed to load completely
+                // Image failed to load completely - preserve ALL your error handling
                 modalBody.innerHTML = `
-                    <div class="image-error">
-                        <h4>Failed to Load Image</h4>
-                        <p>The image could not be loaded. This might be due to:</p>
-                        <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
-                            <li>The image is not set to "Anyone with the link can view"</li>
-                            <li>Google Drive is blocking the image embedding</li>
-                            <li>The file is not an image format</li>
-                            <li>The URL is incorrect or the file was deleted</li>
-                        </ul>
+                    <div class="image-gallery">
+                        ${patientImages.length > 1 ? `
+                            <button class="gallery-nav gallery-nav-prev" onclick="previousImage()" id="prevBtn">
+                                ❮ Previous
+                            </button>
+                        ` : ''}
                         
-                        <p><strong>Attempted URL:</strong></p>
-                        <p style="word-break: break-all; font-family: monospace; background: #f3f4f6; padding: 10px; border-radius: 4px; margin: 10px 0;">${convertedImageUrl}</p>
-                        
-                        ${convertedImageUrl !== imageUrl.trim() ? `<p><strong>Original URL:</strong></p><p style="word-break: break-all; font-family: monospace; background: #f3f4f6; padding: 10px; border-radius: 4px; margin: 10px 0;">${imageUrl.trim()}</p>` : ''}
-                        
-                        <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 6px; border-left: 4px solid #f59e0b;">
-                            <h5 style="margin: 0 0 10px 0; color: #92400e;">💡 Solutions:</h5>
-                            <p style="margin: 5px 0; color: #92400e;"><strong>For Google Drive:</strong></p>
-                            <ol style="margin: 5px 0 10px 20px; color: #92400e;">
-                                <li>Right-click the image → "Get link"</li>
-                                <li>Change to "Anyone with the link"</li>
-                                <li>Use a direct image hosting service instead</li>
-                            </ol>
-                            <p style="margin: 5px 0; color: #92400e;"><strong>Alternatives:</strong> Try imgur.com, dropbox.com, or any direct image URL</p>
+                        <div class="image-error">
+                            <h4>Failed to Load Image ${currentImageIndex + 1}</h4>
+                            <p>The image could not be loaded. This might be due to:</p>
+                            <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
+                                <li>The image is not set to "Anyone with the link can view"</li>
+                                <li>Google Drive is blocking the image embedding</li>
+                                <li>The file is not an image format</li>
+                                <li>The URL is incorrect or the file was deleted</li>
+                            </ul>
+                            
+                            <p><strong>Attempted URL:</strong></p>
+                            <p style="word-break: break-all; font-family: monospace; background: #f3f4f6; padding: 10px; border-radius: 4px; margin: 10px 0;">${convertedImageUrl}</p>
+                            
+                            ${convertedImageUrl !== imageUrl.trim() ? `<p><strong>Original URL:</strong></p><p style="word-break: break-all; font-family: monospace; background: #f3f4f6; padding: 10px; border-radius: 4px; margin: 10px 0;">${imageUrl.trim()}</p>` : ''}
+                            
+                            <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 6px; border-left: 4px solid #f59e0b;">
+                                <h5 style="margin: 0 0 10px 0; color: #92400e;">💡 Solutions:</h5>
+                                <p style="margin: 5px 0; color: #92400e;"><strong>For Google Drive:</strong></p>
+                                <ol style="margin: 5px 0 10px 20px; color: #92400e;">
+                                    <li>Right-click the image → "Get link"</li>
+                                    <li>Change to "Anyone with the link"</li>
+                                    <li>Use a direct image hosting service instead</li>
+                                </ol>
+                                <p style="margin: 5px 0; color: #92400e;"><strong>Alternatives:</strong> Try imgur.com, dropbox.com, or any direct image URL</p>
+                            </div>
+                            
+                            <button onclick="window.open('${imageUrl.trim()}', '_blank')" style="margin-top: 15px; padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                🔗 Open Original Link
+                            </button>
                         </div>
                         
-                        <button onclick="window.open('${imageUrl.trim()}', '_blank')" style="margin-top: 15px; padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
-                            🔗 Open Original Link
-                        </button>
+                        ${patientImages.length > 1 ? `
+                            <button class="gallery-nav gallery-nav-next" onclick="nextImage()" id="nextBtn">
+                                Next ❯
+                            </button>
+                        ` : ''}
                     </div>
+                    
+                    ${patientImages.length > 1 ? `
+                        <div class="gallery-indicators">
+                            ${patientImages.map((_, index) => `
+                                <button class="gallery-dot ${index === currentImageIndex ? 'active' : ''}" 
+                                        onclick="loadImageAtIndex(${index})">
+                                </button>
+                            `).join('')}
+                        </div>
+                    ` : ''}
                 `;
+                updateNavigationButtons();
             };
             
             // Start loading the image
             img.src = convertedImageUrl;
+        }
+
+        // Create gallery HTML with navigation
+        function createGalleryHTML(imageUrl, patientName) {
+            const showNavigation = patientImages.length > 1;
+            
+            return `
+                <div class="image-gallery">
+                    ${showNavigation ? `
+                        <button class="gallery-nav gallery-nav-prev" onclick="previousImage()" id="prevBtn">
+                            ❮ Previous
+                        </button>
+                    ` : ''}
+                    
+                    <img src="${imageUrl}" alt="${patientName}" class="patient-image">
+                    
+                    ${showNavigation ? `
+                        <button class="gallery-nav gallery-nav-next" onclick="nextImage()" id="nextBtn">
+                            Next ❯
+                        </button>
+                    ` : ''}
+                </div>
+                
+                ${showNavigation ? `
+                    <div class="gallery-indicators">
+                        ${patientImages.map((_, index) => `
+                            <button class="gallery-dot ${index === currentImageIndex ? 'active' : ''}" 
+                                    onclick="loadImageAtIndex(${index})">
+                            </button>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // Navigation functions
+        function nextImage() {
+            const nextIndex = (currentImageIndex + 1) % patientImages.length;
+            loadImageAtIndex(nextIndex);
+        }
+
+        function previousImage() {
+            const prevIndex = (currentImageIndex - 1 + patientImages.length) % patientImages.length;
+            loadImageAtIndex(prevIndex);
+        }
+
+        // Update navigation button states
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (prevBtn && nextBtn) {
+                // For circular navigation, buttons are always enabled
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+                
+                // Update indicators
+                const dots = document.querySelectorAll('.gallery-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentImageIndex);
+                });
+            }
         }
         
         // Close patient image modal
@@ -2730,12 +3195,12 @@ function hideReviewSection() {
         
         async function sendToWebhook(message) {
             const webhookUrl = document.getElementById('webhookUrl').value;
-            
-            if (!webhookUrl) {
-                showStatus('Webhook URL not configured', 'error');
-                return;
-            }
-            
+
+if (!webhookUrl) {
+    showStatus('Webhook URL not configured. Please select a chatbot first.', 'error');
+    return;
+}
+         
             // Show loading spinner
             addMessage('<div class="spinner"></div>', 'ai');
             
@@ -2843,11 +3308,11 @@ function hideReviewSection() {
         
         async function submitConversation() {
             const submitWebhookUrl = document.getElementById('submitWebhookUrl').value;
-            
-            if (!submitWebhookUrl) {
-                showStatus('Submit webhook URL not configured', 'error');
-                return;
-            }
+
+if (!submitWebhookUrl) {
+    showStatus('Submit webhook URL not configured. Please select a chatbot first.', 'error');
+    return;
+}
             
             if (conversationHistory.length === 0) {
                 showStatus('No conversation to submit', 'error');
@@ -3113,6 +3578,99 @@ function hideReviewSection() {
             // Speak
             synthesis.speak(utterance);
         }
+
+        async function speakWithElevenLabs(text) {
+    console.log('Speaking with ElevenLabs TTS:', text);
+    
+    const apiKey = document.getElementById('elevenlabsApiKey').value;
+    const voiceId = document.getElementById('elevenlabsVoice').value;
+    
+    if (!apiKey) {
+        console.error('ElevenLabs API key not provided');
+        showStatus('Please enter your ElevenLabs API key', 'error');
+        return;
+    }
+    
+    if (!voiceId) {
+        console.error('ElevenLabs voice not selected');
+        showStatus('Please select an ElevenLabs voice', 'error');
+        return;
+    }
+    
+    // Stop any currently playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    synthesis.cancel();
+    
+    try {
+        const stability = parseFloat(document.getElementById('elevenlabsStability').value);
+        const clarity = parseFloat(document.getElementById('elevenlabsClarity').value);
+        
+        console.log('Using ElevenLabs voice:', voiceId, 'Stability:', stability, 'Clarity:', clarity);
+        
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'audio/mpeg',
+                'Content-Type': 'application/json',
+                'xi-api-key': apiKey
+            },
+            body: JSON.stringify({
+                text: text,
+                model_id: 'eleven_monolingual_v1',
+                voice_settings: {
+                    stability: stability,
+                    similarity_boost: clarity,
+                    style: 0.0,
+                    use_speaker_boost: true
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Invalid ElevenLabs API key');
+            } else if (response.status === 429) {
+                throw new Error('ElevenLabs rate limit exceeded');
+            } else {
+                throw new Error(`ElevenLabs API error: ${response.status}`);
+            }
+        }
+        
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        currentAudio = new Audio(audioUrl);
+        
+        currentAudio.onplay = function() {
+            console.log('ElevenLabs audio started playing');
+        };
+        
+        currentAudio.onended = function() {
+            console.log('ElevenLabs audio finished playing');
+            URL.revokeObjectURL(audioUrl);
+            currentAudio = null;
+        };
+        
+        currentAudio.onerror = function(error) {
+            console.error('ElevenLabs audio playback error:', error);
+            URL.revokeObjectURL(audioUrl);
+            currentAudio = null;
+        };
+        
+        await currentAudio.play();
+        
+    } catch (error) {
+        console.error('ElevenLabs TTS error:', error);
+        showStatus(`ElevenLabs error: ${error.message}`, 'error');
+        
+        // Fallback to browser TTS
+        console.log('Falling back to browser TTS');
+        speakWithBrowser(text);
+    }
+}
         
         // ===== CHAT MANAGEMENT =====
         // Handle chat display and messages
@@ -3203,7 +3761,13 @@ function hideReviewSection() {
         elevenlabsVoice: document.getElementById('elevenlabsVoice').value,
         deepgramApiKey: document.getElementById('deepgramApiKey').value, // Add this line
         deepgramModel: document.getElementById('deepgramModel').value, // Add this line
-        deepgramLanguage: document.getElementById('deepgramLanguage').value // Add this line
+        deepgramLanguage: document.getElementById('deepgramLanguage').value, // Add this line
+        configSheetId: document.getElementById('configSheetId').value,
+        selectedChatbot: document.getElementById('chatbotSelect').value,
+        scenarioSetsId: document.getElementById('scenarioSetsId').value,
+        selectedScenarioSet: document.getElementById('scenarioSetSelect').value,
+         browserVoice: document.getElementById('voiceSelect').value,
+        elevenlabsVoiceSelection: document.getElementById('elevenlabsVoice').value
     };
     localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
 }
@@ -3216,6 +3780,23 @@ function hideReviewSection() {
                 document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl || '';
                 document.getElementById('sheetId').value = config.sheetId || '';
                 document.getElementById('elevenlabsApiKey').value = config.elevenlabsApiKey || '';
+                // ADD THESE NEW LINES after the existing config loading:
+                document.getElementById('configSheetId').value = config.configSheetId || '';
+                document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
+         
+                // ADD THIS NEW CODE:
+                // Restore voice selections
+                if (config.browserVoice) {
+                    document.getElementById('voiceSelect').value = config.browserVoice;
+                }
+                if (config.elevenlabsVoiceSelection) {
+                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoiceSelection;
+                }
+                
+                // Restore saved chatbot selection if configurations are already loaded
+                if (config.selectedChatbot && chatbotConfigurations.length > 0) {
+                    document.getElementById('chatbotSelect').value = config.selectedChatbot;
+                }
                 
                 // Try to set sheet name in dropdown first
                 const sheetNameDropdown = document.getElementById('sheetName');
@@ -3245,7 +3826,7 @@ if (config.deepgramModel) {
 if (config.deepgramLanguage) {
     document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
 }
-                
+     
                 // Set ElevenLabs voice if saved
                 if (config.elevenlabsVoice) {
                     document.getElementById('elevenlabsVoice').value = config.elevenlabsVoice;
@@ -3253,15 +3834,129 @@ if (config.deepgramLanguage) {
             }
         }
 
-        // Add cleanup when page is unloaded
-window.addEventListener('beforeunload', function() {
-    console.log('Page unloading, cleaning up Deepgram connection...');
-    closeDeepgramConnection();
-});
-        
+        // ===== COLLAPSIBLE PANELS =====
+let isConfigCollapsed = false;
+let isVoiceCollapsed = false;
+
+function toggleConfigCollapse() {
+    const configCard = document.getElementById('configCard');
+    const grid = document.querySelector('.grid');
+    const collapseBtn = document.getElementById('configCollapseBtn');
+    
+    isConfigCollapsed = !isConfigCollapsed;
+    
+    if (isConfigCollapsed) {
+        configCard.classList.add('collapsed');
+        grid.classList.add('config-collapsed');
+        collapseBtn.innerHTML = '▶';
+        collapseBtn.title = 'Expand Configuration';
+        localStorage.setItem('configCollapsed', 'true');
+    } else {
+        configCard.classList.remove('collapsed');
+        grid.classList.remove('config-collapsed');
+        collapseBtn.innerHTML = '◀';
+        collapseBtn.title = 'Collapse Configuration';
+        localStorage.setItem('configCollapsed', 'false');
+    }
+}
+
+function toggleVoiceCollapse() {
+    const voiceCard = document.getElementById('voiceCard');
+    const grid = document.querySelector('.grid');
+    const collapseBtn = document.getElementById('voiceCollapseBtn');
+    
+    isVoiceCollapsed = !isVoiceCollapsed;
+    
+    if (isVoiceCollapsed) {
+        voiceCard.classList.add('voice-collapsed');
+        grid.classList.add('voice-collapsed');
+        collapseBtn.innerHTML = '▶';
+        collapseBtn.title = 'Expand Voice Control';
+        localStorage.setItem('voiceCollapsed', 'true');
+    } else {
+        voiceCard.classList.remove('voice-collapsed');
+        grid.classList.remove('voice-collapsed');
+        collapseBtn.innerHTML = '◀';
+        collapseBtn.title = 'Collapse Voice Control';
+        localStorage.setItem('voiceCollapsed', 'false');
+    }
+}
+
+function handleConfigHeaderClick(event) {
+    const configCard = document.getElementById('configCard');
+    
+    if (configCard.classList.contains('collapsed') && !event.target.classList.contains('collapse-btn')) {
+        toggleConfigCollapse();
+    }
+}
+
+function handleVoiceHeaderClick(event) {
+    const voiceCard = document.getElementById('voiceCard');
+    
+    if (voiceCard.classList.contains('voice-collapsed') && !event.target.classList.contains('collapse-btn')) {
+        toggleVoiceCollapse();
+    }
+}
+
+function loadCollapsedState() {
+    const savedConfigState = localStorage.getItem('configCollapsed');
+    if (savedConfigState === 'true') {
+        setTimeout(() => {
+            toggleConfigCollapse();
+        }, 100);
+    }
+    
+    const savedVoiceState = localStorage.getItem('voiceCollapsed');
+    if (savedVoiceState === 'true') {
+        setTimeout(() => {
+            toggleVoiceCollapse();
+        }, 150);
+    }
+}
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
