@@ -3024,6 +3024,8 @@ document.addEventListener('keydown', function(event) {
 // ===== KEYBOARD SHORTCUTS =====
 // Global keyboard event handler for shortcuts
 document.addEventListener('keydown', function(event) {
+    console.log('Key pressed:', event.key, 'Code:', event.code, 'Active element:', document.activeElement.tagName);
+    
     // Check if user is typing in an input field or content-editable area
     const activeElement = document.activeElement;
     const isInputField = activeElement.tagName === 'INPUT' || 
@@ -3031,57 +3033,56 @@ document.addEventListener('keydown', function(event) {
                        activeElement.tagName === 'SELECT' ||
                        activeElement.contentEditable === 'true';
     
+    console.log('Is input field:', isInputField, 'Recording state:', recordingState);
+    
     // Space bar for start/stop recording (only when not typing in input fields)
     if (event.code === 'Space' && !isInputField) {
+        console.log('Spacebar detected - attempting to toggle recording');
         event.preventDefault(); // Prevent page scrolling
         const talkButton = document.getElementById('talkButton');
         
-        // Only handle if talk button is enabled
-        if (!talkButton.disabled) {
-            toggleRecording();
+        if (talkButton) {
+            console.log('Talk button found, disabled:', talkButton.disabled);
+            // Only handle if talk button is enabled
+            if (!talkButton.disabled) {
+                console.log('Calling toggleRecording()');
+                toggleRecording();
+            } else {
+                console.log('Talk button is disabled');
+            }
+        } else {
+            console.log('Talk button not found!');
         }
         return;
     }
     
     // Enter key for sending message (only when reviewing transcript)
     if (event.key === 'Enter' && !event.shiftKey) {
+        console.log('Enter key detected, recording state:', recordingState);
         const sendButton = document.getElementById('sendBtn');
         
-        // Only send if we're in review mode and button is enabled
-        if (recordingState === 'reviewing' && !sendButton.disabled) {
-            event.preventDefault();
-            sendReviewedMessage();
-            return;
+        if (sendButton) {
+            console.log('Send button found, disabled:', sendButton.disabled);
+            // Only send if we're in review mode and button is enabled
+            if (recordingState === 'reviewing' && !sendButton.disabled) {
+                console.log('Calling sendReviewedMessage()');
+                event.preventDefault();
+                sendReviewedMessage();
+                return;
+            } else {
+                console.log('Not in reviewing state or button disabled');
+            }
+        } else {
+            console.log('Send button not found!');
         }
         
         // If editing transcript and Enter is pressed, allow normal behavior
-        // (new line in contenteditable)
         if (activeElement.id === 'reviewTranscript') {
-            // Allow Enter for line breaks in transcript editing
+            console.log('In transcript editing mode - allowing normal Enter behavior');
             return;
         }
     }
 });
-
-// Show keyboard shortcuts in UI
-function showKeyboardHints() {
-    const reviewSection = document.getElementById('reviewSection');
-    if (reviewSection && !reviewSection.querySelector('.keyboard-hints')) {
-        const hintsDiv = document.createElement('div');
-        hintsDiv.className = 'keyboard-hints';
-        hintsDiv.style.cssText = `
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-align: center;
-            margin-top: 8px;
-            padding: 8px;
-            background: rgba(37, 99, 235, 0.1);
-            border-radius: 4px;
-        `;
-        hintsDiv.innerHTML = '💡 <strong>Shortcuts:</strong> SPACEBAR = Start/Stop Recording • ENTER = Send Message';
-        reviewSection.appendChild(hintsDiv);
-    }
-}
         
         // Select a random scenario
         function selectRandomScenario() {
@@ -3987,6 +3988,7 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
+
 
 
 
