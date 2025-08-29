@@ -100,9 +100,19 @@
         
         /* Grid layout for main content - MODIFIED FOR 3 COLUMNS */
         .grid {
-        
-        /* Card component for sections */
-        .card {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2.5fr;
+    gap: 20px;
+    flex: 1;
+    align-items: stretch;
+    min-height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Card component for sections */
+.card {
     background: var(--card-background);
     padding: 20px 20px 0 20px;
     border-radius: 12px;
@@ -116,6 +126,13 @@
     max-height: calc(100vh - 240px);
     position: relative;
     overflow: hidden;
+}
+
+        .card h2 {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    text-shadow: 0 0 5px var(--accent-glow);
 }
 
 .card-content {
@@ -4143,6 +4160,7 @@ function loadCollapsedState() {
     </script>
 </body>
 </html>
+
 
 
 
