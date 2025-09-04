@@ -103,16 +103,20 @@ body {
 }
         
         /* Header section styling */
-      .header {
+     .header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px 140px 20px 20px; /* Add extra right padding for button */
+            padding: 20px;
             background: var(--card-background);
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             animation: fadeInUp 0.8s ease-out both;
             position: relative;
-            overflow: hidden; /* Prevent button from breaking out */
+        }
+
+        .header-content {
+            position: relative;
+            width: 100%;
         }
         
         .header h1 {
@@ -381,9 +385,9 @@ input:focus, select:focus, textarea:focus {
 /* Back to Landing Page Button */
 .back-to-landing-btn {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    z-index: 1000;
+    top: 0;
+    right: 0;
+    z-index: 10;
     padding: 8px 16px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); 
     color: white;
@@ -400,7 +404,6 @@ input:focus, select:focus, textarea:focus {
     display: flex;
     align-items: center;
     gap: 6px;
-    max-width: 120px; /* Limit button width */
     white-space: nowrap;
 }
 
@@ -1803,19 +1806,21 @@ a:hover {
 </head>
 
 <body>
-    <!-- Back to Landing Page Button -->
-<a href="https://bap04223.github.io/Landing-Page/" class="back-to-landing-btn" title="Return to Landing Page">
-    ← Back to Hub
-</a>
+   
     <div class="container">
         <!-- Header section with title and description -->
         <div class="header">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
-    <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
-    <h1 style="margin: 0;">Avatar Video Consultation Training</h1>
-    <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
-</div>
-            <p>Practice your consultation skills with our AI-powered patients</p>
+            <div class="header-content">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                    <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
+                    <h1 style="margin: 0;">Avatar Video Consultation Training</h1>
+                    <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
+                </div>
+                <p>Practice your consultation skills with our AI-powered patients</p>
+                <a href="https://bap04223.github.io/Landing-Page/" class="back-to-landing-btn" title="Return to Landing Page">
+                    ← Back to Hub
+                </a>
+            </div>
         </div>
         
         <!-- Instructions box -->
@@ -7855,6 +7860,7 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
 
 
 
