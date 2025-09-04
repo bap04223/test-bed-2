@@ -103,15 +103,16 @@ body {
 }
         
         /* Header section styling */
-        .header {
+      .header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px;
+            padding: 20px 140px 20px 20px; /* Add extra right padding for button */
             background: var(--card-background);
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             animation: fadeInUp 0.8s ease-out both;
             position: relative;
+            overflow: hidden; /* Prevent button from breaking out */
         }
         
         .header h1 {
@@ -377,17 +378,18 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Back to Landing Page Button */
+/* Back to Landing Page Button */
 .back-to-landing-btn {
     position: absolute;
-    top: 30px;
-    left: 90px;
+    top: 15px;
+    left: 15px;
     z-index: 1000;
-    padding: 12px 20px;
+    padding: 8px 16px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); 
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -397,7 +399,9 @@ input:focus, select:focus, textarea:focus {
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    max-width: 120px; /* Limit button width */
+    white-space: nowrap;
 }
 
 .back-to-landing-btn:hover {
@@ -413,11 +417,16 @@ input:focus, select:focus, textarea:focus {
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
+    .header {
+        padding: 15px 100px 15px 15px; /* Reduced padding on mobile */
+    }
+    
     .back-to-landing-btn {
-        top: 15px;
-        right: 15px;
-        padding: 10px 16px;
-        font-size: 13px;
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 12px;
+        max-width: 80px;
     }
 }
         
@@ -7846,6 +7855,7 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
 
 
 
