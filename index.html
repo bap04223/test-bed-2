@@ -2772,9 +2772,45 @@ function newSession() {
 streamId = null;
 didSessionId = null;
 
-// Reset idle animation state
-stopIdleMonitoring();
-isPlayingIdle = false;
+// Complete idle animation reset
+    stopIdleMonitoring();
+    isPlayingIdle = false;
+    
+    // Clear idle animation data
+    if (idleAnimationUrl) {
+        URL.revokeObjectURL(idleAnimationUrl);
+        idleAnimationUrl = null;
+    }
+    idleAnimationBlob = null;
+    window.preGeneratedIdleUrl = null;
+    
+    // Reset idle video element
+    const idleVideo = document.getElementById('idleVideo');
+    if (idleVideo) {
+        idleVideo.pause();
+        idleVideo.src = '';
+        idleVideo.style.opacity = '0';
+    }
+    
+    // Reset idle animation buttons to initial state
+    const generateBtn = document.getElementById('generateIdleBtn');
+    const downloadBtn = document.getElementById('downloadIdleBtn');
+    
+    if (generateBtn) {
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = 'Generate Idle';
+        setButtonStatus('generateIdleBtn', 'pending', 'Generate Idle');
+    }
+    
+    if (downloadBtn) {
+        downloadBtn.disabled = true;
+    }
+    
+    // Clear browser cache for idle animations (optional - removes all cached idles)
+    if (videoCache && videoCache.memoryCache) {
+        videoCache.memoryCache.clear();
+        console.log('Cleared idle animation cache');
+    }
     
     // Reset to default values but preserve configuration
     document.getElementById('didApiKey').value = currentApiKey;
@@ -7860,6 +7896,7 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
 
 
 
