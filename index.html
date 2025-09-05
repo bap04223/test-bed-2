@@ -2381,7 +2381,7 @@ a:hover {
         left: 0;
         opacity: 1;
         z-index: 1;
-        transition: opacity 0.5s ease-in-out;
+        transition: opacity 0.1s ease-in-out;
     "
 >
 </video>
@@ -2406,7 +2406,7 @@ a:hover {
         left: 0;
         opacity: 0;
         z-index: 2;
-        transition: opacity 0.5s ease-in-out;
+        transition: opacity 0.3s ease-in-out;
     "
 >
 </video>
@@ -2550,7 +2550,7 @@ let idleAnimationBlob = null;     // Cached idle animation as blob for download
 let isPlayingIdle = false;        // Track if idle animation is currently playing
 let idleCheckInterval = null;     // Interval for checking when to show idle
 let lastActivityTime = Date.now(); // Last time there was avatar activity
-const IDLE_DELAY = 0;         // Show idle after 0.5 seconds of inactivity
+const IDLE_DELAY = 1000;         // Show idle after 1 seconds of inactivity
 
         // ===== D-ID AVATAR CONFIGURATION VARIABLES =====
 let serviceType = 'talks';        // Service type (talks or clips)
@@ -4869,7 +4869,7 @@ function startIdleMonitoring() {
             showIdleLayer();
         }
         
-    }, 300); // Check every 300ms for responsive transitions
+    }, 100); // Check every 300ms for responsive transitions
     
     console.log('Idle monitoring with overlay system started');
 }
@@ -8031,6 +8031,7 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
 
 
 
