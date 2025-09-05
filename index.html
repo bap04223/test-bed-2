@@ -2255,6 +2255,7 @@ a:hover {
     onclick="initializeDID()" 
     style="margin-bottom: 5px; width: 100%;"
     id="initializeAvatarBtn"
+    title="Select a scenario first, then initialize avatar"
 >
     Initialize & Connect Avatar
 </button>
@@ -3660,6 +3661,11 @@ async function initializeDID() {
     try {
         console.log('=== initializeDID() called ===');
         updateAvatarStatus('Initializing D-ID Streaming...', 'loading');
+        
+        // Check if scenario is selected first
+        if (!currentScenario) {
+            throw new Error('Please select a patient scenario first');
+        }
         
         // Get API key from configuration
         didApiKey = document.getElementById('didApiKey').value;
@@ -5628,6 +5634,12 @@ clearChat();
     // Add initial message
     addMessage('Scenario loaded. Press the start recoding button to start the consultation.', 'ai');
 }     
+
+        // Update avatar button tooltip now that scenario is selected
+    const avatarBtn = document.getElementById('initializeAvatarBtn');
+    if (avatarBtn && !isAvatarInitialized) {
+        avatarBtn.title = 'Initialize avatar with current scenario settings';
+    }
         
         // ===== MULTI-IMAGE PATIENT GALLERY =====
 // Global variables for image gallery
@@ -6966,6 +6978,11 @@ function forceScrollToBottom() {
     button.disabled = true;
     button.title = 'No Scenario Selected';
 }
+           // Update avatar button tooltip if no scenario
+    const avatarBtn = document.getElementById('initializeAvatarBtn');
+    if (avatarBtn && !currentScenario) {
+        avatarBtn.title = 'Select a scenario first, then initialize avatar';
+    }
 }
 
 // ===== CORS PROXY FUNCTION =====
@@ -8031,6 +8048,7 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
 
 
 
