@@ -3889,8 +3889,11 @@ async function connectStream() {
             throw new Error(`Failed to send SDP answer: ${sdpResponse.status} - ${errorText}`);
         }
         
-       console.log('SDP answer sent successfully');
+     console.log('SDP answer sent successfully');
 updateAvatarStatus(`${config.serviceType.toUpperCase()} stream connected - Ready for speech`, 'success');
+
+// Start connection health monitoring
+startConnectionHealthMonitoring();
 
 // Start idle monitoring if idle animation is available
 if (idleAnimationUrl) {
@@ -3993,29 +3996,128 @@ function onIceCandidate(event) {
 
 // FIXED: Enhanced Connection State Handler
 function onIceConnectionStateChange() {
-    console.log('ICE connection state changed to:', peerConnection.iceConnectionState);
+    const state = peerConnection.iceConnectionState;
+    console.log('ICE connection state changed to:', state);
     
-    if (peerConnection.iceConnectionState === 'connected' || peerConnection.iceConnectionState === 'completed') {
+    if (state === 'connected' || state === 'completed') {
         isStreamConnected = true;
         const currentServiceType = document.getElementById('serviceType').value;
         updateAvatarStatus(`${currentServiceType.toUpperCase()} stream ready for speech`, 'success');
         console.log('Stream connection established successfully');
         
-    } else if (peerConnection.iceConnectionState === 'failed' || peerConnection.iceConnectionState === 'closed') {
+        // Clear any previous disconnection messages
+        showStatus('Avatar stream connected successfully', 'success');
+        
+    } else if (state === 'disconnected') {
+        console.log('ICE connection temporarily disconnected - attempting to reconnect...');
+        updateAvatarStatus('Connection interrupted - attempting to reconnect...', 'error');
+        showStatus('Avatar connection interrupted - reconnecting...', 'error');
+        
+        // Add chat notification for disconnection
+        addMessage('🔌 Avatar connection temporarily lost. Attempting to reconnect...', 'system');
+        
+    } else if (state === 'failed' || state === 'closed') {
         isStreamConnected = false;
+        console.log('ICE connection failed or closed permanently');
         updateAvatarStatus('Stream connection lost', 'error');
-        console.log('Stream connection lost or failed');
+        showStatus('Avatar connection lost - re-initialization required', 'error');
+        
+        // Add chat notification for permanent disconnection
+        addMessage('🔌 Avatar connection has been lost. Click "Initialize & Connect Avatar" to reconnect for video responses.', 'system');
+        
+        // Reset avatar initialization status
+        if (isAvatarInitialized) {
+            setButtonStatus('initializeAvatarBtn', 'pending', 'Initialize & Connect Avatar');
+            isAvatarInitialized = false;
+        }
         
         // Auto-cleanup on failure
         setTimeout(() => {
             closeStreamConnection();
         }, 1000);
+        
+    } else if (state === 'checking') {
+        console.log('ICE connection checking...');
+        updateAvatarStatus('Checking connection...', 'loading');
+        
+    } else if (state === 'new') {
+        console.log('ICE connection starting...');
+        updateAvatarStatus('Establishing connection...', 'loading');
     }
 }
 
 function onConnectionStateChange() {
-    console.log('Connection state:', peerConnection.connectionState);
+    const state = peerConnection.connectionState;
+    console.log('Peer connection state changed to:', state);
+    
+    if (state === 'connected') {
+        console.log('Peer connection fully established');
+        
+    } else if (state === 'disconnected') {
+        console.log('Peer connection disconnected');
+        showStatus('Avatar peer connection disconnected', 'error');
+        
+    } else if (state === 'failed') {
+        console.log('Peer connection failed');
+        showStatus('Avatar peer connection failed - restart required', 'error');
+        addMessage('🔌 Avatar peer connection failed. Please re-initialize the avatar.', 'system');
+        
+        // Reset connection status
+        isStreamConnected = false;
+        if (isAvatarInitialized) {
+            setButtonStatus('initializeAvatarBtn', 'pending', 'Initialize & Connect Avatar');
+            isAvatarInitialized = false;
+        }
+        
+    } else if (state === 'closed') {
+        console.log('Peer connection closed');
+        isStreamConnected = false;
+        
+    } else if (state === 'connecting') {
+        console.log('Peer connection attempting to connect');
+        updateAvatarStatus('Connecting...', 'loading');
+    }
 }
+
+// Periodic connection health monitoring
+let connectionHealthInterval = null;
+
+function startConnectionHealthMonitoring() {
+    // Clear any existing monitoring
+    if (connectionHealthInterval) {
+        clearInterval(connectionHealthInterval);
+    }
+    
+    connectionHealthInterval = setInterval(() => {
+        if (peerConnection && isAvatarInitialized) {
+            const iceState = peerConnection.iceConnectionState;
+            const connectionState = peerConnection.connectionState;
+            
+            // Check if connection has degraded
+            if ((iceState === 'failed' || iceState === 'closed' || 
+                 connectionState === 'failed' || connectionState === 'closed') && 
+                isStreamConnected) {
+                
+                console.log('Connection health check detected failure:', { iceState, connectionState });
+                
+                // Trigger the appropriate state change handler
+                if (iceState === 'failed' || iceState === 'closed') {
+                    onIceConnectionStateChange();
+                } else if (connectionState === 'failed' || connectionState === 'closed') {
+                    onConnectionStateChange();
+                }
+            }
+        }
+    }, 5000); // Check every 5 seconds
+}
+
+function stopConnectionHealthMonitoring() {
+    if (connectionHealthInterval) {
+        clearInterval(connectionHealthInterval);
+        connectionHealthInterval = null;
+    }
+}
+        
 
 function onSignalingStateChange() {
     console.log('Signaling state:', peerConnection.signalingState);
@@ -4140,6 +4242,9 @@ stopIdleMonitoring();
             console.error('Error deleting stream on server:', error);
         }
     }
+    
+    // Stop connection health monitoring
+    stopConnectionHealthMonitoring();
     
     // Clear stream variables
     streamId = null;
@@ -7926,6 +8031,7 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
 
 
 
