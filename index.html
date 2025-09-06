@@ -2360,7 +2360,7 @@ a:hover {
     </div>
 </div>
    
-   <!-- Idle Animation Video (Background Layer) -->
+ /* Idle Animation Video (Background Layer) */
 <video 
     id="idleVideo" 
     width="100%" 
@@ -2373,7 +2373,8 @@ a:hover {
         background-color: var(--chat-background); 
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
+        object-position: center center;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         display: block;
         margin: 0 auto;
@@ -2399,7 +2400,8 @@ a:hover {
         background-color: transparent; 
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
+        object-position: center center;
         display: block;
         margin: 0 auto;
         position: absolute;
@@ -4669,6 +4671,10 @@ function showIdleLayer() {
     
     if (idleVideo && avatarVideo) {
         console.log('Showing idle layer');
+        
+        // Synchronize video dimensions before transitioning
+        synchronizeVideoSizes();
+        
         idleVideo.style.opacity = '1';
         avatarVideo.style.opacity = '0';
         updateAvatarStatus('Showing idle animation', 'info');
@@ -4682,12 +4688,46 @@ function showAvatarLayer() {
     
     if (idleVideo && avatarVideo) {
         console.log('Showing avatar layer');
+        
+        // Synchronize video dimensions before transitioning
+        synchronizeVideoSizes();
+        
         avatarVideo.style.opacity = '1';
         idleVideo.style.opacity = '0'; // Completely hide idle when avatar is active
         updateAvatarStatus('Avatar speaking', 'playing');
     }
 }
 
+        // Synchronize video element sizes to prevent jumping
+function synchronizeVideoSizes() {
+    const idleVideo = document.getElementById('idleVideo');
+    const avatarVideo = document.getElementById('avatarVideo');
+    
+    if (!idleVideo || !avatarVideo) return;
+    
+    // Get the current container dimensions
+    const videoWrapper = document.querySelector('.video-wrapper');
+    if (!videoWrapper) return;
+    
+    const containerRect = videoWrapper.getBoundingClientRect();
+    
+    // Apply consistent sizing to both videos
+    const videos = [idleVideo, avatarVideo];
+    videos.forEach(video => {
+        // Force consistent object-fit behavior
+        video.style.objectFit = 'cover';
+        video.style.objectPosition = 'center center';
+        
+        // Ensure dimensions match container exactly
+        video.style.width = '100%';
+        video.style.height = '100%';
+        
+        // Force a reflow to apply changes immediately
+        video.offsetHeight;
+    });
+    
+    console.log('Video sizes synchronized for container:', containerRect.width, 'x', containerRect.height);
+}
 // Start monitoring for idle state with overlay system
 function startIdleMonitoring() {
     if (idleCheckInterval) {
@@ -7089,6 +7129,10 @@ if (reviewOverlay) {
     // Sync back to original
     syncReviewSections(true);
 }
+    // Synchronize video sizes when entering/exiting fullscreen
+    setTimeout(() => {
+        synchronizeVideoSizes();
+    }, 300); // Wait for fullscreen transition to complete
 }
 
 function enterVideoFullscreen() {
@@ -7910,4 +7954,5 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
 
