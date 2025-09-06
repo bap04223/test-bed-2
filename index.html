@@ -1148,6 +1148,8 @@ input:focus, select:focus, textarea:focus {
     object-position: center center; /* Force center positioning */
 }
 
+        
+
 /* COLLAPSIBLE CONFIGURATION PANEL */
 .collapse-btn {
     float: right;
@@ -4141,6 +4143,7 @@ function setVideoElement(stream) {
     if (!stream || !avatarVideo) return;
     
     avatarVideo.srcObject = stream;
+    avatarVideo.style.objectFit = 'cover'; // Force cover to match idle video size
     avatarVideo.muted = false;
     avatarVideo.volume = 0.8;
     
@@ -7954,5 +7957,6 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
 
 
