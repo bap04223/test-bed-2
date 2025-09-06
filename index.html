@@ -6788,49 +6788,53 @@ async function loadChatbotConfigurations() {
                 const row = data.values[i];
                 if (row.length >= 3 && row[0] && row[1] && row[2]) {
                     chatbotConfigurations.push({
-                        name: row[0].trim(),
-                        webhookUrl: row[1].trim(),
-                        submitWebhookUrl: row[2].trim(),
-                        description: row[3] ? row[3].trim() : '',
-                        deepgramApiKey: row[4] ? row[4].trim() : '', // Column E
-                        didApiKey: row[6] ? row[6].trim() : ''       // Column G
-                    });
+    name: row[0].trim(),                           // Column A: Chatbot Name
+    webhookUrl: row[1].trim(),                     // Column B: Webhook URL
+    submitWebhookUrl: row[2].trim(),               // Column C: Submit Webhook URL
+    feedbackWebhookUrl: row[3] ? row[3].trim() : '', // Column D: Feedback Webhook URL
+    description: row[4] ? row[4].trim() : '',      // Column E: Description
+    deepgramApiKey: row[5] ? row[5].trim() : '',   // Column F: Deepgram API Key
+    didApiKey: row[7] ? row[7].trim() : ''         // Column H: D-ID API Key
+});
                 }
             }
             
             // AUTO-POPULATE API KEYS FROM FIRST CONFIGURATION
-            if (chatbotConfigurations.length > 0) {
-                const firstConfig = chatbotConfigurations[0];
-                
-                // Auto-populate Deepgram API key if present
-                if (firstConfig.deepgramApiKey && firstConfig.deepgramApiKey.trim() !== '') {
-                    document.getElementById('deepgramApiKey').value = firstConfig.deepgramApiKey;
-                    console.log('Auto-populated Deepgram API key from first configuration');
-                }
-                
-                // Auto-populate D-ID API key if present
-                if (firstConfig.didApiKey && firstConfig.didApiKey.trim() !== '') {
-                    document.getElementById('didApiKey').value = firstConfig.didApiKey;
-                    console.log('Auto-populated D-ID API key from first configuration');
-                }
-                
-                // Save the auto-populated keys
-                saveConfig();
-            }
+if (chatbotConfigurations.length > 0) {
+    const firstConfig = chatbotConfigurations[0];
+    
+    // Auto-populate Deepgram API key if present
+    if (firstConfig.deepgramApiKey && firstConfig.deepgramApiKey.trim() !== '') {
+        document.getElementById('deepgramApiKey').value = firstConfig.deepgramApiKey;
+        console.log('Auto-populated Deepgram API key from first configuration');
+    }
+    
+    // Auto-populate D-ID API key if present
+    if (firstConfig.didApiKey && firstConfig.didApiKey.trim() !== '') {
+        document.getElementById('didApiKey').value = firstConfig.didApiKey;
+        console.log('Auto-populated D-ID API key from first configuration');
+    }
+    
+    // Save the auto-populated keys
+    saveConfig();
+}
             
             populateChatbotDropdown();
             
             // Enhanced status message showing what was auto-populated
-            let statusParts = [`Loaded ${chatbotConfigurations.length} configurations`];
-            if (chatbotConfigurations.length > 0) {
-                const firstConfig = chatbotConfigurations[0];
-                if (firstConfig.deepgramApiKey && firstConfig.deepgramApiKey.trim() !== '') {
-                    statusParts.push('Auto-filled Deepgram key');
-                }
-                if (firstConfig.didApiKey && firstConfig.didApiKey.trim() !== '') {
-                    statusParts.push('Auto-filled D-ID key');
-                }
-            }
+let statusParts = [`Loaded ${chatbotConfigurations.length} configurations`];
+if (chatbotConfigurations.length > 0) {
+    const firstConfig = chatbotConfigurations[0];
+    if (firstConfig.deepgramApiKey && firstConfig.deepgramApiKey.trim() !== '') {
+        statusParts.push('Auto-filled Deepgram key');
+    }
+    if (firstConfig.didApiKey && firstConfig.didApiKey.trim() !== '') {
+        statusParts.push('Auto-filled D-ID key');
+    }
+    if (firstConfig.feedbackWebhookUrl && firstConfig.feedbackWebhookUrl.trim() !== '') {
+        statusParts.push('Feedback webhook available');
+    }
+}
             
             showStatus(`✅ ${statusParts.join(', ')}`, 'success');
 
@@ -8784,8 +8788,14 @@ async function submitFeedback(event) {
         
         console.log('Submitting feedback:', feedbackData);
         
-        // Use a feedback webhook URL - you'll need to configure this
-        const webhookUrl = 'YOUR_FEEDBACK_WEBHOOK_URL'; // Replace with your feedback webhook
+       // Use the feedback webhook URL from the current chatbot configuration
+const webhookUrl = currentChatbotConfig && currentChatbotConfig.feedbackWebhookUrl 
+    ? currentChatbotConfig.feedbackWebhookUrl 
+    : null;
+
+if (!webhookUrl) {
+    throw new Error('No feedback webhook URL configured in the selected chatbot configuration');
+}
         
         const response = await fetch(webhookUrl, {
             method: 'POST',
@@ -8933,6 +8943,7 @@ document.addEventListener('keydown', function(event) {
     </script>
 </body>
 </html>
+
 
 
 
