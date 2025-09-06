@@ -63,9 +63,7 @@ label[for="didApiKey"],
 label[for="deepgramModel"],
 #deepgramLanguage,
 label[for="deepgramLanguage"],
-#deepgramSettings,
-#generateIdleBtn,
-#downloadIdleBtn {
+#deepgramSettings {
     display: none !important;
 }
 
@@ -103,7 +101,7 @@ body {
 }
         
         /* Header section styling */
-     .header {
+        .header {
             text-align: center;
             margin-bottom: 30px;
             padding: 20px;
@@ -111,12 +109,6 @@ body {
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             animation: fadeInUp 0.8s ease-out both;
-            position: relative;
-        }
-
-        .header-content {
-            position: relative;
-            width: 100%;
         }
         
         .header h1 {
@@ -382,18 +374,17 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Back to Landing Page Button */
-/* Back to Landing Page Button */
 .back-to-landing-btn {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    padding: 8px 16px;
+    position: fixed;
+    top: 29px;
+    left: 88px;
+    z-index: 1000;
+    padding: 12px 20px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); 
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -403,8 +394,7 @@ input:focus, select:focus, textarea:focus {
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 6px;
-    white-space: nowrap;
+    gap: 8px;
 }
 
 .back-to-landing-btn:hover {
@@ -420,16 +410,11 @@ input:focus, select:focus, textarea:focus {
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-    .header {
-        padding: 15px 100px 15px 15px; /* Reduced padding on mobile */
-    }
-    
     .back-to-landing-btn {
-        top: 10px;
-        right: 10px;
-        padding: 6px 12px;
-        font-size: 12px;
-        max-width: 80px;
+        top: 15px;
+        right: 15px;
+        padding: 10px 16px;
+        font-size: 13px;
     }
 }
         
@@ -674,7 +659,7 @@ input:focus, select:focus, textarea:focus {
         /* UPDATED Patient Image Button Styling - OVERLAY VERSION */
 .patient-image-btn-overlay {
     position: absolute;
-    bottom: 20px;
+    bottom: 80px;
     left: 20px;
     z-index: 20;
     padding: 0 !important;
@@ -1365,7 +1350,7 @@ input:focus, select:focus, textarea:focus {
 /* Timer Display Styles - Overlay Version */
 .timer-overlay {
     position: absolute;
-    top: 92%;
+    top: 15px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -1555,7 +1540,7 @@ input:focus, select:focus, textarea:focus {
 
 /* Fullscreen timer positioning */
 .video-fullscreen-active .timer-overlay {
-    top: 81% !important;
+    top: 20px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     background: linear-gradient(135deg, #10b981, #059669) !important;
@@ -1570,8 +1555,8 @@ input:focus, select:focus, textarea:focus {
 
 /* Fullscreen patient image button positioning */
 .video-fullscreen-active .patient-image-btn-overlay {
-    bottom: 100px !important;
-    left: 150px !important;
+    bottom: 120px !important;
+    left: 30px !important;
     width: 80px !important;
     height: 80px !important;
     font-size: 24px !important;
@@ -1581,7 +1566,7 @@ input:focus, select:focus, textarea:focus {
 /* Enhanced fullscreen review section visibility */
 .fullscreen-review-overlay {
     position: fixed !important;
-    bottom: 5px !important;
+    bottom: 20px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 90% !important;
@@ -1806,21 +1791,19 @@ a:hover {
 </head>
 
 <body>
-   
+    <!-- Back to Landing Page Button -->
+<a href="https://bap04223.github.io/Landing-Page/" class="back-to-landing-btn" title="Return to Landing Page">
+    ← Back to Hub
+</a>
     <div class="container">
         <!-- Header section with title and description -->
         <div class="header">
-            <div class="header-content">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
-                    <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
-                    <h1 style="margin: 0;">Avatar Video Consultation Training</h1>
-                    <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
-                </div>
-                <p>Practice your consultation skills with our AI-powered patients</p>
-                <a href="https://bap04223.github.io/Landing-Page/" class="back-to-landing-btn" title="Return to Landing Page">
-                    ← Back to Hub
-                </a>
-            </div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+    <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
+    <h1 style="margin: 0;">Avatar Video Consultation Training</h1>
+    <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
+</div>
+            <p>Practice your consultation skills with our AI-powered patients</p>
         </div>
         
         <!-- Instructions box -->
@@ -3671,15 +3654,9 @@ setupAvatarActivityListeners(); // Add this line
             // Continue anyway - don't fail initialization
         }
         
-       // AUTOMATICALLY CONNECT STREAM AFTER INITIALIZATION
+        // AUTOMATICALLY CONNECT STREAM AFTER INITIALIZATION
 updateAvatarStatus('Initialization complete, connecting stream...', 'loading');
 await connectStream();
-
-// AUTOMATICALLY HANDLE IDLE ANIMATION AFTER STREAM CONNECTION
-if (isStreamConnected) {
-    updateAvatarStatus('Stream connected, setting up idle animation...', 'loading');
-    await handleIdleAnimationSetup();
-}
 
 // Set button to completed status
 setButtonCompleted('initializeAvatarBtn', 'Avatar Connected');
@@ -4320,7 +4297,9 @@ if (avatarVideo) {
     }
 }
 
-        // Idle animation generation
+// IDLE ANIMATION FUNCTIONS
+
+// Generate idle animation using D-ID Talks API
 async function generateIdleAnimation() {
     if (!didApiKey) {
         showStatus('Please enter D-ID API key first', 'error');
@@ -4339,141 +4318,35 @@ async function generateIdleAnimation() {
         generateBtn.disabled = true;
         generateBtn.innerHTML = '⏳ Checking cache...';
         
-        // Use the same logic as automatic setup
-        const success = await handleIdleAnimationSetup();
-        
-        if (success) {
-            showStatus('✅ Idle animation ready!', 'success');
-        } else {
-            showStatus('❌ Idle animation generation failed', 'error');
-        }
-        
-    } catch (error) {
-        console.error('Manual idle animation error:', error);
-        showStatus(`❌ Failed: ${error.message}`, 'error');
-        
-        const generateBtn = document.getElementById('generateIdleBtn');
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = 'Generate Idle';
-        setButtonStatus('generateIdleBtn', 'pending', 'Generate Idle');
-        
-    } finally {
-        isGeneratingIdle = false;
-    }
-}
-
-
-// NEW: Automatic idle animation setup during initialization
-async function handleIdleAnimationSetup() {
-    try {
-        console.log('=== Starting automatic idle animation setup ===');
-        
-        // Get current avatar configuration
+        // Generate cache key based on current avatar configuration
         const config = getAvatarConfiguration();
         const cacheKey = videoCache.generateCacheKey(config);
+        
+        console.log('Cache key for current configuration:', cacheKey);
         
         // Check browser memory cache first
         let cachedVideo = videoCache.getFromCache(cacheKey);
         if (cachedVideo) {
-            console.log('Found idle animation in browser cache - using immediately!');
+            console.log('Found idle animation in browser cache - reusing immediately!');
             idleAnimationUrl = cachedVideo.url;
             idleAnimationBlob = cachedVideo.blob;
             
             setButtonCompleted('generateIdleBtn', 'Idle Ready (Cached) ✓');
             document.getElementById('downloadIdleBtn').disabled = false;
-            updateAvatarStatus('Avatar ready with cached idle animation', 'success');
+            updateAvatarStatus('Idle animation ready (from cache)', 'success');
+            showStatus('✅ Using cached idle animation - no API cost!', 'success');
             
             if (isStreamConnected) {
                 startIdleMonitoring();
             }
-            return true;
+            return; // Exit early - we're done!
         }
         
-        // Check for pre-generated URL from scenario
-        if (window.preGeneratedIdleUrl) {
-            console.log('Found pre-generated idle URL, fetching...');
-            updateAvatarStatus('Loading pre-generated idle animation...', 'loading');
-            
-            try {
-                const response = await fetch(window.preGeneratedIdleUrl);
-                if (response.ok) {
-                    const videoBlob = await response.blob();
-                    
-                    // Cache it for this session
-                    const objectUrl = URL.createObjectURL(videoBlob);
-                    const videoData = {
-                        blob: videoBlob,
-                        url: objectUrl,
-                        source: 'pre_generated'
-                    };
-                    
-                    videoCache.storeInCache(cacheKey, videoData);
-                    idleAnimationUrl = objectUrl;
-                    idleAnimationBlob = videoBlob;
-                    
-                    setButtonCompleted('generateIdleBtn', 'Idle Ready (Pre-generated) ✓');
-                    document.getElementById('downloadIdleBtn').disabled = false;
-                    updateAvatarStatus('Avatar ready with pre-generated idle animation', 'success');
-                    
-                    if (isStreamConnected) {
-                        startIdleMonitoring();
-                    }
-                    return true;
-                }
-            } catch (error) {
-                console.warn('Failed to fetch pre-generated idle:', error);
-                // Continue to generation below
-            }
-        }
-        
-        // No cached or pre-generated version - generate new one automatically
-        console.log('No cached or pre-generated idle found, generating automatically...');
-        updateAvatarStatus('Generating idle animation automatically...', 'loading');
-        
-        // Update the generate button to show it's working
-        const generateBtn = document.getElementById('generateIdleBtn');
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = '⏳ Auto-generating...';
-        
-        // Use the existing generation logic but streamlined
-        const success = await performIdleGeneration();
-        
-        if (success) {
-            setButtonCompleted('generateIdleBtn', 'Idle Generated ✓');
-            document.getElementById('downloadIdleBtn').disabled = false;
-            updateAvatarStatus('Avatar ready with generated idle animation', 'success');
-            
-            if (isStreamConnected) {
-                startIdleMonitoring();
-            }
-            return true;
-        } else {
-            // If generation fails, update button state but don't fail initialization
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = 'Generate Idle';
-            setButtonStatus('generateIdleBtn', 'pending', 'Auto-gen Failed - Retry');
-            updateAvatarStatus('Avatar connected (idle generation failed)', 'success');
-            return false;
-        }
-        
-    } catch (error) {
-        console.error('Automatic idle setup error:', error);
-        
-        // Don't fail initialization if idle setup fails
-        const generateBtn = document.getElementById('generateIdleBtn');
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = 'Generate Idle';
-        setButtonStatus('generateIdleBtn', 'pending', 'Auto-setup Failed');
-        updateAvatarStatus('Avatar connected (idle setup failed)', 'success');
-        return false;
-    }
-}
-
-// Helper function for the actual idle generation logic
-async function performIdleGeneration() {
-    try {
-        const config = getAvatarConfiguration();
-        const cacheKey = videoCache.generateCacheKey(config);
+        // No cached version - must generate new
+        console.log('No cached version found, generating new idle animation');
+        generateBtn.innerHTML = '⏳ Generating new...';
+        updateAvatarStatus('Generating new idle animation...', 'loading');
+        showStatus('Creating new idle animation (this will cost D-ID credits)...', 'info');
         
         // Determine source URL based on service type
         let sourceUrl = '';
@@ -4499,38 +4372,38 @@ async function performIdleGeneration() {
             voiceConfig.voice_id = optimalVoice;
         }
         
-        // Create idle animation payload
-        const idlePayload = {
-            source_url: sourceUrl,
-            driver_url: "bank://lively/",
-            script: {
-                type: "text",
-                ssml: true,
-                input: "<break time=\"5000ms\"/><break time=\"5000ms\"/><break time=\"5000ms\"/>",
-                provider: voiceConfig
-            },
-            config: {
-                fluent: true,
-                pad_audio: 0.0,
-                stitch: true,
-                result_format: "mp4",
-                crop: {
-                    type: "rectangle",
-                    rectangle: {
-                        top: 0,
-                        left: 0,
-                        width: 1,
-                        height: 1
-                    }
-                },
-                align: {
-                    type: "no-align"
-                },
-                background: {
-                    color: "#16213e"
-                }
-            }
-        };
+// Create idle animation payload with consistent framing
+const idlePayload = {
+    source_url: sourceUrl,
+    driver_url: "bank://lively/",
+    script: {
+        type: "text",
+        ssml: true,
+        input: "<break time=\"5000ms\"/><break time=\"5000ms\"/><break time=\"5000ms\"/>",
+        provider: voiceConfig
+    },
+    config: {
+    fluent: true,
+    pad_audio: 0.0,
+    stitch: true,
+    result_format: "mp4",
+    crop: {
+        type: "rectangle",
+        rectangle: {
+            top: 0,
+            left: 0,
+            width: 1,
+            height: 1
+        }
+    },
+    align: {
+        type: "no-align"
+    },
+    background: {
+        color: "#16213e"
+    }
+}
+};
         
         // Create D-ID talk
         const response = await fetch('https://api.d-id.com/talks', {
@@ -4550,13 +4423,15 @@ async function performIdleGeneration() {
         const talkResponse = await response.json();
         const talkId = talkResponse.id;
         
+        generateBtn.innerHTML = '⏳ Processing...';
         updateAvatarStatus('Processing idle animation...', 'loading');
         const originalVideoUrl = await waitForTalkCompletion(talkId);
         
-        // Fetch video via n8n proxy
+        // Fetch video via n8n proxy (to avoid CORS)
+        generateBtn.innerHTML = '⏳ Fetching video...';
         const videoBlob = await fetchVideoViaN8nProxy(originalVideoUrl);
         
-        // Cache in browser memory
+        // Cache in browser memory for immediate reuse this session
         const objectUrl = URL.createObjectURL(videoBlob);
         const videoData = {
             blob: videoBlob,
@@ -4568,15 +4443,32 @@ async function performIdleGeneration() {
         idleAnimationUrl = objectUrl;
         idleAnimationBlob = videoBlob;
         
-        console.log('Idle animation generated and cached successfully');
-        return true;
+        // Update UI
+        setButtonCompleted('generateIdleBtn', 'Idle Generated ✓');
+        document.getElementById('downloadIdleBtn').disabled = false;
+        updateAvatarStatus('Idle animation ready', 'success');
+        showStatus('✅ Idle animation generated and cached in browser!', 'success');
+        
+        console.log('Idle animation cached in browser for reuse this session');
+        
+        if (isStreamConnected) {
+            startIdleMonitoring();
+        }
         
     } catch (error) {
-        console.error('Idle generation error:', error);
-        throw error;
+        console.error('Idle animation error:', error);
+        updateAvatarStatus(`Generation failed: ${error.message}`, 'error');
+        showStatus(`❌ Failed: ${error.message}`, 'error');
+        
+        const generateBtn = document.getElementById('generateIdleBtn');
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = 'Generate Idle';
+        setButtonStatus('generateIdleBtn', 'pending', 'Generate Idle');
+        
+    } finally {
+        isGeneratingIdle = false;
     }
 }
-        
 
 // Download idle animation as MP4 file
 function downloadIdleAnimation() {
@@ -7335,20 +7227,6 @@ function updateAvatarFromScenario() {
         }
     }
     
-    // NEW: Handle idle animation URL
-    const idleAnimationUrl = currentScenario['Idle Animation URL'] || 
-                            currentScenario['Idle Video URL'] || 
-                            currentScenario['Idle Animation'] ||
-                            currentScenario['Pre-generated Idle'];
-    
-    if (idleAnimationUrl && idleAnimationUrl.trim() !== '') {
-        window.preGeneratedIdleUrl = convertGoogleDriveUrl(idleAnimationUrl.trim());
-        console.log('Pre-generated idle URL found:', window.preGeneratedIdleUrl);
-        hasChanges = true;
-    } else {
-        window.preGeneratedIdleUrl = null;
-    }
-    
     // Save configuration if changes were made
     if (hasChanges) {
         saveConfig();
@@ -7360,9 +7238,6 @@ function updateAvatarFromScenario() {
         }
         if (voiceSelection && voiceSelection.trim() !== '') {
             statusParts.push(`Voice: ${voiceSelection.trim()}`);
-        }
-        if (window.preGeneratedIdleUrl) {
-            statusParts.push(`Pre-gen Idle: Available`);
         }
         
         showStatus(`Loaded from scenario - ${statusParts.join(', ')}`, 'success');
@@ -7860,6 +7735,39 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
