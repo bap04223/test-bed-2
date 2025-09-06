@@ -418,6 +418,84 @@ input:focus, select:focus, textarea:focus {
     transform: translateY(0);
 }
 
+/* Feedback Button */
+.feedback-btn {
+    position: absolute;
+    top: 54px;
+    left: 0;
+    z-index: 10;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--warning-color), #d97706); 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    min-width: 120px;
+    height: 36px;
+    justify-content: center;
+}
+
+.feedback-btn:hover {
+    background: linear-gradient(135deg, #d97706, #b45309); 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    color: white;
+}
+
+.feedback-btn:active {
+    transform: translateY(0);
+}
+
+/* Help Button */
+.help-btn {
+    position: absolute;
+    top: 105px;
+    left: 0;
+    z-index: 10;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #10b981, #047857); 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    min-width: 120px;
+    height: 36px;
+    justify-content: center;
+}
+
+.help-btn:hover {
+    background: linear-gradient(135deg, #047857, #065f46); 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    color: white;
+}
+
+.help-btn:active {
+    transform: translateY(0);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .header {
@@ -576,6 +654,410 @@ input:focus, select:focus, textarea:focus {
                 transform: translateY(0);
             }
         }
+
+        /* Feedback Modal Styles */
+.feedback-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.feedback-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feedback-modal-content {
+    position: relative;
+    width: 95%;
+    max-width: 800px;
+    max-height: 95vh;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    animation: slideIn 0.3s ease-out;
+    border: 1px solid var(--border-color);
+}
+
+.feedback-modal-header {
+    background: var(--warning-color);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.feedback-modal-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.feedback-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.feedback-modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.feedback-modal-body {
+    padding: 20px;
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+}
+
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feedback-form .form-group {
+    margin-bottom: 0;
+}
+
+.feedback-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.feedback-form input,
+.feedback-form select,
+.feedback-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 16px;
+    background: var(--input-background);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.feedback-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.feedback-form input:focus,
+.feedback-form select:focus,
+.feedback-form textarea:focus {
+    outline: none;
+    border-color: var(--warning-color);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+}
+
+.feedback-form .button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.feedback-form .button-group button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.feedback-submit-btn {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.feedback-submit-btn:hover {
+    background-color: #d97706;
+}
+
+.feedback-submit-btn:disabled {
+    background-color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+.feedback-cancel-btn {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.feedback-cancel-btn:hover {
+    background-color: var(--text-secondary);
+}
+
+/* Feedback Form Rating Styles */
+.rating-instructions {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: var(--input-background);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.rating-instructions h4 {
+    margin: 0 0 10px 0;
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+
+.rating-instructions p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.section-header {
+    margin: 25px 0 15px 0;
+    padding: 10px 0;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.section-header h5 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.rating-group {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: var(--input-background);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.rating-group label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+    font-size: 1.1em;
+}
+
+.rating-scale {
+    width: 100%;
+}
+
+.scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.scale-numbers {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3px;
+}
+
+.scale-numbers input[type="radio"] {
+    display: none;
+}
+
+.scale-numbers label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--card-background);
+    margin: 0;
+}
+
+.scale-numbers label:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.scale-numbers input[type="radio"]:checked + label {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Help Modal Styles */
+.help-modal {
+    display: none;
+    position: fixed;
+    z-index: 3000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.help-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.help-modal-content {
+    position: relative;
+    width: 95%;
+    max-width: 900px;
+    max-height: 95vh;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    animation: slideIn 0.3s ease-out;
+    border: 1px solid var(--border-color);
+}
+
+.help-modal-header {
+    background: var(--success-color);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.help-modal-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.help-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.help-modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.help-modal-body {
+    padding: 20px;
+    max-height: calc(95vh - 120px);
+    overflow-y: auto;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.help-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: var(--input-background);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.help-section h4 {
+    margin: 0 0 15px 0;
+    color: var(--success-color);
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.help-section ol,
+.help-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.help-section li {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.help-section strong {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.help-section p {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+/* Mobile responsiveness for rating scales */
+@media (max-width: 768px) {
+    .scale-numbers label {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9em;
+    }
+    
+    .scale-labels {
+        font-size: 0.9em;
+    }
+    
+    .rating-group label {
+        font-size: 1em;
+    }
+    
+    .feedback-modal-content {
+        width: 98%;
+        max-width: none;
+    }
+    
+    .help-modal-content {
+        width: 98%;
+        max-width: none;
+    }
+    
+    .help-modal-body {
+        font-size: 14px;
+    }
+}
         
         /* Button group styling for control buttons */
         .button-group {
@@ -1817,9 +2299,15 @@ a:hover {
                     <div class="card-icon" style="margin: 0; background: linear-gradient(135deg, #fa709a, #fee140);">🎭</div>
                 </div>
                 <p>Practice your consultation skills with our AI-powered patients</p>
-                <a href="https://bap04223.github.io/Landing-Page/" class="back-to-landing-btn" title="Return to Landing Page">
-                    ← Back to Hub
-                </a>
+               <a href="https://bap04223.github.io/Landing-Page/" class="back-to-landing-btn" title="Return to Landing Page">
+    ← Back to Hub
+</a>
+<button class="feedback-btn" onclick="showFeedbackModal()" title="Submit Feedback">
+    💬 Feedback
+</button>
+<button class="help-btn" onclick="showHelpModal()" title="How to Use">
+    ❓ Help
+</button>
             </div>
         </div>
         
@@ -2470,6 +2958,317 @@ a:hover {
         </div>
     </div>
 
+ <!-- Feedback Modal -->
+<div class="feedback-modal" id="feedbackModal" onclick="closeFeedbackModal(event)">
+    <div class="feedback-modal-content" onclick="event.stopPropagation()">
+        <div class="feedback-modal-header">
+            <h3>💬 Submit Feedback</h3>
+            <button class="feedback-modal-close" onclick="closeFeedbackModal()">&times;</button>
+        </div>
+        <div class="feedback-modal-body">
+            <form class="feedback-form" id="feedbackForm">
+                <div class="form-group">
+                    <label for="feedbackName">Name (Optional):</label>
+                    <input type="text" id="feedbackName" placeholder="Your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="feedbackEmail">Email (Optional):</label>
+                    <input type="email" id="feedbackEmail" placeholder="your.email@example.com">
+                </div>
+                
+                <div class="rating-instructions">
+                    <h4>Post-Simulation Feedback Form</h4>
+                    <p><strong>Rating Scale: 1 (Strongly Disagree) - 10 (Strongly Agree)</strong></p>
+                </div>
+                
+                <!-- User Experience Questions -->
+                <div class="section-header">
+                    <h5>User Experience Questions</h5>
+                </div>
+                
+                <div class="form-group rating-group">
+                    <label>1. The AI patient responded in a realistic and believable manner throughout the consultation.</label>
+                    <div class="rating-scale">
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="scale-numbers">
+                            <input type="radio" name="realistic_responses" value="1" id="realistic_1"><label for="realistic_1">1</label>
+                            <input type="radio" name="realistic_responses" value="2" id="realistic_2"><label for="realistic_2">2</label>
+                            <input type="radio" name="realistic_responses" value="3" id="realistic_3"><label for="realistic_3">3</label>
+                            <input type="radio" name="realistic_responses" value="4" id="realistic_4"><label for="realistic_4">4</label>
+                            <input type="radio" name="realistic_responses" value="5" id="realistic_5"><label for="realistic_5">5</label>
+                            <input type="radio" name="realistic_responses" value="6" id="realistic_6"><label for="realistic_6">6</label>
+                            <input type="radio" name="realistic_responses" value="7" id="realistic_7"><label for="realistic_7">7</label>
+                            <input type="radio" name="realistic_responses" value="8" id="realistic_8"><label for="realistic_8">8</label>
+                            <input type="radio" name="realistic_responses" value="9" id="realistic_9"><label for="realistic_9">9</label>
+                            <input type="radio" name="realistic_responses" value="10" id="realistic_10"><label for="realistic_10">10</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group rating-group">
+                    <label>2. The simulation interface was user-friendly and easy to navigate.</label>
+                    <div class="rating-scale">
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="scale-numbers">
+                            <input type="radio" name="user_friendly" value="1" id="friendly_1"><label for="friendly_1">1</label>
+                            <input type="radio" name="user_friendly" value="2" id="friendly_2"><label for="friendly_2">2</label>
+                            <input type="radio" name="user_friendly" value="3" id="friendly_3"><label for="friendly_3">3</label>
+                            <input type="radio" name="user_friendly" value="4" id="friendly_4"><label for="friendly_4">4</label>
+                            <input type="radio" name="user_friendly" value="5" id="friendly_5"><label for="friendly_5">5</label>
+                            <input type="radio" name="user_friendly" value="6" id="friendly_6"><label for="friendly_6">6</label>
+                            <input type="radio" name="user_friendly" value="7" id="friendly_7"><label for="friendly_7">7</label>
+                            <input type="radio" name="user_friendly" value="8" id="friendly_8"><label for="friendly_8">8</label>
+                            <input type="radio" name="user_friendly" value="9" id="friendly_9"><label for="friendly_9">9</label>
+                            <input type="radio" name="user_friendly" value="10" id="friendly_10"><label for="friendly_10">10</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group rating-group">
+                    <label>3. The AI patient's responses were appropriate and relevant to my questions and interventions.</label>
+                    <div class="rating-scale">
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="scale-numbers">
+                            <input type="radio" name="appropriate_responses" value="1" id="appropriate_1"><label for="appropriate_1">1</label>
+                            <input type="radio" name="appropriate_responses" value="2" id="appropriate_2"><label for="appropriate_2">2</label>
+                            <input type="radio" name="appropriate_responses" value="3" id="appropriate_3"><label for="appropriate_3">3</label>
+                            <input type="radio" name="appropriate_responses" value="4" id="appropriate_4"><label for="appropriate_4">4</label>
+                            <input type="radio" name="appropriate_responses" value="5" id="appropriate_5"><label for="appropriate_5">5</label>
+                            <input type="radio" name="appropriate_responses" value="6" id="appropriate_6"><label for="appropriate_6">6</label>
+                            <input type="radio" name="appropriate_responses" value="7" id="appropriate_7"><label for="appropriate_7">7</label>
+                            <input type="radio" name="appropriate_responses" value="8" id="appropriate_8"><label for="appropriate_8">8</label>
+                            <input type="radio" name="appropriate_responses" value="9" id="appropriate_9"><label for="appropriate_9">9</label>
+                            <input type="radio" name="appropriate_responses" value="10" id="appropriate_10"><label for="appropriate_10">10</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Educational Value Questions -->
+                <div class="section-header">
+                    <h5>Educational Value Questions</h5>
+                </div>
+                
+                <div class="form-group rating-group">
+                    <label>4. This simulation helped me practice essential patient communication skills.</label>
+                    <div class="rating-scale">
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="scale-numbers">
+                            <input type="radio" name="communication_skills" value="1" id="comm_1"><label for="comm_1">1</label>
+                            <input type="radio" name="communication_skills" value="2" id="comm_2"><label for="comm_2">2</label>
+                            <input type="radio" name="communication_skills" value="3" id="comm_3"><label for="comm_3">3</label>
+                            <input type="radio" name="communication_skills" value="4" id="comm_4"><label for="comm_4">4</label>
+                            <input type="radio" name="communication_skills" value="5" id="comm_5"><label for="comm_5">5</label>
+                            <input type="radio" name="communication_skills" value="6" id="comm_6"><label for="comm_6">6</label>
+                            <input type="radio" name="communication_skills" value="7" id="comm_7"><label for="comm_7">7</label>
+                            <input type="radio" name="communication_skills" value="8" id="comm_8"><label for="comm_8">8</label>
+                            <input type="radio" name="communication_skills" value="9" id="comm_9"><label for="comm_9">9</label>
+                            <input type="radio" name="communication_skills" value="10" id="comm_10"><label for="comm_10">10</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group rating-group">
+                    <label>5. The scenario challenged me to apply my pharmaceutical knowledge effectively.</label>
+                    <div class="rating-scale">
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="scale-numbers">
+                            <input type="radio" name="pharma_knowledge" value="1" id="pharma_1"><label for="pharma_1">1</label>
+                            <input type="radio" name="pharma_knowledge" value="2" id="pharma_2"><label for="pharma_2">2</label>
+                            <input type="radio" name="pharma_knowledge" value="3" id="pharma_3"><label for="pharma_3">3</label>
+                            <input type="radio" name="pharma_knowledge" value="4" id="pharma_4"><label for="pharma_4">4</label>
+                            <input type="radio" name="pharma_knowledge" value="5" id="pharma_5"><label for="pharma_5">5</label>
+                            <input type="radio" name="pharma_knowledge" value="6" id="pharma_6"><label for="pharma_6">6</label>
+                            <input type="radio" name="pharma_knowledge" value="7" id="pharma_7"><label for="pharma_7">7</label>
+                            <input type="radio" name="pharma_knowledge" value="8" id="pharma_8"><label for="pharma_8">8</label>
+                            <input type="radio" name="pharma_knowledge" value="9" id="pharma_9"><label for="pharma_9">9</label>
+                            <input type="radio" name="pharma_knowledge" value="10" id="pharma_10"><label for="pharma_10">10</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group rating-group">
+                    <label>6. I feel more confident in conducting patient consultations after completing this simulation.</label>
+                    <div class="rating-scale">
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="scale-numbers">
+                            <input type="radio" name="confidence" value="1" id="conf_1"><label for="conf_1">1</label>
+                            <input type="radio" name="confidence" value="2" id="conf_2"><label for="conf_2">2</label>
+                            <input type="radio" name="confidence" value="3" id="conf_3"><label for="conf_3">3</label>
+                            <input type="radio" name="confidence" value="4" id="conf_4"><label for="conf_4">4</label>
+                            <input type="radio" name="confidence" value="5" id="conf_5"><label for="conf_5">5</label>
+                            <input type="radio" name="confidence" value="6" id="conf_6"><label for="conf_6">6</label>
+                            <input type="radio" name="confidence" value="7" id="conf_7"><label for="conf_7">7</label>
+                            <input type="radio" name="confidence" value="8" id="conf_8"><label for="conf_8">8</label>
+                            <input type="radio" name="confidence" value="9" id="conf_9"><label for="conf_9">9</label>
+                            <input type="radio" name="confidence" value="10" id="conf_10"><label for="conf_10">10</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group rating-group">
+                    <label>7. The simulation provided valuable learning opportunities that complement traditional teaching methods.</label>
+                    <div class="rating-scale">
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="scale-numbers">
+                            <input type="radio" name="learning_value" value="1" id="learn_1"><label for="learn_1">1</label>
+                            <input type="radio" name="learning_value" value="2" id="learn_2"><label for="learn_2">2</label>
+                            <input type="radio" name="learning_value" value="3" id="learn_3"><label for="learn_3">3</label>
+                            <input type="radio" name="learning_value" value="4" id="learn_4"><label for="learn_4">4</label>
+                            <input type="radio" name="learning_value" value="5" id="learn_5"><label for="learn_5">5</label>
+                            <input type="radio" name="learning_value" value="6" id="learn_6"><label for="learn_6">6</label>
+                            <input type="radio" name="learning_value" value="7" id="learn_7"><label for="learn_7">7</label>
+                            <input type="radio" name="learning_value" value="8" id="learn_8"><label for="learn_8">8</label>
+                            <input type="radio" name="learning_value" value="9" id="learn_9"><label for="learn_9">9</label>
+                            <input type="radio" name="learning_value" value="10" id="learn_10"><label for="learn_10">10</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group rating-group">
+                    <label>8. I would recommend this simulation to other pharmacy students.</label>
+                    <div class="rating-scale">
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="scale-numbers">
+                            <input type="radio" name="recommend" value="1" id="rec_1"><label for="rec_1">1</label>
+                            <input type="radio" name="recommend" value="2" id="rec_2"><label for="rec_2">2</label>
+                            <input type="radio" name="recommend" value="3" id="rec_3"><label for="rec_3">3</label>
+                            <input type="radio" name="recommend" value="4" id="rec_4"><label for="rec_4">4</label>
+                            <input type="radio" name="recommend" value="5" id="rec_5"><label for="rec_5">5</label>
+                            <input type="radio" name="recommend" value="6" id="rec_6"><label for="rec_6">6</label>
+                            <input type="radio" name="recommend" value="7" id="rec_7"><label for="rec_7">7</label>
+                            <input type="radio" name="recommend" value="8" id="rec_8"><label for="rec_8">8</label>
+                            <input type="radio" name="recommend" value="9" id="rec_9"><label for="rec_9">9</label>
+                            <input type="radio" name="recommend" value="10" id="rec_10"><label for="rec_10">10</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feedbackMessage">Additional Comments (Optional):</label>
+                    <textarea id="feedbackMessage" placeholder="Please share any additional feedback, suggestions, or comments about your experience..."></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="feedback-cancel-btn" onclick="closeFeedbackModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="feedback-submit-btn" id="feedbackSubmitBtn">
+                        Submit Feedback
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="help-modal" id="helpModal" onclick="closeHelpModal(event)">
+    <div class="help-modal-content" onclick="event.stopPropagation()">
+        <div class="help-modal-header">
+            <h3>❓ How to Use the Training System</h3>
+            <button class="help-modal-close" onclick="closeHelpModal()">&times;</button>
+        </div>
+        <div class="help-modal-body">
+            <div class="help-section">
+                <h4>🚀 Getting Started</h4>
+                <ol>
+                    <li><strong>Load Configurations:</strong> Enter your Chatbot ID and Scenario Sets ID, then click the load buttons to populate the dropdown menus.</li>
+                    <li><strong>Select Chatbot:</strong> Choose the AI chatbot configuration you want to practice with from the dropdown.</li>
+                    <li><strong>Select Scenario Set:</strong> Choose the collection of patient scenarios you want to use.</li>
+                    <li><strong>Choose Sheet:</strong> Select the specific sheet containing your scenarios.</li>
+                    <li><strong>Pick a Scenario:</strong> Either select a specific patient scenario or use "Random Scenario" for surprise practice.</li>
+                    <li><strong>Initialize Avatar:</strong> Click "Initialize & Connect Avatar" to set up the video patient.</li>
+                </ol>
+            </div>
+            
+            <div class="help-section">
+                <h4>🎭 During the Video Consultation</h4>
+                <ol>
+                    <li><strong>Start Speaking:</strong> Hold down the "Start Recording" button and speak your consultation naturally.</li>
+                    <li><strong>Professional Communication:</strong> Introduce yourself, ask appropriate questions, provide advice as you would with a real patient.</li>
+                    <li><strong>View Patient Image:</strong> If available, click the patient image button (📷) to see visual information about your patient.</li>
+                    <li><strong>Watch Avatar Response:</strong> The AI patient will respond with both speech and realistic video animation.</li>
+                    <li><strong>Continue Dialogue:</strong> Keep the conversation going by recording your responses to build consultation skills.</li>
+                </ol>
+            </div>
+            
+            <div class="help-section">
+                <h4>🎤 Recording Controls</h4>
+                <ul>
+                    <li><strong>Start Recording:</strong> Click the blue microphone button or press SPACEBAR</li>
+                    <li><strong>Stop Recording:</strong> Click the red stop button or press SPACEBAR again</li>
+                    <li><strong>Review & Edit:</strong> Check your transcription before sending - you can edit it if needed</li>
+                    <li><strong>Send Message:</strong> Click "Send Message" or press ENTER to submit your response</li>
+                    <li><strong>Delete & Retry:</strong> Use this if you want to record again</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h4>📊 Managing Your Session</h4>
+                <ul>
+                    <li><strong>Clear Chat:</strong> Remove all messages to start fresh with the same scenario</li>
+                    <li><strong>New Session:</strong> Start completely over with a new session ID</li>
+                    <li><strong>Export Chat:</strong> Download your conversation as a text file for review</li>
+                    <li><strong>Submit Chat:</strong> Send your consultation to your instructor for evaluation</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h4>🎯 Best Practices</h4>
+                <ul>
+                    <li><strong>Be Professional:</strong> Practice real-world communication skills</li>
+                    <li><strong>Ask Questions:</strong> Gather information about symptoms, medications, allergies</li>
+                    <li><strong>Provide Clear Advice:</strong> Give specific, actionable recommendations</li>
+                    <li><strong>Show Empathy:</strong> Acknowledge patient concerns and feelings</li>
+                    <li><strong>Follow Up:</strong> Ask if the patient has any other questions</li>
+                    <li><strong>Speak Clearly:</strong> The speech recognition works best with clear, steady speech</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h4>🔧 Troubleshooting</h4>
+                <ul>
+                    <li><strong>No Video Response:</strong> Check that you've initialized the avatar and selected a scenario</li>
+                    <li><strong>Speech Not Recognized:</strong> Speak more clearly, check microphone permissions</li>
+                    <li><strong>Can't Load Scenarios:</strong> Verify your Google Sheet IDs are correct and publicly accessible</li>
+                    <li><strong>Avatar Won't Initialize:</strong> Check your D-ID API key and internet connection</li>
+                    <li><strong>No Audio from Avatar:</strong> Check your speakers/headphones and browser audio settings</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h4>💡 Need More Help?</h4>
+                <p>If you encounter issues or have suggestions for improvement, click the <strong>Feedback</strong> button to submit a report. Include details about what you were trying to do and what went wrong.</p>
+            </div>
+        </div>
+    </div>
+</div>
+    
 <!-- JavaScript code for functionality -->
     <script>    
       // ===== BROWSER VIDEO CACHE CLASS =====
@@ -7906,10 +8705,235 @@ function forceTimerStyling() {
         timerDisplay.classList.remove('fullscreen-critical-pulse');
     }
 }
-      
+
+// ===== FEEDBACK MODAL FUNCTIONS =====
+
+function showFeedbackModal() {
+    const modal = document.getElementById('feedbackModal');
+    modal.classList.add('show');
+    
+    // Focus on the first input
+    setTimeout(() => {
+        document.getElementById('feedbackName').focus();
+    }, 300);
+}
+
+function closeFeedbackModal(event) {
+    // If event is passed and it's not the backdrop click, ignore
+    if (event && event.target !== event.currentTarget && event.type === 'click') {
+        return;
+    }
+    
+    const modal = document.getElementById('feedbackModal');
+    modal.classList.remove('show');
+    
+    // Reset form
+    document.getElementById('feedbackForm').reset();
+    
+    // Reset submit button
+    const submitBtn = document.getElementById('feedbackSubmitBtn');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Feedback';
+}
+
+async function submitFeedback(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('feedbackSubmitBtn');
+    
+    // Disable submit button and show loading state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    
+    try {
+        // Collect form data
+        const feedbackData = {
+            name: document.getElementById('feedbackName').value.trim(),
+            email: document.getElementById('feedbackEmail').value.trim(),
+            ratings: {
+                realistic_responses: getRadioValue('realistic_responses'),
+                user_friendly: getRadioValue('user_friendly'),
+                appropriate_responses: getRadioValue('appropriate_responses'),
+                communication_skills: getRadioValue('communication_skills'),
+                pharma_knowledge: getRadioValue('pharma_knowledge'),
+                confidence: getRadioValue('confidence'),
+                learning_value: getRadioValue('learning_value'),
+                recommend: getRadioValue('recommend')
+            },
+            additional_comments: document.getElementById('feedbackMessage').value.trim(),
+            timestamp: new Date().toISOString(),
+            sessionId: sessionId,
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+            currentScenario: currentScenario ? {
+                name: currentScenario['Patient Name'] || currentScenario['Scenario Name'] || 'Unknown',
+                id: currentScenario.id || 'Unknown'
+            } : null,
+            systemInfo: {
+                chatbotConfig: currentChatbotConfig ? currentChatbotConfig.name : 'None',
+                scenarioSet: currentScenarioSet ? currentScenarioSet.name : 'None',
+                messageCount: conversationHistory.length
+            }
+        };
+
+        // Create CSV formatted data
+        const csvData = formatFeedbackAsCSV(feedbackData);
+        
+        // Add CSV data to the payload
+        feedbackData.csvFormatted = csvData;
+        
+        console.log('Submitting feedback:', feedbackData);
+        
+        // Use a feedback webhook URL - you'll need to configure this
+        const webhookUrl = 'YOUR_FEEDBACK_WEBHOOK_URL'; // Replace with your feedback webhook
+        
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            mode: 'cors',
+            body: JSON.stringify(feedbackData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Success
+        submitBtn.textContent = '✅ Sent!';
+        submitBtn.style.backgroundColor = 'var(--success-color)';
+        
+        showStatus('✅ Feedback submitted successfully! Thank you for your input.', 'success');
+        
+        // Close modal after short delay
+        setTimeout(() => {
+            closeFeedbackModal();
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Feedback submission error:', error);
+        
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Retry Submission';
+        submitBtn.style.backgroundColor = 'var(--danger-color)';
+        
+        if (error.message.includes('Failed to fetch')) {
+            showStatus('❌ Cannot reach feedback server. Please check your connection.', 'error');
+        } else {
+            showStatus(`❌ Feedback submission failed: ${error.message}`, 'error');
+        }
+        
+        // Reset button color after 3 seconds
+        setTimeout(() => {
+            submitBtn.style.backgroundColor = 'var(--warning-color)';
+            submitBtn.textContent = 'Submit Feedback';
+        }, 3000);
+    }
+}
+
+// Helper function to get radio button values
+function getRadioValue(name) {
+    const radio = document.querySelector(`input[name="${name}"]:checked`);
+    return radio ? parseInt(radio.value) : null;
+}
+
+// Helper function to format feedback data as CSV
+function formatFeedbackAsCSV(data) {
+    const headers = [
+        'Timestamp',
+        'Session ID',
+        'Name',
+        'Email',
+        'Scenario Name',
+        'Chatbot Config',
+        'Realistic Responses (1-10)',
+        'User Friendly Interface (1-10)',
+        'Appropriate Responses (1-10)',
+        'Communication Skills Practice (1-10)',
+        'Pharmaceutical Knowledge Application (1-10)',
+        'Confidence Building (1-10)',
+        'Learning Value (1-10)',
+        'Would Recommend (1-10)',
+        'Additional Comments',
+        'Message Count',
+        'User Agent'
+    ];
+    
+    const values = [
+        data.timestamp,
+        data.sessionId,
+        `"${data.name || ''}"`,
+        `"${data.email || ''}"`,
+        `"${data.currentScenario ? data.currentScenario.name : ''}"`,
+        `"${data.systemInfo.chatbotConfig}"`,
+        data.ratings.realistic_responses || '',
+        data.ratings.user_friendly || '',
+        data.ratings.appropriate_responses || '',
+        data.ratings.communication_skills || '',
+        data.ratings.pharma_knowledge || '',
+        data.ratings.confidence || '',
+        data.ratings.learning_value || '',
+        data.ratings.recommend || '',
+        `"${data.additional_comments.replace(/"/g, '""')}"`, // Escape quotes in comments
+        data.systemInfo.messageCount,
+        `"${data.userAgent}"`
+    ];
+    
+    return {
+        headers: headers.join(','),
+        row: values.join(','),
+        fullCSV: headers.join(',') + '\n' + values.join(',')
+    };
+}
+
+// ===== HELP MODAL FUNCTIONS =====
+
+function showHelpModal() {
+    const modal = document.getElementById('helpModal');
+    modal.classList.add('show');
+}
+
+function closeHelpModal(event) {
+    // If event is passed and it's not the backdrop click, ignore
+    if (event && event.target !== event.currentTarget && event.type === 'click') {
+        return;
+    }
+    
+    const modal = document.getElementById('helpModal');
+    modal.classList.remove('show');
+}
+
+// Add event listener for feedback form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const feedbackForm = document.getElementById('feedbackForm');
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', submitFeedback);
+    }
+});
+
+// Add keyboard support for closing modals with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const feedbackModal = document.getElementById('feedbackModal');
+        const helpModal = document.getElementById('helpModal');
+        
+        if (feedbackModal && feedbackModal.classList.contains('show')) {
+            closeFeedbackModal();
+        }
+        
+        if (helpModal && helpModal.classList.contains('show')) {
+            closeHelpModal();
+        }
+    }
+});
+        
     </script>
 </body>
 </html>
+
 
 
 
