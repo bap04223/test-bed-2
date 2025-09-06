@@ -1148,8 +1148,6 @@ input:focus, select:focus, textarea:focus {
     object-position: center center; /* Force center positioning */
 }
 
-        
-
 /* COLLAPSIBLE CONFIGURATION PANEL */
 .collapse-btn {
     float: right;
@@ -2257,7 +2255,6 @@ a:hover {
     onclick="initializeDID()" 
     style="margin-bottom: 5px; width: 100%;"
     id="initializeAvatarBtn"
-    title="Select a scenario first, then initialize avatar"
 >
     Initialize & Connect Avatar
 </button>
@@ -2270,9 +2267,9 @@ a:hover {
         onclick="generateIdleAnimation()" 
         style="flex: 1; font-size: 12px; padding: 8px;"
         id="generateIdleBtn"
-        title="Check for cached or pre-generated idle animation"
+        title="Generate 15-second idle animation"
     >
-        Check for Idle
+        Generate Idle
     </button>
     <button 
         type="button"
@@ -2362,7 +2359,7 @@ a:hover {
     </div>
 </div>
    
- /* Idle Animation Video (Background Layer) */
+   <!-- Idle Animation Video (Background Layer) -->
 <video 
     id="idleVideo" 
     width="100%" 
@@ -2375,8 +2372,7 @@ a:hover {
         background-color: var(--chat-background); 
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        object-position: center center;
+        object-fit: contain;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         display: block;
         margin: 0 auto;
@@ -2385,7 +2381,7 @@ a:hover {
         left: 0;
         opacity: 1;
         z-index: 1;
-        transition: opacity 0.1s ease-in-out;
+        transition: opacity 0.5s ease-in-out;
     "
 >
 </video>
@@ -2402,8 +2398,7 @@ a:hover {
         background-color: transparent; 
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        object-position: center center;
+        object-fit: contain;
         display: block;
         margin: 0 auto;
         position: absolute;
@@ -2411,7 +2406,7 @@ a:hover {
         left: 0;
         opacity: 0;
         z-index: 2;
-        transition: opacity 0.3s ease-in-out;
+        transition: opacity 0.5s ease-in-out;
     "
 >
 </video>
@@ -2555,7 +2550,7 @@ let idleAnimationBlob = null;     // Cached idle animation as blob for download
 let isPlayingIdle = false;        // Track if idle animation is currently playing
 let idleCheckInterval = null;     // Interval for checking when to show idle
 let lastActivityTime = Date.now(); // Last time there was avatar activity
-const IDLE_DELAY = 0;         // Show idle after 1 seconds of inactivity
+const IDLE_DELAY = 0;         // Show idle after 0.5 seconds of inactivity
 
         // ===== D-ID AVATAR CONFIGURATION VARIABLES =====
 let serviceType = 'talks';        // Service type (talks or clips)
@@ -3666,11 +3661,6 @@ async function initializeDID() {
         console.log('=== initializeDID() called ===');
         updateAvatarStatus('Initializing D-ID Streaming...', 'loading');
         
-        // Check if scenario is selected first
-        if (!currentScenario) {
-            throw new Error('Please select a patient scenario first');
-        }
-        
         // Get API key from configuration
         didApiKey = document.getElementById('didApiKey').value;
         
@@ -3899,11 +3889,8 @@ async function connectStream() {
             throw new Error(`Failed to send SDP answer: ${sdpResponse.status} - ${errorText}`);
         }
         
-     console.log('SDP answer sent successfully');
+       console.log('SDP answer sent successfully');
 updateAvatarStatus(`${config.serviceType.toUpperCase()} stream connected - Ready for speech`, 'success');
-
-// Start connection health monitoring
-startConnectionHealthMonitoring();
 
 // Start idle monitoring if idle animation is available
 if (idleAnimationUrl) {
@@ -4006,128 +3993,29 @@ function onIceCandidate(event) {
 
 // FIXED: Enhanced Connection State Handler
 function onIceConnectionStateChange() {
-    const state = peerConnection.iceConnectionState;
-    console.log('ICE connection state changed to:', state);
+    console.log('ICE connection state changed to:', peerConnection.iceConnectionState);
     
-    if (state === 'connected' || state === 'completed') {
+    if (peerConnection.iceConnectionState === 'connected' || peerConnection.iceConnectionState === 'completed') {
         isStreamConnected = true;
         const currentServiceType = document.getElementById('serviceType').value;
         updateAvatarStatus(`${currentServiceType.toUpperCase()} stream ready for speech`, 'success');
         console.log('Stream connection established successfully');
         
-        // Clear any previous disconnection messages
-        showStatus('Avatar stream connected successfully', 'success');
-        
-    } else if (state === 'disconnected') {
-        console.log('ICE connection temporarily disconnected - attempting to reconnect...');
-        updateAvatarStatus('Connection interrupted - attempting to reconnect...', 'error');
-        showStatus('Avatar connection interrupted - reconnecting...', 'error');
-        
-        // Add chat notification for disconnection
-        addMessage('🔌 Avatar connection temporarily lost. Attempting to reconnect...', 'system');
-        
-    } else if (state === 'failed' || state === 'closed') {
+    } else if (peerConnection.iceConnectionState === 'failed' || peerConnection.iceConnectionState === 'closed') {
         isStreamConnected = false;
-        console.log('ICE connection failed or closed permanently');
         updateAvatarStatus('Stream connection lost', 'error');
-        showStatus('Avatar connection lost - re-initialization required', 'error');
-        
-        // Add chat notification for permanent disconnection
-        addMessage('🔌 Avatar connection has been lost. Click "Initialize & Connect Avatar" to reconnect for video responses.', 'system');
-        
-        // Reset avatar initialization status
-        if (isAvatarInitialized) {
-            setButtonStatus('initializeAvatarBtn', 'pending', 'Initialize & Connect Avatar');
-            isAvatarInitialized = false;
-        }
+        console.log('Stream connection lost or failed');
         
         // Auto-cleanup on failure
         setTimeout(() => {
             closeStreamConnection();
         }, 1000);
-        
-    } else if (state === 'checking') {
-        console.log('ICE connection checking...');
-        updateAvatarStatus('Checking connection...', 'loading');
-        
-    } else if (state === 'new') {
-        console.log('ICE connection starting...');
-        updateAvatarStatus('Establishing connection...', 'loading');
     }
 }
 
 function onConnectionStateChange() {
-    const state = peerConnection.connectionState;
-    console.log('Peer connection state changed to:', state);
-    
-    if (state === 'connected') {
-        console.log('Peer connection fully established');
-        
-    } else if (state === 'disconnected') {
-        console.log('Peer connection disconnected');
-        showStatus('Avatar peer connection disconnected', 'error');
-        
-    } else if (state === 'failed') {
-        console.log('Peer connection failed');
-        showStatus('Avatar peer connection failed - restart required', 'error');
-        addMessage('🔌 Avatar peer connection failed. Please re-initialize the avatar.', 'system');
-        
-        // Reset connection status
-        isStreamConnected = false;
-        if (isAvatarInitialized) {
-            setButtonStatus('initializeAvatarBtn', 'pending', 'Initialize & Connect Avatar');
-            isAvatarInitialized = false;
-        }
-        
-    } else if (state === 'closed') {
-        console.log('Peer connection closed');
-        isStreamConnected = false;
-        
-    } else if (state === 'connecting') {
-        console.log('Peer connection attempting to connect');
-        updateAvatarStatus('Connecting...', 'loading');
-    }
+    console.log('Connection state:', peerConnection.connectionState);
 }
-
-// Periodic connection health monitoring
-let connectionHealthInterval = null;
-
-function startConnectionHealthMonitoring() {
-    // Clear any existing monitoring
-    if (connectionHealthInterval) {
-        clearInterval(connectionHealthInterval);
-    }
-    
-    connectionHealthInterval = setInterval(() => {
-        if (peerConnection && isAvatarInitialized) {
-            const iceState = peerConnection.iceConnectionState;
-            const connectionState = peerConnection.connectionState;
-            
-            // Check if connection has degraded
-            if ((iceState === 'failed' || iceState === 'closed' || 
-                 connectionState === 'failed' || connectionState === 'closed') && 
-                isStreamConnected) {
-                
-                console.log('Connection health check detected failure:', { iceState, connectionState });
-                
-                // Trigger the appropriate state change handler
-                if (iceState === 'failed' || iceState === 'closed') {
-                    onIceConnectionStateChange();
-                } else if (connectionState === 'failed' || connectionState === 'closed') {
-                    onConnectionStateChange();
-                }
-            }
-        }
-    }, 5000); // Check every 5 seconds
-}
-
-function stopConnectionHealthMonitoring() {
-    if (connectionHealthInterval) {
-        clearInterval(connectionHealthInterval);
-        connectionHealthInterval = null;
-    }
-}
-        
 
 function onSignalingStateChange() {
     console.log('Signaling state:', peerConnection.signalingState);
@@ -4143,7 +4031,6 @@ function setVideoElement(stream) {
     if (!stream || !avatarVideo) return;
     
     avatarVideo.srcObject = stream;
-    avatarVideo.style.objectFit = 'cover'; // Force cover to match idle video size
     avatarVideo.muted = false;
     avatarVideo.volume = 0.8;
     
@@ -4253,9 +4140,6 @@ stopIdleMonitoring();
             console.error('Error deleting stream on server:', error);
         }
     }
-    
-    // Stop connection health monitoring
-    stopConnectionHealthMonitoring();
     
     // Clear stream variables
     streamId = null;
@@ -4474,8 +4358,13 @@ if (avatarVideo) {
 
         // Idle animation generation
 async function generateIdleAnimation() {
+    if (!didApiKey) {
+        showStatus('Please enter D-ID API key first', 'error');
+        return;
+    }
+    
     if (isGeneratingIdle) {
-        showStatus('Idle animation setup already in progress', 'info');
+        showStatus('Idle animation generation already in progress', 'info');
         return;
     }
 
@@ -4484,25 +4373,25 @@ async function generateIdleAnimation() {
         
         const generateBtn = document.getElementById('generateIdleBtn');
         generateBtn.disabled = true;
-        generateBtn.innerHTML = '⏳ Checking for idle...';
+        generateBtn.innerHTML = '⏳ Checking cache...';
         
-        // Use the simplified setup logic
+        // Use the same logic as automatic setup
         const success = await handleIdleAnimationSetup();
         
         if (success) {
-            showStatus('Idle animation ready!', 'success');
+            showStatus('✅ Idle animation ready!', 'success');
         } else {
-            showStatus('No idle animation available. Use external generator to create idle animations.', 'info');
+            showStatus('❌ Idle animation generation failed', 'error');
         }
         
     } catch (error) {
-        console.error('Idle animation setup error:', error);
-        showStatus(`Setup failed: ${error.message}`, 'error');
+        console.error('Manual idle animation error:', error);
+        showStatus(`❌ Failed: ${error.message}`, 'error');
         
         const generateBtn = document.getElementById('generateIdleBtn');
         generateBtn.disabled = false;
-        generateBtn.innerHTML = 'Check for Idle';
-        setButtonStatus('generateIdleBtn', 'pending', 'Check for Idle');
+        generateBtn.innerHTML = 'Generate Idle';
+        setButtonStatus('generateIdleBtn', 'pending', 'Generate Idle');
         
     } finally {
         isGeneratingIdle = false;
@@ -4510,10 +4399,10 @@ async function generateIdleAnimation() {
 }
 
 
-// Simplified idle animation setup - only handles cached and pre-generated
+// NEW: Automatic idle animation setup during initialization
 async function handleIdleAnimationSetup() {
     try {
-        console.log('=== Starting idle animation setup (cached/pre-generated only) ===');
+        console.log('=== Starting automatic idle animation setup ===');
         
         // Get current avatar configuration
         const config = getAvatarConfiguration();
@@ -4569,27 +4458,160 @@ async function handleIdleAnimationSetup() {
                 }
             } catch (error) {
                 console.warn('Failed to fetch pre-generated idle:', error);
-                updateAvatarStatus('Pre-generated idle failed to load', 'error');
+                // Continue to generation below
             }
         }
         
-        // No cached or pre-generated version available
-        console.log('No idle animation available - avatar will work without idle');
-        updateAvatarStatus('Avatar ready (no idle animation available)', 'success');
-        setButtonStatus('generateIdleBtn', 'pending', 'No Idle Available');
-        document.getElementById('downloadIdleBtn').disabled = true;
+        // No cached or pre-generated version - generate new one automatically
+        console.log('No cached or pre-generated idle found, generating automatically...');
+        updateAvatarStatus('Generating idle animation automatically...', 'loading');
         
-        return false; // No idle available, but don't fail initialization
+        // Update the generate button to show it's working
+        const generateBtn = document.getElementById('generateIdleBtn');
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '⏳ Auto-generating...';
+        
+        // Use the existing generation logic but streamlined
+        const success = await performIdleGeneration();
+        
+        if (success) {
+            setButtonCompleted('generateIdleBtn', 'Idle Generated ✓');
+            document.getElementById('downloadIdleBtn').disabled = false;
+            updateAvatarStatus('Avatar ready with generated idle animation', 'success');
+            
+            if (isStreamConnected) {
+                startIdleMonitoring();
+            }
+            return true;
+        } else {
+            // If generation fails, update button state but don't fail initialization
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = 'Generate Idle';
+            setButtonStatus('generateIdleBtn', 'pending', 'Auto-gen Failed - Retry');
+            updateAvatarStatus('Avatar connected (idle generation failed)', 'success');
+            return false;
+        }
         
     } catch (error) {
-        console.error('Idle setup error:', error);
-        updateAvatarStatus('Avatar ready (idle setup failed)', 'success');
-        setButtonStatus('generateIdleBtn', 'pending', 'Idle Setup Failed');
+        console.error('Automatic idle setup error:', error);
+        
+        // Don't fail initialization if idle setup fails
+        const generateBtn = document.getElementById('generateIdleBtn');
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = 'Generate Idle';
+        setButtonStatus('generateIdleBtn', 'pending', 'Auto-setup Failed');
+        updateAvatarStatus('Avatar connected (idle setup failed)', 'success');
         return false;
     }
 }
 
-
+// Helper function for the actual idle generation logic
+async function performIdleGeneration() {
+    try {
+        const config = getAvatarConfiguration();
+        const cacheKey = videoCache.generateCacheKey(config);
+        
+        // Determine source URL based on service type
+        let sourceUrl = '';
+        if (config.serviceType === 'talks' && config.sourceUrl) {
+            sourceUrl = config.sourceUrl;
+        } else if (config.serviceType === 'clips' && config.presenterId) {
+            sourceUrl = `https://clips-presenters.d-id.com/${config.presenterId}/image.png`;
+        } else {
+            sourceUrl = defaultPresenterUrl;
+        }
+        
+        // Get voice configuration
+        let voiceConfig = {
+            type: 'microsoft',
+            voice_id: 'en-US-JennyNeural'
+        };
+        
+        const manualVoiceSelection = document.getElementById('voiceSelection').value;
+        if (manualVoiceSelection) {
+            voiceConfig.voice_id = manualVoiceSelection;
+        } else if (config.serviceType === 'clips' && config.presenterId) {
+            const optimalVoice = getPresenterVoice(config.presenterId);
+            voiceConfig.voice_id = optimalVoice;
+        }
+        
+        // Create idle animation payload
+        const idlePayload = {
+            source_url: sourceUrl,
+            driver_url: "bank://lively/",
+            script: {
+                type: "text",
+                ssml: true,
+                input: "<break time=\"5000ms\"/><break time=\"5000ms\"/><break time=\"5000ms\"/>",
+                provider: voiceConfig
+            },
+            config: {
+                fluent: true,
+                pad_audio: 0.0,
+                stitch: true,
+                result_format: "mp4",
+                crop: {
+                    type: "rectangle",
+                    rectangle: {
+                        top: 0,
+                        left: 0,
+                        width: 1,
+                        height: 1
+                    }
+                },
+                align: {
+                    type: "no-align"
+                },
+                background: {
+                    color: "#16213e"
+                }
+            }
+        };
+        
+        // Create D-ID talk
+        const response = await fetch('https://api.d-id.com/talks', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${didApiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(idlePayload)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to create idle animation: ${response.status} - ${errorText}`);
+        }
+        
+        const talkResponse = await response.json();
+        const talkId = talkResponse.id;
+        
+        updateAvatarStatus('Processing idle animation...', 'loading');
+        const originalVideoUrl = await waitForTalkCompletion(talkId);
+        
+        // Fetch video via n8n proxy
+        const videoBlob = await fetchVideoViaN8nProxy(originalVideoUrl);
+        
+        // Cache in browser memory
+        const objectUrl = URL.createObjectURL(videoBlob);
+        const videoData = {
+            blob: videoBlob,
+            url: objectUrl,
+            source: 'newly_generated'
+        };
+        
+        videoCache.storeInCache(cacheKey, videoData);
+        idleAnimationUrl = objectUrl;
+        idleAnimationBlob = videoBlob;
+        
+        console.log('Idle animation generated and cached successfully');
+        return true;
+        
+    } catch (error) {
+        console.error('Idle generation error:', error);
+        throw error;
+    }
+}
         
 
 // Download idle animation as MP4 file
@@ -4674,10 +4696,6 @@ function showIdleLayer() {
     
     if (idleVideo && avatarVideo) {
         console.log('Showing idle layer');
-        
-        // Synchronize video dimensions before transitioning
-        synchronizeVideoSizes();
-        
         idleVideo.style.opacity = '1';
         avatarVideo.style.opacity = '0';
         updateAvatarStatus('Showing idle animation', 'info');
@@ -4691,46 +4709,12 @@ function showAvatarLayer() {
     
     if (idleVideo && avatarVideo) {
         console.log('Showing avatar layer');
-        
-        // Synchronize video dimensions before transitioning
-        synchronizeVideoSizes();
-        
         avatarVideo.style.opacity = '1';
         idleVideo.style.opacity = '0'; // Completely hide idle when avatar is active
         updateAvatarStatus('Avatar speaking', 'playing');
     }
 }
 
-        // Synchronize video element sizes to prevent jumping
-function synchronizeVideoSizes() {
-    const idleVideo = document.getElementById('idleVideo');
-    const avatarVideo = document.getElementById('avatarVideo');
-    
-    if (!idleVideo || !avatarVideo) return;
-    
-    // Get the current container dimensions
-    const videoWrapper = document.querySelector('.video-wrapper');
-    if (!videoWrapper) return;
-    
-    const containerRect = videoWrapper.getBoundingClientRect();
-    
-    // Apply consistent sizing to both videos
-    const videos = [idleVideo, avatarVideo];
-    videos.forEach(video => {
-        // Force consistent object-fit behavior
-        video.style.objectFit = 'cover';
-        video.style.objectPosition = 'center center';
-        
-        // Ensure dimensions match container exactly
-        video.style.width = '100%';
-        video.style.height = '100%';
-        
-        // Force a reflow to apply changes immediately
-        video.offsetHeight;
-    });
-    
-    console.log('Video sizes synchronized for container:', containerRect.width, 'x', containerRect.height);
-}
 // Start monitoring for idle state with overlay system
 function startIdleMonitoring() {
     if (idleCheckInterval) {
@@ -4780,7 +4764,7 @@ function startIdleMonitoring() {
             showIdleLayer();
         }
         
-    }, 100); // Check every 100ms for responsive transitions
+    }, 300); // Check every 300ms for responsive transitions
     
     console.log('Idle monitoring with overlay system started');
 }
@@ -5539,12 +5523,6 @@ clearChat();
     // Add initial message
     addMessage('Scenario loaded. Press the start recoding button to start the consultation.', 'ai');
 }     
-
-        // Update avatar button tooltip now that scenario is selected
-    const avatarBtn = document.getElementById('initializeAvatarBtn');
-    if (avatarBtn && !isAvatarInitialized) {
-        avatarBtn.title = 'Initialize avatar with current scenario settings';
-    }
         
         // ===== MULTI-IMAGE PATIENT GALLERY =====
 // Global variables for image gallery
@@ -6883,11 +6861,6 @@ function forceScrollToBottom() {
     button.disabled = true;
     button.title = 'No Scenario Selected';
 }
-           // Update avatar button tooltip if no scenario
-    const avatarBtn = document.getElementById('initializeAvatarBtn');
-    if (avatarBtn && !currentScenario) {
-        avatarBtn.title = 'Select a scenario first, then initialize avatar';
-    }
 }
 
 // ===== CORS PROXY FUNCTION =====
@@ -7132,10 +7105,6 @@ if (reviewOverlay) {
     // Sync back to original
     syncReviewSections(true);
 }
-    // Synchronize video sizes when entering/exiting fullscreen
-    setTimeout(() => {
-        synchronizeVideoSizes();
-    }, 300); // Wait for fullscreen transition to complete
 }
 
 function enterVideoFullscreen() {
@@ -7957,6 +7926,11 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
+
+
+
+
 
 
 
