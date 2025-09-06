@@ -2550,7 +2550,7 @@ let idleAnimationBlob = null;     // Cached idle animation as blob for download
 let isPlayingIdle = false;        // Track if idle animation is currently playing
 let idleCheckInterval = null;     // Interval for checking when to show idle
 let lastActivityTime = Date.now(); // Last time there was avatar activity
-const IDLE_DELAY = 0;         // Show idle after 0.5 seconds of inactivity
+const IDLE_DELAY = 500;         // Show idle after 0.5 seconds of inactivity
 
         // ===== D-ID AVATAR CONFIGURATION VARIABLES =====
 let serviceType = 'talks';        // Service type (talks or clips)
@@ -2772,45 +2772,9 @@ function newSession() {
 streamId = null;
 didSessionId = null;
 
-// Complete idle animation reset
-    stopIdleMonitoring();
-    isPlayingIdle = false;
-    
-    // Clear idle animation data
-    if (idleAnimationUrl) {
-        URL.revokeObjectURL(idleAnimationUrl);
-        idleAnimationUrl = null;
-    }
-    idleAnimationBlob = null;
-    window.preGeneratedIdleUrl = null;
-    
-    // Reset idle video element
-    const idleVideo = document.getElementById('idleVideo');
-    if (idleVideo) {
-        idleVideo.pause();
-        idleVideo.src = '';
-        idleVideo.style.opacity = '0';
-    }
-    
-    // Reset idle animation buttons to initial state
-    const generateBtn = document.getElementById('generateIdleBtn');
-    const downloadBtn = document.getElementById('downloadIdleBtn');
-    
-    if (generateBtn) {
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = 'Generate Idle';
-        setButtonStatus('generateIdleBtn', 'pending', 'Generate Idle');
-    }
-    
-    if (downloadBtn) {
-        downloadBtn.disabled = true;
-    }
-    
-    // Clear browser cache for idle animations (optional - removes all cached idles)
-    if (videoCache && videoCache.memoryCache) {
-        videoCache.memoryCache.clear();
-        console.log('Cleared idle animation cache');
-    }
+// Reset idle animation state
+stopIdleMonitoring();
+isPlayingIdle = false;
     
     // Reset to default values but preserve configuration
     document.getElementById('didApiKey').value = currentApiKey;
@@ -7694,7 +7658,7 @@ function startResponseTimer() {
                 }
             }
         }
-    // Timer expired
+        // Timer expired
         if (remaining <= 0) {
             clearInterval(responseTimer);
             responseTimer = null;
@@ -7702,38 +7666,8 @@ function startResponseTimer() {
             // Show timeout message
             showStatus('⏰ 2-minute response window expired!', 'error');
             
-            // Check D-ID connection status and add appropriate message
-            let timeoutMessage = '⏰ Response timer expired (2 minutes). Consider if you need more information or should take action.';
-            
-            // Check if D-ID connection is still active
-            if (!isStreamConnected || !streamId || !didSessionId) {
-                timeoutMessage += '\n\n🔌 D-ID avatar connection has been lost. You may need to re-initialize the avatar to continue with video responses.';
-                
-                // Update avatar status
-                updateAvatarStatus('Connection lost - Re-initialize avatar to reconnect', 'error');
-                
-                // Reset avatar initialization status
-                if (isAvatarInitialized) {
-                    setButtonStatus('initializeAvatarBtn', 'pending', 'Initialize & Connect Avatar');
-                    isAvatarInitialized = false;
-                    isStreamConnected = false;
-                }
-            } else {
-                // Connection appears to be active, but check peer connection state
-                if (peerConnection) {
-                    const connectionState = peerConnection.connectionState;
-                    const iceConnectionState = peerConnection.iceConnectionState;
-                    
-                    if (connectionState === 'failed' || connectionState === 'closed' || 
-                        iceConnectionState === 'failed' || iceConnectionState === 'closed') {
-                        timeoutMessage += '\n\n🔌 D-ID avatar connection appears unstable. You may need to re-initialize the avatar for reliable video responses.';
-                        updateAvatarStatus('Connection unstable - Consider re-initializing', 'error');
-                    }
-                }
-            }
-            
             // Add timeout message to chat
-            addMessage(timeoutMessage, 'system');
+            addMessage('⏰ Response timer expired (2 minutes). Consider if you need more information or should take action.', 'system');
             
             // Hide timer
             hideResponseTimer();
@@ -7926,6 +7860,77 @@ function forceTimerStyling() {
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
