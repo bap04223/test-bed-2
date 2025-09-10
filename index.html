@@ -295,30 +295,7 @@ select option {
     box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
         
-        /* ElevenLabs Load Voices button states */
-        .btn-voice-load-pending {
-            background-color: var(--danger-color) !important;
-            color: white !important;
-        }
-
-        .btn-voice-load-pending:hover {
-            background-color: #dc2626 !important;
-        }
-
-        .btn-voice-load-success {
-            background-color: var(--success-color) !important;
-            color: white !important;
-        }
-
-        .btn-voice-load-success:hover {
-            background-color: #047857 !important;
-        }
-
-        .btn-voice-load-success::after {
-            content: " ✓";
-            font-weight: bold;
-        }
-
+        
 /* Back to Landing Page Button */
 .back-to-landing-btn {
     position: absolute;
@@ -1836,9 +1813,9 @@ Load Scenario Sets
                     <button class="tts-provider-btn active" id="browserTtsBtn" onclick="selectTtsProvider('browser')">
                         Browser TTS
                     </button>
-                    <button class="tts-provider-btn" id="elevenlabsTtsBtn" onclick="selectTtsProvider('elevenlabs')">
-                        ElevenLabs
-                    </button>
+                    <button class="tts-provider-btn" id="humeTtsBtn" onclick="selectTtsProvider('hume')">
+    Hume TTS
+</button>
                 </div>
             </div>
             
@@ -1866,56 +1843,52 @@ Load Scenario Sets
             </div>
             
             <!-- ElevenLabs TTS Settings -->
-            <div id="elevenlabsSettings" class="tts-settings elevenlabs-config" style="display: none;">
-                <div class="form-group" style="display: none;">
-                    <label for="elevenlabsApiKey">ElevenLabs API Key:</label>
-                    <input 
-                        type="text" 
-                        id="elevenlabsApiKey" 
-                        placeholder="Enter your ElevenLabs API key"
-                        title="Get your API key from elevenlabs.io"
-                    >
-                    <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
-                        Get your API key from <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a>
-                    </small>
-                </div>
-                
-               <div class="form-group">
-                    <label for="elevenlabsVoice">ElevenLabs Voice:</label>
-                    <select id="elevenlabsVoice" disabled>
-                        <option value="">Enter API key to load voices...</option>
-                    </select>
-                    <button class="btn-voice-load-pending" id="loadVoicesBtn" onclick="loadElevenLabsVoices()" style="margin-top: 8px; width: 100%; font-size: 14px;">
-                        Load Voices
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <label for="elevenlabsStability">Voice Stability:</label>
-                    <input 
-                        type="range" 
-                        id="elevenlabsStability" 
-                        min="0" 
-                        max="1" 
-                        step="0.1" 
-                        value="0.5"
-                    >
-                    <span id="stabilityValue">0.5</span>
-                </div>
-                
-                <div class="form-group">
-                    <label for="elevenlabsClarity">Voice Clarity:</label>
-                    <input 
-                        type="range" 
-                        id="elevenlabsClarity" 
-                        min="0" 
-                        max="1" 
-                        step="0.1" 
-                        value="0.75"
-                    >
-                    <span id="clarityValue">0.75</span>
-                </div>
-            </div>
+           <div id="humeSettings" class="tts-settings elevenlabs-config" style="display: none;">
+             <div class="form-group">
+    <label for="humeApiKey">Hume API Key:</label>
+    <input 
+        type="text" 
+        id="humeApiKey" 
+        placeholder="Enter your Hume API key"
+        title="Get your API key from dev.hume.ai"
+    >
+    <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
+        Get your API key from <a href="https://dev.hume.ai" target="_blank">dev.hume.ai</a>
+    </small>
+</div>
+
+<div class="form-group">
+    <label for="humeVoiceDescription">Voice Description:</label>
+    <textarea 
+        id="humeVoiceDescription" 
+        placeholder="Describe the voice (e.g., 'A warm, professional female voice with a British accent')"
+        rows="3"
+        style="resize: vertical;"
+    ></textarea>
+    <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
+        Describe how you want the voice to sound. Hume will generate a voice based on your description.
+    </small>
+</div>
+
+<div class="form-group">
+    <label for="humePredefinedVoice">Or Use Predefined Voice (Optional):</label>
+    <select id="humePredefinedVoice">
+        <option value="">Use voice description above</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="humeSpeed">Speech Speed:</label>
+    <input 
+        type="range" 
+        id="humeSpeed" 
+        min="0.5" 
+        max="2.0" 
+        step="0.1" 
+        value="1.0"
+    >
+    <span id="humeSpeedValue">1.0</span>
+</div>
 
            
 <!-- Deepgram STT Settings -->
@@ -2437,7 +2410,7 @@ Random Scenario
         let fullTranscript = '';         // Store the complete transcript during recording
         let forceStopRecognition = false; // Flag to force stop recognition
         let currentTtsProvider = 'browser'; // Current TTS provider
-        let elevenlabsVoices = [];       // Store ElevenLabs voices
+      
         let currentAudio = null;         // Current playing audio for ElevenLabs
         let currentSttProvider = 'browser'; // Current STT provider (browser or deepgram)
         let recordingState = 'stopped'; // 'stopped', 'recording', 'reviewing'
@@ -2624,21 +2597,21 @@ function updateSessionInfo() {
         // Handle switching between browser and ElevenLabs TTS
         
         function selectTtsProvider(provider) {
-            currentTtsProvider = provider;
-            
-            // Update UI
-            document.getElementById('browserTtsBtn').classList.toggle('active', provider === 'browser');
-            document.getElementById('elevenlabsTtsBtn').classList.toggle('active', provider === 'elevenlabs');
-            
-            // Show/hide settings
-            document.getElementById('browserTtsSettings').style.display = provider === 'browser' ? 'block' : 'none';
-            document.getElementById('elevenlabsSettings').style.display = provider === 'elevenlabs' ? 'block' : 'none';
-            
-            // Save preference
-            saveConfig();
-            
-            console.log('TTS provider changed to:', provider);
-        }
+    currentTtsProvider = provider;
+    
+    // Update UI
+    document.getElementById('browserTtsBtn').classList.toggle('active', provider === 'browser');
+    document.getElementById('humeTtsBtn').classList.toggle('active', provider === 'hume');
+    
+    // Show/hide settings
+    document.getElementById('browserTtsSettings').style.display = provider === 'browser' ? 'block' : 'none';
+    document.getElementById('humeSettings').style.display = provider === 'hume' ? 'block' : 'none';
+    
+    // Save preference
+    saveConfig();
+    
+    console.log('TTS provider changed to:', provider);
+}
 
         // ===== STT PROVIDER MANAGEMENT =====
 function selectSttProvider(provider) {
@@ -2837,106 +2810,111 @@ if (fullTranscript.trim()) {
         // ===== ELEVENLABS INTEGRATION =====
         // Functions for ElevenLabs TTS API
         
-        async function loadElevenLabsVoices() {
-            const apiKey = document.getElementById('elevenlabsApiKey').value;
-            const loadBtn = document.getElementById('loadVoicesBtn');
-            
-            if (!apiKey) {
-                showStatus('Please enter your ElevenLabs API key first', 'error');
-                return;
-            }
-            
-            // Set button to loading state
-            loadBtn.disabled = true;
-            loadBtn.innerHTML = '⏳ Loading...';
-            loadBtn.className = 'btn-voice-load-pending';
-            
-            showStatus('Loading ElevenLabs voices...', 'info');
-            
-            try {
-                const response = await fetch('https://api.elevenlabs.io/v1/voices', {
-                    method: 'GET',
-                    headers: {
-                        'xi-api-key': apiKey,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('Invalid API key');
-                    } else if (response.status === 429) {
-                        throw new Error('Rate limit exceeded');
-                    } else {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                }
-                
-                const data = await response.json();
-                elevenlabsVoices = data.voices;
-                
-                // Populate voice dropdown
-                const voiceSelect = document.getElementById('elevenlabsVoice');
-                voiceSelect.innerHTML = '<option value="">Select a voice...</option>';
-                voiceSelect.disabled = false;
-                
-                elevenlabsVoices.forEach(voice => {
-                    const option = document.createElement('option');
-                    option.value = voice.voice_id;
-                    option.textContent = `${voice.name} (${voice.labels?.gender || 'Unknown'})`;
-                    voiceSelect.appendChild(option);
-                });
-                
-                // Set button to success state
-                loadBtn.disabled = false;
-                loadBtn.innerHTML = 'Voices Loaded';
-                loadBtn.className = 'btn-voice-load-success';
-                
-                showStatus(`Loaded ${elevenlabsVoices.length} ElevenLabs voices`, 'success');
-                
-                // Reapply scenario voice settings after ElevenLabs voices are loaded
-                if (currentScenario) {
-                    applyScenarioVoiceSettings();
-                }
-                
-                console.log('ElevenLabs voices loaded:', elevenlabsVoices);
-                
-            } catch (error) {
-                console.error('Error loading ElevenLabs voices:', error);
-                
-                // Set button back to pending state on error
-                loadBtn.disabled = false;
-                loadBtn.innerHTML = 'Load Failed - Retry';
-                loadBtn.className = 'btn-voice-load-pending';
-                
-                showStatus(`Error loading voices: ${error.message}`, 'error');
+   async function speakWithHume(text) {
+    console.log('Speaking with Hume TTS:', text);
+    
+    const apiKey = document.getElementById('humeApiKey').value;
+    
+    if (!apiKey) {
+        console.error('Hume API key not provided');
+        showStatus('Please enter your Hume API key', 'error');
+        return;
+    }
+    
+    // Stop any currently playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    synthesis.cancel();
+    
+    try {
+        const voiceDescription = document.getElementById('humeVoiceDescription').value;
+        const predefinedVoice = document.getElementById('humePredefinedVoice').value;
+        const speed = parseFloat(document.getElementById('humeSpeed').value);
+        
+        console.log('Using Hume voice description:', voiceDescription, 'Speed:', speed);
+        
+        // Prepare the request payload
+        const requestBody = {
+            utterances: [{
+                text: text,
+                description: voiceDescription || undefined,
+                voice: predefinedVoice || undefined,
+                speed: speed !== 1.0 ? speed : undefined
+            }],
+            output_format: 'mp3',
+            num_generations: 1
+        };
+        
+        const response = await fetch('https://api.hume.ai/v0/tts/synthesize/json', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Hume-Api-Key': apiKey
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Invalid Hume API key');
+            } else if (response.status === 429) {
+                throw new Error('Hume rate limit exceeded');
+            } else {
+                const errorText = await response.text();
+                throw new Error(`Hume API error: ${response.status} - ${errorText}`);
             }
         }
-
-        // Reset ElevenLabs button state when API key changes
-        function resetElevenLabsButtonState() {
-            const loadBtn = document.getElementById('loadVoicesBtn');
-            const apiKey = document.getElementById('elevenlabsApiKey').value;
+        
+        const data = await response.json();
+        
+        // Extract the base64-encoded audio from the response
+        if (data.generations && data.generations.length > 0 && data.generations[0].snippets.length > 0) {
+            const audioBase64 = data.generations[0].snippets[0].audio;
             
-            if (loadBtn) {
-                if (apiKey && apiKey.trim() !== '') {
-                    // API key present - set to pending state
-                    loadBtn.className = 'btn-voice-load-pending';
-                    loadBtn.innerHTML = '🔄 Load Voices';
-                    loadBtn.disabled = false;
-                } else {
-                    // No API key - keep red but disabled
-                    loadBtn.className = 'btn-voice-load-pending';
-                    loadBtn.innerHTML = '🔄 Load Voices';
-                    loadBtn.disabled = true;
-                }
+            // Convert base64 to blob
+            const audioBytes = atob(audioBase64);
+            const audioArray = new Uint8Array(audioBytes.length);
+            for (let i = 0; i < audioBytes.length; i++) {
+                audioArray[i] = audioBytes.charCodeAt(i);
             }
+            const audioBlob = new Blob([audioArray], { type: 'audio/mpeg' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            
+            currentAudio = new Audio(audioUrl);
+            
+            currentAudio.onplay = function() {
+                console.log('Hume audio started playing');
+            };
+            
+            currentAudio.onended = function() {
+                console.log('Hume audio finished playing');
+                URL.revokeObjectURL(audioUrl);
+                currentAudio = null;
+            };
+            
+            currentAudio.onerror = function(error) {
+                console.error('Hume audio playback error:', error);
+                URL.revokeObjectURL(audioUrl);
+                currentAudio = null;
+            };
+            
+            await currentAudio.play();
+        } else {
+            throw new Error('No audio data received from Hume API');
         }
-             
-        function previewElevenLabsVoice() {
-            const sampleText = "Hello, I'm here to help you with your pharmacy consultation. How can I assist you today?";
-            speakWithElevenLabs(sampleText);
-        }
+        
+    } catch (error) {
+        console.error('Hume TTS error:', error);
+        showStatus(`Hume error: ${error.message}`, 'error');
+        
+        // Fallback to browser TTS
+        console.log('Falling back to browser TTS');
+        speakWithBrowser(text);
+    }
+}
         
         // ===== SPEECH RECOGNITION SETUP =====
         // Configure the browser's speech recognition API
@@ -3062,13 +3040,7 @@ recognition.onend = function() {
     if (voices.length === 0) {
         synthesis.onvoiceschanged = loadVoices;
     }
-    
-    // ADD THIS NEW CODE:
-    // Reapply scenario voice settings after voices are loaded
-    if (currentScenario) {
-        applyScenarioVoiceSettings();
     }
-}
         
         // ===== EVENT LISTENERS =====
         // Set up various UI interactions
@@ -3079,21 +3051,18 @@ recognition.onend = function() {
                 document.getElementById('rateValue').textContent = e.target.value;
             });
             
-            // ElevenLabs sliders
-            document.getElementById('elevenlabsStability').addEventListener('input', function(e) {
-                document.getElementById('stabilityValue').textContent = e.target.value;
-            });
-            
-            document.getElementById('elevenlabsClarity').addEventListener('input', function(e) {
-                document.getElementById('clarityValue').textContent = e.target.value;
-            });
-            
-            // Save configuration when changed
-            document.getElementById('webhookUrl').addEventListener('change', saveConfig);
-            document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
-            document.getElementById('sheetId').addEventListener('change', saveConfig);
-            document.getElementById('elevenlabsApiKey').addEventListener('change', saveConfig);
-            document.getElementById('elevenlabsApiKey').addEventListener('input', resetElevenLabsButtonState);
+            // Hume speed slider
+document.getElementById('humeSpeed').addEventListener('input', function(e) {
+    document.getElementById('humeSpeedValue').textContent = e.target.value;
+});
+
+// Save configuration when changed
+document.getElementById('webhookUrl').addEventListener('change', saveConfig);
+document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
+document.getElementById('sheetId').addEventListener('change', saveConfig);
+document.getElementById('humeApiKey').addEventListener('change', saveConfig);
+document.getElementById('humeVoiceDescription').addEventListener('change', saveConfig);
+document.getElementById('humePredefinedVoice').addEventListener('change', saveConfig);
         }
         
         // ===== NEW RECORDING FUNCTIONS =====
@@ -3406,7 +3375,7 @@ async function loadChatbotConfigurations() {
     feedbackWebhookUrl: row[3] ? row[3].trim() : '',
     description: row[4] ? row[4].trim() : '',
     deepgramApiKey: row[5] ? row[5].trim() : '',
-    elevenlabsApiKey: row[6] ? row[6].trim() : ''
+    humeApiKey: row[6] ? row[6].trim() : ''
 });
                 }
             }
@@ -3418,11 +3387,8 @@ async function loadChatbotConfigurations() {
                 if (firstConfig.deepgramApiKey) {
                     document.getElementById('deepgramApiKey').value = firstConfig.deepgramApiKey;
                 }
-                if (firstConfig.elevenlabsApiKey) {
-    document.getElementById('elevenlabsApiKey').value = firstConfig.elevenlabsApiKey;
-    resetElevenLabsButtonState();
-    // Auto-load voices after API key is populated
-    loadElevenLabsVoices();
+               if (firstConfig.humeApiKey) {
+    document.getElementById('humeApiKey').value = firstConfig.humeApiKey;
 }
             }
             
@@ -3862,45 +3828,18 @@ function applyScenarioVoiceSettings() {
                         currentScenario['Browser Voice'] || 
                         currentScenario['TTS Voice Browser'];
     
-    // Check for ElevenLabs voice setting
-    const elevenlabsVoice = currentScenario['ElevenLabs Voice'] || 
-                           currentScenario['ElevenLabs TTS Voice'] || 
-                           currentScenario['TTS Voice ElevenLabs'];
-    
-    // Apply browser TTS voice if specified
-    if (browserVoice && browserVoice.trim() !== '') {
-        const voiceSelect = document.getElementById('voiceSelect');
-        const voices = synthesis.getVoices();
-        
-        // Try to find matching voice by name (case-insensitive partial match)
-        for (let i = 0; i < voices.length; i++) {
-            if (voices[i].name.toLowerCase().includes(browserVoice.toLowerCase()) ||
-                browserVoice.toLowerCase().includes(voices[i].name.toLowerCase())) {
-                voiceSelect.value = i;
-                console.log(`Applied browser voice from scenario: ${voices[i].name}`);
-                showStatus(`Browser voice set to: ${voices[i].name}`, 'info');
-                break;
-            }
-        }
-    }
-    
-    // Apply ElevenLabs voice if specified and voices are loaded
-    if (elevenlabsVoice && elevenlabsVoice.trim() !== '' && elevenlabsVoices.length > 0) {
-        const elevenlabsSelect = document.getElementById('elevenlabsVoice');
-        
-        // Try to find matching voice by name or ID
-        for (let voice of elevenlabsVoices) {
-            if (voice.name.toLowerCase().includes(elevenlabsVoice.toLowerCase()) ||
-                voice.voice_id === elevenlabsVoice ||
-                elevenlabsVoice.toLowerCase().includes(voice.name.toLowerCase())) {
-                elevenlabsSelect.value = voice.voice_id;
-                console.log(`Applied ElevenLabs voice from scenario: ${voice.name}`);
-                showStatus(`ElevenLabs voice set to: ${voice.name}`, 'info');
-                break;
-            }
-        }
-    }
-    
+// Check for Hume voice setting
+const humeVoiceDescription = currentScenario['Hume Voice Description'] || 
+                            currentScenario['Hume Voice'] || 
+                            currentScenario['Voice Description'] ||
+                            currentScenario['TTS Voice Hume'];
+
+// Apply Hume voice description if specified
+if (humeVoiceDescription && humeVoiceDescription.trim() !== '') {
+    document.getElementById('humeVoiceDescription').value = humeVoiceDescription;
+    console.log(`Applied Hume voice description from scenario: ${humeVoiceDescription}`);
+    showStatus(`Voice description set to: ${humeVoiceDescription}`, 'info');
+}    
     // Save the updated configuration
     saveConfig();
 }
@@ -4961,15 +4900,15 @@ if (!submitWebhookUrl) {
         // ===== TEXT TO SPEECH =====
         // Convert AI response to speech using selected provider
         
-        function speakText(text) {
-            console.log('Speaking text with provider:', currentTtsProvider, 'Text:', text);
-            
-            if (currentTtsProvider === 'elevenlabs') {
-                speakWithElevenLabs(text);
-            } else {
-                speakWithBrowser(text);
-            }
-        }
+      function speakText(text) {
+    console.log('Speaking text with provider:', currentTtsProvider, 'Text:', text);
+    
+    if (currentTtsProvider === 'hume') {
+        speakWithHume(text);
+    } else {
+        speakWithBrowser(text);
+    }
+}
         
         function speakWithBrowser(text) {
             console.log('Speaking with browser TTS:', text);
@@ -5023,98 +4962,6 @@ if (!submitWebhookUrl) {
             synthesis.speak(utterance);
         }
 
-        async function speakWithElevenLabs(text) {
-    console.log('Speaking with ElevenLabs TTS:', text);
-    
-    const apiKey = document.getElementById('elevenlabsApiKey').value;
-    const voiceId = document.getElementById('elevenlabsVoice').value;
-    
-    if (!apiKey) {
-        console.error('ElevenLabs API key not provided');
-        showStatus('Please enter your ElevenLabs API key', 'error');
-        return;
-    }
-    
-    if (!voiceId) {
-        console.error('ElevenLabs voice not selected');
-        showStatus('Please select an ElevenLabs voice', 'error');
-        return;
-    }
-    
-    // Stop any currently playing audio
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
-    synthesis.cancel();
-    
-    try {
-        const stability = parseFloat(document.getElementById('elevenlabsStability').value);
-        const clarity = parseFloat(document.getElementById('elevenlabsClarity').value);
-        
-        console.log('Using ElevenLabs voice:', voiceId, 'Stability:', stability, 'Clarity:', clarity);
-        
-        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'audio/mpeg',
-                'Content-Type': 'application/json',
-                'xi-api-key': apiKey
-            },
-            body: JSON.stringify({
-                text: text,
-                model_id: 'eleven_turbo_v2_5',
-                voice_settings: {
-                    stability: stability,
-                    similarity_boost: clarity,
-                    style: 0.0,
-                    use_speaker_boost: true
-                }
-            })
-        });
-        
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error('Invalid ElevenLabs API key');
-            } else if (response.status === 429) {
-                throw new Error('ElevenLabs rate limit exceeded');
-            } else {
-                throw new Error(`ElevenLabs API error: ${response.status}`);
-            }
-        }
-        
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        
-        currentAudio = new Audio(audioUrl);
-        
-        currentAudio.onplay = function() {
-            console.log('ElevenLabs audio started playing');
-        };
-        
-        currentAudio.onended = function() {
-            console.log('ElevenLabs audio finished playing');
-            URL.revokeObjectURL(audioUrl);
-            currentAudio = null;
-        };
-        
-        currentAudio.onerror = function(error) {
-            console.error('ElevenLabs audio playback error:', error);
-            URL.revokeObjectURL(audioUrl);
-            currentAudio = null;
-        };
-        
-        await currentAudio.play();
-        
-    } catch (error) {
-        console.error('ElevenLabs TTS error:', error);
-        showStatus(`ElevenLabs error: ${error.message}`, 'error');
-        
-        // Fallback to browser TTS
-        console.log('Falling back to browser TTS');
-        speakWithBrowser(text);
-    }
-}
         
         // ===== CHAT MANAGEMENT =====
         // Handle chat display and messages
@@ -5220,8 +5067,10 @@ if (!submitWebhookUrl) {
         sheetName: getSelectedSheetName(),
         ttsProvider: currentTtsProvider,
         sttProvider: currentSttProvider, // Add this line
-        elevenlabsApiKey: document.getElementById('elevenlabsApiKey').value,
-        elevenlabsVoice: document.getElementById('elevenlabsVoice').value,
+        humeApiKey: document.getElementById('humeApiKey').value,
+        humeVoiceDescription: document.getElementById('humeVoiceDescription').value,
+        humePredefinedVoice: document.getElementById('humePredefinedVoice').value,
+        humeSpeed: document.getElementById('humeSpeed').value,
         deepgramApiKey: document.getElementById('deepgramApiKey').value, // Add this line
         deepgramModel: document.getElementById('deepgramModel').value, // Add this line
         deepgramLanguage: document.getElementById('deepgramLanguage').value, // Add this line
@@ -5242,7 +5091,18 @@ if (!submitWebhookUrl) {
                 document.getElementById('webhookUrl').value = config.webhookUrl || '';
                 document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl || '';
                 document.getElementById('sheetId').value = config.sheetId || '';
-                document.getElementById('elevenlabsApiKey').value = config.elevenlabsApiKey || '';
+                document.getElementById('humeApiKey').value = config.humeApiKey || '';
+                if (config.humeVoiceDescription) {
+                    document.getElementById('humeVoiceDescription').value = config.humeVoiceDescription;
+                }
+                if (config.humePredefinedVoice) {
+                    document.getElementById('humePredefinedVoice').value = config.humePredefinedVoice;
+                }
+                if (config.humeSpeed) {
+                    document.getElementById('humeSpeed').value = config.humeSpeed;
+                    document.getElementById('humeSpeedValue').textContent = config.humeSpeed;
+                }
+                
                 // ADD THESE NEW LINES after the existing config loading:
                 document.getElementById('configSheetId').value = config.configSheetId || '';
                 document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
@@ -5290,10 +5150,7 @@ if (config.deepgramLanguage) {
     document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
 }
      
-                // Set ElevenLabs voice if saved
-                if (config.elevenlabsVoice) {
-                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoice;
-                }
+               
             }
         }
 
@@ -5598,6 +5455,7 @@ function closeHelpModal(event) {
     </script>
 </body>
 </html>
+
 
 
 
