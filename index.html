@@ -1701,6 +1701,15 @@ a:hover {
 .card-icon:hover {
     transform: scale(1.1) rotate(5deg);
 }
+
+.keyboard-hints kbd {
+    background: var(--card-background);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border-color);
+    font-family: monospace;
+    font-size: 12px;
+}
              
   </style>
        
@@ -3040,7 +3049,12 @@ recognition.onend = function() {
     if (voices.length === 0) {
         synthesis.onvoiceschanged = loadVoices;
     }
+    
+    // Reapply scenario voice settings after voices are loaded
+    if (currentScenario) {
+        applyScenarioVoiceSettings();
     }
+}
         
         // ===== EVENT LISTENERS =====
         // Set up various UI interactions
@@ -3330,6 +3344,37 @@ function hideReviewSection() {
     document.getElementById('deleteBtn').disabled = true;
     
     document.getElementById('talkButton').disabled = false;
+}
+
+function showKeyboardHints() {
+    // Remove any existing hints
+    const existingHints = document.querySelector('.keyboard-hints');
+    if (existingHints) {
+        existingHints.remove();
+    }
+    
+    // Create keyboard hints element
+    const hintsDiv = document.createElement('div');
+    hintsDiv.className = 'keyboard-hints';
+    hintsDiv.style.cssText = `
+        margin-top: 10px;
+        padding: 10px;
+        background: var(--input-background);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        text-align: center;
+        font-size: 14px;
+        color: var(--text-secondary);
+    `;
+    hintsDiv.innerHTML = `
+        <strong>Keyboard Shortcuts:</strong> 
+        Press <kbd style="background: var(--card-background); padding: 2px 6px; border-radius: 3px;">Enter</kbd> to send • 
+        <kbd style="background: var(--card-background); padding: 2px 6px; border-radius: 3px;">Escape</kbd> to cancel
+    `;
+    
+    // Add after the review section
+    const reviewSection = document.getElementById('reviewSection');
+    reviewSection.appendChild(hintsDiv);
 }
 
         // ===== GOOGLE SHEETS INTEGRATION =====
@@ -3821,28 +3866,6 @@ function setButtonPending(buttonId, pendingText = null) {
             
         // Apply voice settings from scenario data
 function applyScenarioVoiceSettings() {
-    if (!currentScenario) return;
-    
-    // Check for Browser TTS voice setting
-    const browserVoice = currentScenario['Browser TTS Voice'] || 
-                        currentScenario['Browser Voice'] || 
-                        currentScenario['TTS Voice Browser'];
-    
-// Check for Hume voice setting
-const humeVoiceDescription = currentScenario['Hume Voice Description'] || 
-                            currentScenario['Hume Voice'] || 
-                            currentScenario['Voice Description'] ||
-                            currentScenario['TTS Voice Hume'];
-
-// Apply Hume voice description if specified
-if (humeVoiceDescription && humeVoiceDescription.trim() !== '') {
-    document.getElementById('humeVoiceDescription').value = humeVoiceDescription;
-    console.log(`Applied Hume voice description from scenario: ${humeVoiceDescription}`);
-    showStatus(`Voice description set to: ${humeVoiceDescription}`, 'info');
-}    
-    // Save the updated configuration
-    saveConfig();
-}
         
 // Update patient image button state based on scenario
 function updatePatientImageButton() {
@@ -5078,8 +5101,8 @@ if (!submitWebhookUrl) {
         selectedChatbot: document.getElementById('chatbotSelect').value,
         scenarioSetsId: document.getElementById('scenarioSetsId').value,
         selectedScenarioSet: document.getElementById('scenarioSetSelect').value,
-         browserVoice: document.getElementById('voiceSelect').value,
-        elevenlabsVoiceSelection: document.getElementById('elevenlabsVoice').value
+      browserVoice: document.getElementById('voiceSelect').value,
+        humeVoiceSelection: document.getElementById('humePredefinedVoice').value
     };
     localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
 }
@@ -5112,8 +5135,8 @@ if (!submitWebhookUrl) {
                 if (config.browserVoice) {
                     document.getElementById('voiceSelect').value = config.browserVoice;
                 }
-                if (config.elevenlabsVoiceSelection) {
-                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoiceSelection;
+                if (config.humeVoiceSelection) {
+                    document.getElementById('humePredefinedVoice').value = config.humeVoiceSelection;
                 }
                 
                 // Restore saved chatbot selection if configurations are already loaded
@@ -5455,6 +5478,7 @@ function closeHelpModal(event) {
     </script>
 </body>
 </html>
+
 
 
 
