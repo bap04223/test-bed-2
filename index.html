@@ -1741,11 +1741,8 @@ a:hover {
             </div>
         </div>       
            
-        <!-- Main content grid -->
+       <!-- Main content grid -->
         <div class="grid">
-    <!-- Grid should close HERE -->
-
-        
             <!-- Configuration section -->
             <div class="card" id="configCard">
 <h2 onclick="handleConfigHeaderClick(event)">Configuration
@@ -2068,7 +2065,9 @@ Random Scenario
         </div>
     </div>
 </div>
-        </div>
+       </div>
+    </div>
+        </div> <!-- This closes the grid -->
     </div>
     
     <!-- Patient Image Modal -->
@@ -3864,8 +3863,48 @@ function setButtonPending(buttonId, pendingText = null) {
             addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
         }
             
-        // Apply voice settings from scenario data
+      // Apply voice settings from scenario data
 function applyScenarioVoiceSettings() {
+    if (!currentScenario) return;
+    
+    // Check for Browser TTS voice setting
+    const browserVoice = currentScenario['Browser TTS Voice'] || 
+                        currentScenario['Browser Voice'] || 
+                        currentScenario['TTS Voice Browser'];
+    
+    // Check for Hume voice setting
+    const humeVoiceDescription = currentScenario['Hume Voice Description'] || 
+                                currentScenario['Hume Voice'] || 
+                                currentScenario['Voice Description'] ||
+                                currentScenario['TTS Voice Hume'];
+
+    // Apply browser TTS voice if specified
+    if (browserVoice && browserVoice.trim() !== '') {
+        const voiceSelect = document.getElementById('voiceSelect');
+        const voices = synthesis.getVoices();
+        
+        // Try to find matching voice by name (case-insensitive partial match)
+        for (let i = 0; i < voices.length; i++) {
+            if (voices[i].name.toLowerCase().includes(browserVoice.toLowerCase()) ||
+                browserVoice.toLowerCase().includes(voices[i].name.toLowerCase())) {
+                voiceSelect.value = i;
+                console.log(`Applied browser voice from scenario: ${voices[i].name}`);
+                showStatus(`Browser voice set to: ${voices[i].name}`, 'info');
+                break;
+            }
+        }
+    }
+
+    // Apply Hume voice description if specified
+    if (humeVoiceDescription && humeVoiceDescription.trim() !== '') {
+        document.getElementById('humeVoiceDescription').value = humeVoiceDescription;
+        console.log(`Applied Hume voice description from scenario: ${humeVoiceDescription}`);
+        showStatus(`Voice description set to: ${humeVoiceDescription}`, 'info');
+    }
+    
+    // Save the updated configuration
+    saveConfig();
+}
         
 // Update patient image button state based on scenario
 function updatePatientImageButton() {
@@ -5478,6 +5517,7 @@ function closeHelpModal(event) {
     </script>
 </body>
 </html>
+
 
 
 
