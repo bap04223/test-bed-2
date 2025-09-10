@@ -295,7 +295,30 @@ select option {
     box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
         
-        
+        /* ElevenLabs Load Voices button states */
+        .btn-voice-load-pending {
+            background-color: var(--danger-color) !important;
+            color: white !important;
+        }
+
+        .btn-voice-load-pending:hover {
+            background-color: #dc2626 !important;
+        }
+
+        .btn-voice-load-success {
+            background-color: var(--success-color) !important;
+            color: white !important;
+        }
+
+        .btn-voice-load-success:hover {
+            background-color: #047857 !important;
+        }
+
+        .btn-voice-load-success::after {
+            content: " ✓";
+            font-weight: bold;
+        }
+
 /* Back to Landing Page Button */
 .back-to-landing-btn {
     position: absolute;
@@ -1701,15 +1724,6 @@ a:hover {
 .card-icon:hover {
     transform: scale(1.1) rotate(5deg);
 }
-
-.keyboard-hints kbd {
-    background: var(--card-background);
-    padding: 2px 6px;
-    border-radius: 3px;
-    border: 1px solid var(--border-color);
-    font-family: monospace;
-    font-size: 12px;
-}
              
   </style>
        
@@ -1741,328 +1755,322 @@ a:hover {
             </div>
         </div>       
            
-      <!-- Main content grid -->
-<div class="grid">
-    <!-- Configuration section -->
-    <div class="card" id="configCard">
-        <h2 onclick="handleConfigHeaderClick(event)">Configuration
-            <button class="collapse-btn" onclick="toggleConfigCollapse()" id="configCollapseBtn">
-                ◀
-            </button>
-        </h2>
-        <div class="card-content">
-            <div class="scrollable-section">
+        <!-- Main content grid -->
+        <div class="grid">
+    <!-- Grid should close HERE -->
 
-                <!-- Chatbot Configuration Section - RESTORED -->
-                <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
-                    <label for="configSheetId">Chatbot ID's:</label>
+        
+            <!-- Configuration section -->
+            <div class="card" id="configCard">
+<h2 onclick="handleConfigHeaderClick(event)">Configuration
+<button class="collapse-btn" onclick="toggleConfigCollapse()" id="configCollapseBtn">
+    ◀
+</button>
+</h2>
+<div class="card-content">
+    <div class="scrollable-section">
+
+<!-- Chatbot Configuration Section - NEW -->
+<div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
+    <label for="configSheetId">Chatbot ID's:</label>
+    <input 
+        type="password" 
+        id="configSheetId" 
+        placeholder="Google Sheet ID containing chatbot configurations"
+        title="The Google Sheet ID containing your chatbot configurations"
+        autocomplete="new-password"
+        style="font-size: 14px;"
+    >
+    <button 
+class="btn-status-pending" 
+onclick="loadChatbotConfigurations()" 
+style="width: 100%; margin-top: 10px; font-size: 14px;"
+id="loadChatbotBtn"
+>
+Load Chatbot Configurations
+</button>
+</div>
+    
+
+<!-- Hidden webhook fields - populated by chatbot configuration -->
+<input type="hidden" id="webhookUrl" />
+<input type="hidden" id="submitWebhookUrl" />
+
+<!-- Scenario Sets Management Section - NEW -->
+<div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
+    <label for="scenarioSetsId">Scenario Sets List:</label>
+    <input 
+        type="password" 
+        id="scenarioSetsId" 
+        placeholder="Google Sheet ID containing list of scenario sets"
+        title="The Google Sheet ID containing your scenario sets list"
+        autocomplete="new-password"
+        style="font-size: 14px;"
+    >
+    <button 
+class="btn-status-pending" 
+onclick="loadScenarioSets()" 
+style="width: 100%; margin-top: 10px; font-size: 14px;"
+id="loadSetsBtn"
+>
+Load Scenario Sets
+</button>
+</div>
+
+                <div class="form-group">
+<label>Speech-to-Text Provider:</label>
+<div class="tts-provider-group">
+    <button class="tts-provider-btn active" id="browserSttBtn" onclick="selectSttProvider('browser')">
+        Browser STT
+    </button>
+    <button class="tts-provider-btn" id="deepgramSttBtn" onclick="selectSttProvider('deepgram')">
+        Deepgram
+    </button>
+</div>
+</div>
+    
+<!-- TTS Provider Selection -->
+            <div class="form-group">
+                <label>Text-to-Speech Provider:</label>
+              <div class="tts-provider-group">
+    <button class="tts-provider-btn active" id="browserTtsBtn" onclick="selectTtsProvider('browser')">
+        Browser TTS
+    </button>
+    <button class="tts-provider-btn" id="humeTtsBtn" onclick="selectTtsProvider('hume')">
+        Hume AI
+    </button>
+</div>
+            </div>
+            
+            <!-- Browser TTS Settings -->
+            <div id="browserTtsSettings" class="tts-settings">
+                <div class="form-group">
+                    <label for="voiceSelect">Browser Voice:</label>
+                    <select id="voiceSelect">
+                        <option value="">Loading voices...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="speechRate">Speech Rate:</label>
                     <input 
-                        type="password" 
-                        id="configSheetId" 
-                        placeholder="Google Sheet ID containing chatbot configurations"
-                        title="The Google Sheet ID containing your chatbot configurations"
-                        autocomplete="new-password"
-                        style="font-size: 14px;"
+                        type="range" 
+                        id="speechRate" 
+                        min="0.5" 
+                        max="2" 
+                        step="0.1" 
+                        value="1"
                     >
-                    <button 
-                        class="btn-status-pending" 
-                        onclick="loadChatbotConfigurations()" 
-                        style="width: 100%; margin-top: 10px; font-size: 14px;"
-                        id="loadChatbotBtn"
-                    >
-                        Load Chatbot Configurations
-                    </button>
+                    <span id="rateValue">1.0</span>
                 </div>
+            </div>
+            
+            <!-- Hume TTS Settings -->
+<div id="humeSettings" class="tts-settings elevenlabs-config" style="display: none;">
+    <div class="form-group">
+        <label for="humeApiKey">Hume API Key:</label>
+        <input 
+            type="text" 
+            id="humeApiKey" 
+            placeholder="Enter your Hume API key"
+            title="Get your API key from platform.hume.ai"
+        >
+        <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
+            Get your API key from <a href="https://platform.hume.ai" target="_blank">platform.hume.ai</a>
+        </small>
+    </div>
+    
+    <div class="form-group">
+        <label for="humeVoice">Hume Voice:</label>
+        <select id="humeVoice">
+            <option value="ITO">ITO (Default)</option>
+            <option value="DACHER">DACHER</option>
+            <option value="AURA">AURA</option>
+            <option value="WHISPERING_VOICE">WHISPERING VOICE</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="humeFormat">Audio Format:</label>
+        <select id="humeFormat">
+            <option value="mp3" selected>MP3</option>
+            <option value="wav">WAV</option>
+            <option value="flac">FLAC</option>
+        </select>
+    </div>
+</div>
 
-                <!-- Hidden webhook fields - populated by chatbot configuration -->
-                <input type="hidden" id="webhookUrl" />
-                <input type="hidden" id="submitWebhookUrl" />
+           
+<!-- Deepgram STT Settings -->
+<div id="deepgramSettings" class="tts-settings elevenlabs-config" style="display: none;">
+<div class="form-group" style="display: none;">
+    <label for="deepgramApiKey">Deepgram API Key:</label>
+    <input 
+        type="text" 
+        id="deepgramApiKey" 
+        placeholder="Enter your Deepgram API key"
+        title="Get your API key from deepgram.com"
+    >
+    <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
+        Get your API key from <a href="https://console.deepgram.com" target="_blank">console.deepgram.com</a>
+    </small>
+</div>
 
-                <!-- Scenario Sets Management Section - RESTORED -->
-                <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px;">
-                    <label for="scenarioSetsId">Scenario Sets List:</label>
-                    <input 
-                        type="password" 
-                        id="scenarioSetsId" 
-                        placeholder="Google Sheet ID containing list of scenario sets"
-                        title="The Google Sheet ID containing your scenario sets list"
-                        autocomplete="new-password"
-                        style="font-size: 14px;"
-                    >
-                    <button 
-                        class="btn-status-pending" 
-                        onclick="loadScenarioSets()" 
-                        style="width: 100%; margin-top: 10px; font-size: 14px;"
-                        id="loadSetsBtn"
-                    >
-                        Load Scenario Sets
-                    </button>
-                </div>
+<div class="form-group" style="display: none;">
+    <label for="deepgramModel">Deepgram Model:</label>
+    <select id="deepgramModel">
+        <option value="nova-2-medical" selected>Nova 2 Medical (Recommended)</option>
+        <option value="nova-2">Nova 2 General</option>
+        <option value="nova">Nova</option>
+        <option value="enhanced">Enhanced</option>
+        <option value="base">Base</option>
+    </select>
+</div>
 
-                <div class="form-group">
-                    <label>Speech-to-Text Provider:</label>
-                    <div class="tts-provider-group">
-                        <button class="tts-provider-btn active" id="browserSttBtn" onclick="selectSttProvider('browser')">
-                            Browser STT
-                        </button>
-                        <button class="tts-provider-btn" id="deepgramSttBtn" onclick="selectSttProvider('deepgram')">
-                            Deepgram
-                        </button>
-                    </div>
-                </div>
+<div class="form-group" style="display: none;">
+    <label for="deepgramLanguage">Language:</label>
+    <select id="deepgramLanguage">
+        <option value="en-GB" selected>English (UK)</option>
+        <option value="en-US">English (US)</option>
+        <option value="en-AU">English (AU)</option>
+    </select>
+</div>
+</div>
+    </div>
+</div>
+</div>
 
-                <!-- TTS Provider Selection -->
-                <div class="form-group">
-                    <label>Text-to-Speech Provider:</label>
-                    <div class="tts-provider-group">
-                        <button class="tts-provider-btn active" id="browserTtsBtn" onclick="selectTtsProvider('browser')">
-                            Browser TTS
-                        </button>
-                        <button class="tts-provider-btn" id="humeTtsBtn" onclick="selectTtsProvider('hume')">
-                            Hume TTS
-                        </button>
-                    </div>
-                </div>
+            
+            <!-- Scenario Management -->
+            <div class="card" id="voiceCard">
+    <h2 onclick="handleVoiceHeaderClick(event)">Scenario Managment
+<button class="collapse-btn" onclick="toggleVoiceCollapse()" id="voiceCollapseBtn">
+    ◀
+</button>
+</h2>
+<div class="card-content">
+    <div class="scrollable-section">
 
-                <!-- Browser TTS Settings -->
-                <div id="browserTtsSettings" class="tts-settings">
-                    <div class="form-group">
-                        <label for="voiceSelect">Browser Voice:</label>
-                        <select id="voiceSelect">
-                            <option value="">Loading voices...</option>
-                        </select>
-                    </div>
+    <div class="form-group" style="margin-top: 15px;">
+    <label for="chatbotSelect">Select Chatbot:</label>
+    <select id="chatbotSelect" disabled style="font-size: 14px;">
+        <option value="">Load configurations first...</option>
+    </select>
+</div>
 
-                    <div class="form-group">
-                        <label for="speechRate">Speech Rate:</label>
-                        <input 
-                            type="range" 
-                            id="speechRate" 
-                            min="0.5" 
-                            max="2" 
-                            step="0.1" 
-                            value="1"
-                        >
-                        <span id="rateValue">1.0</span>
-                    </div>
-                </div>
+    
+         <div class="form-group" style="margin-top: 15px;">
+        <label for="scenarioSetSelect">Select Scenario Set:</label>
+        <select id="scenarioSetSelect" disabled style="font-size: 14px;">
+            <option value="">Load scenario sets first...</option>
+        </select>
+    </div>
+    
+    <!-- Hidden field - automatically populated from scenario set selection -->
+    <input type="hidden" id="sheetId">
 
-                <!-- Hume TTS Settings -->
-                <div id="humeSettings" class="tts-settings elevenlabs-config" style="display: none;">
-                    <div class="form-group">
-                        <label for="humeApiKey">Hume API Key:</label>
-                        <input 
-                            type="text" 
-                            id="humeApiKey" 
-                            placeholder="Enter your Hume API key"
-                            title="Get your API key from dev.hume.ai"
-                        >
-                        <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
-                            Get your API key from <a href="https://dev.hume.ai" target="_blank">dev.hume.ai</a>
-                        </small>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="humeVoiceDescription">Voice Description:</label>
-                        <textarea 
-                            id="humeVoiceDescription" 
-                            placeholder="Describe the voice (e.g., 'A warm, professional female voice with a British accent')"
-                            rows="3"
-                            style="resize: vertical;"
-                        ></textarea>
-                        <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
-                            Describe how you want the voice to sound. Hume will generate a voice based on your description.
-                        </small>
-                    </div>
+<!-- Google Sheets configuration - MODIFIED -->
+<div class="form-group">
+    <label for="sheetName">Sheet Name:</label>
+    <select id="sheetName" disabled>
+        <option value="">Select scenario set first</option>
+    </select>
+</div>
 
-                    <div class="form-group">
-                        <label for="humePredefinedVoice">Or Use Predefined Voice (Optional):</label>
-                        <select id="humePredefinedVoice">
-                            <option value="">Use voice description above</option>
-                        </select>
-                    </div>
+<!-- Scenario selection dropdown -->
+<div class="form-group" style="margin-top: 20px;">
+    <label for="scenarioSelect">Select Scenario:</label>
+    <select id="scenarioSelect" disabled>
+        <option value="">Load sheet data first...</option>
+    </select>
+</div>
 
-                    <div class="form-group">
-                        <label for="humeSpeed">Speech Speed:</label>
-                        <input 
-                            type="range" 
-                            id="humeSpeed" 
-                            min="0.5" 
-                            max="2.0" 
-                            step="0.1" 
-                            value="1.0"
-                        >
-                        <span id="humeSpeedValue">1.0</span>
-                    </div>
-                </div>
+<button class="btn-info" onclick="selectRandomScenario()" style="width: 100%; margin-top: 10px;">
+Random Scenario
+</button>
 
-                <!-- Deepgram STT Settings -->
-                <div id="deepgramSettings" class="tts-settings elevenlabs-config" style="display: none;">
-                    <div class="form-group" style="display: none;">
-                        <label for="deepgramApiKey">Deepgram API Key:</label>
-                        <input 
-                            type="text" 
-                            id="deepgramApiKey" 
-                            placeholder="Enter your Deepgram API key"
-                            title="Get your API key from deepgram.com"
-                        >
-                        <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">
-                            Get your API key from <a href="https://console.deepgram.com" target="_blank">console.deepgram.com</a>
-                        </small>
-                    </div>
-
-                    <div class="form-group" style="display: none;">
-                        <label for="deepgramModel">Deepgram Model:</label>
-                        <select id="deepgramModel">
-                            <option value="nova-2-medical" selected>Nova 2 Medical (Recommended)</option>
-                            <option value="nova-2">Nova 2 General</option>
-                            <option value="nova">Nova</option>
-                            <option value="enhanced">Enhanced</option>
-                            <option value="base">Base</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" style="display: none;">
-                        <label for="deepgramLanguage">Language:</label>
-                        <select id="deepgramLanguage">
-                            <option value="en-GB" selected>English (UK)</option>
-                            <option value="en-US">English (US)</option>
-                            <option value="en-AU">English (AU)</option>
-                        </select>
-                    </div>
-                </div>
+      <!-- Patient Image Button -->
+        <button 
+            class="patient-image-btn disabled" 
+            id="patientImageBtn"
+            onclick="showPatientImage()"
+            disabled
+        >
+            📷 No Scenario Selected
+        </button>
+        
+       <!-- Avatar Image Container -->
+        <div class="avatar-container" id="avatarContainer" style="display: block;">
+            <div class="avatar-placeholder">
+                <div class="avatar-placeholder-icon">👤</div>
+                <div class="avatar-name no-avatar">Select a scenario to load patient avatar</div>
             </div>
         </div>
     </div>
-
-    <!-- Scenario Management -->
-    <div class="card" id="voiceCard">
-        <h2 onclick="handleVoiceHeaderClick(event)">Scenario Management
-            <button class="collapse-btn" onclick="toggleVoiceCollapse()" id="voiceCollapseBtn">
-                ◀
+</div>
+</div>
+            
+            <!-- Chat display area -->
+            <div class="card">
+    <h2>Conversation</h2>
+    <div class="card-content">
+        <div class="chat-container" id="chatContainer">
+            <p style="text-align: center; color: var(--text-secondary);">
+                Select a scenario and start speaking to begin the consultation...
+            </p>
+        </div>
+        
+        <!-- Control buttons with improved layout -->
+        <div class="button-group">
+            <button class="btn-secondary" onclick="clearChat()">
+                Clear Chat
             </button>
-        </h2>
-        <div class="card-content">
-            <div class="scrollable-section">
+            <button class="btn-danger" onclick="submitConversation()">
+                Submit Chat
+            </button>
+            <button class="btn-info" onclick="exportConversation()">
+                Export Chat
+            </button>
+            <button class="btn-warning" onclick="newSession()">
+                New Session
+            </button>
+        </div>  
+        
+<!-- Review section for transcript before sending -->
+<div class="review-section" id="reviewSection">
+<h3 style="margin: 0 0 10px 0; color: var(--primary-color); text-align: center;">Live Transcription & Review</h3>
 
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="chatbotSelect">Select Chatbot:</label>
-                    <select id="chatbotSelect" disabled style="font-size: 14px;">
-                        <option value="">Load configurations first...</option>
-                    </select>
-                </div>
+<div class="review-transcript" id="reviewTranscript" contenteditable="true" placeholder="Your transcribed message will appear here...">
+    No message to review yet
+</div>
 
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="scenarioSetSelect">Select Scenario Set:</label>
-                    <select id="scenarioSetSelect" disabled style="font-size: 14px;">
-                        <option value="">Load scenario sets first...</option>
-                    </select>
-                </div>
-
-                <!-- Hidden field - automatically populated from scenario set selection -->
-                <input type="hidden" id="sheetId">
-
-                <!-- Google Sheets configuration -->
-                <div class="form-group">
-                    <label for="sheetName">Sheet Name:</label>
-                    <select id="sheetName" disabled>
-                        <option value="">Select scenario set first</option>
-                    </select>
-                </div>
-
-                <!-- Scenario selection dropdown -->
-                <div class="form-group" style="margin-top: 20px;">
-                    <label for="scenarioSelect">Select Scenario:</label>
-                    <select id="scenarioSelect" disabled>
-                        <option value="">Load sheet data first...</option>
-                    </select>
-                </div>
-
-                <button class="btn-info" onclick="selectRandomScenario()" style="width: 100%; margin-top: 10px;">
-                    Random Scenario
-                </button>
-
-                <!-- Patient Image Button -->
-                <button 
-                    class="patient-image-btn disabled" 
-                    id="patientImageBtn"
-                    onclick="showPatientImage()"
-                    disabled
-                >
-                    📷 No Scenario Selected
-                </button>
-
-                <!-- Avatar Image Container -->
-                <div class="avatar-container" id="avatarContainer" style="display: block;">
-                    <div class="avatar-placeholder">
-                        <div class="avatar-placeholder-icon">👤</div>
-                        <div class="avatar-name no-avatar">Select a scenario to load patient avatar</div>
-                    </div>
-                </div>
-            </div>
+<div class="review-buttons">
+<button 
+    class="btn-info" 
+    id="talkButton"
+    onclick="toggleRecording()"
+>
+    Start Recording
+</button>
+<button class="btn-success" onclick="sendReviewedMessage()" disabled id="sendBtn">
+    Send Message
+</button>
+<button class="btn-warning" onclick="editTranscript()" disabled id="editBtn">
+    Edit
+</button>
+<button class="btn-danger" onclick="deleteTranscript()" disabled id="deleteBtn">
+    Delete & Retry
+</button>
+</div>
+            
+            <!-- Status display area for system messages -->
+            <div id="status" class="status info" style="display: none; margin-top: 15px;"></div>
         </div>
     </div>
-
-    <!-- Chat display area -->
-    <div class="card">
-        <h2>Conversation</h2>
-        <div class="card-content">
-            <div class="chat-container" id="chatContainer">
-                <p style="text-align: center; color: var(--text-secondary);">
-                    Select a scenario and start speaking to begin the consultation...
-                </p>
-            </div>
-
-            <!-- Control buttons with improved layout -->
-            <div class="button-group">
-                <button class="btn-secondary" onclick="clearChat()">
-                    Clear Chat
-                </button>
-                <button class="btn-danger" onclick="submitConversation()">
-                    Submit Chat
-                </button>
-                <button class="btn-info" onclick="exportConversation()">
-                    Export Chat
-                </button>
-                <button class="btn-warning" onclick="newSession()">
-                    New Session
-                </button>
-            </div>  
-
-            <!-- Review section for transcript before sending -->
-            <div class="review-section" id="reviewSection">
-                <h3 style="margin: 0 0 10px 0; color: var(--primary-color); text-align: center;">Live Transcription & Review</h3>
-
-                <div class="review-transcript" id="reviewTranscript" contenteditable="true" placeholder="Your transcribed message will appear here...">
-                    No message to review yet
-                </div>
-
-                <div class="review-buttons">
-                    <button 
-                        class="btn-info" 
-                        id="talkButton"
-                        onclick="toggleRecording()"
-                    >
-                        Start Recording
-                    </button>
-                    <button class="btn-success" onclick="sendReviewedMessage()" disabled id="sendBtn">
-                        Send Message
-                    </button>
-                    <button class="btn-warning" onclick="editTranscript()" disabled id="editBtn">
-                        Edit
-                    </button>
-                    <button class="btn-danger" onclick="deleteTranscript()" disabled id="deleteBtn">
-                        Delete & Retry
-                    </button>
-                </div>
-
-                <!-- Status display area for system messages -->
-                <div id="status" class="status info" style="display: none; margin-top: 15px;"></div>
-            </div>
+</div>
         </div>
     </div>
-</div> <!-- This closes the grid -->            
-
     
     <!-- Patient Image Modal -->
     <div class="image-modal" id="imageModal" onclick="closeImageModal(event)">
@@ -2412,7 +2420,7 @@ a:hover {
         let fullTranscript = '';         // Store the complete transcript during recording
         let forceStopRecognition = false; // Flag to force stop recognition
         let currentTtsProvider = 'browser'; // Current TTS provider
-      
+        let elevenlabsVoices = [];       // Store ElevenLabs voices
         let currentAudio = null;         // Current playing audio for ElevenLabs
         let currentSttProvider = 'browser'; // Current STT provider (browser or deepgram)
         let recordingState = 'stopped'; // 'stopped', 'recording', 'reviewing'
@@ -2615,6 +2623,88 @@ function updateSessionInfo() {
     console.log('TTS provider changed to:', provider);
 }
 
+        // ===== HUME AI TTS INTEGRATION =====
+
+async function speakWithHume(text) {
+    console.log('Speaking with Hume TTS:', text);
+    
+    const apiKey = document.getElementById('humeApiKey').value;
+    const voice = document.getElementById('humeVoice').value || 'ITO';
+    const format = document.getElementById('humeFormat').value || 'mp3';
+    
+    if (!apiKey) {
+        console.error('Hume API key not provided');
+        showStatus('Please enter your Hume API key', 'error');
+        return;
+    }
+    
+    // Stop any currently playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    synthesis.cancel();
+    
+    try {
+        console.log('Using Hume voice:', voice, 'Format:', format);
+        
+        const response = await fetch('https://api.hume.ai/v0/tts/synthesize_file_streaming', {
+            method: 'POST',
+            headers: {
+                'Accept': `audio/${format}`,
+                'Content-Type': 'application/json',
+                'X-Hume-Api-Key': apiKey
+            },
+            body: JSON.stringify({
+                text: text,
+                voice: voice,
+                format: format
+            })
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Invalid Hume API key');
+            } else if (response.status === 429) {
+                throw new Error('Hume rate limit exceeded');
+            } else {
+                throw new Error(`Hume API error: ${response.status}`);
+            }
+        }
+        
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        currentAudio = new Audio(audioUrl);
+        
+        currentAudio.onplay = function() {
+            console.log('Hume audio started playing');
+        };
+        
+        currentAudio.onended = function() {
+            console.log('Hume audio finished playing');
+            URL.revokeObjectURL(audioUrl);
+            currentAudio = null;
+        };
+        
+        currentAudio.onerror = function(error) {
+            console.error('Hume audio playback error:', error);
+            URL.revokeObjectURL(audioUrl);
+            currentAudio = null;
+        };
+        
+        await currentAudio.play();
+        
+    } catch (error) {
+        console.error('Hume TTS error:', error);
+        showStatus(`Hume error: ${error.message}`, 'error');
+        
+        // Fallback to browser TTS
+        console.log('Falling back to browser TTS');
+        speakWithBrowser(text);
+    }
+}
+
         // ===== STT PROVIDER MANAGEMENT =====
 function selectSttProvider(provider) {
     currentSttProvider = provider;
@@ -2812,90 +2902,7 @@ if (fullTranscript.trim()) {
         // ===== ELEVENLABS INTEGRATION =====
         // Functions for ElevenLabs TTS API
         
-async function speakWithHume(text) {
-    console.log('Speaking with Hume TTS:', text);
-    
-    const apiKey = document.getElementById('humeApiKey').value;
-    
-    if (!apiKey) {
-        console.error('Hume API key not provided');
-        showStatus('Please enter your Hume API key', 'error');
-        return;
-    }
-    
-    // Stop any currently playing audio
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
-    synthesis.cancel();
-    
-    try {
-        const voiceDescription = document.getElementById('humeVoiceDescription').value;
-        const speed = parseFloat(document.getElementById('humeSpeed').value);
         
-        console.log('Using Hume voice description:', voiceDescription, 'Speed:', speed);
-        
-        // Use Hume's streaming TTS endpoint
-        const response = await fetch('https://api.hume.ai/v0/tts/streaming', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json',
-                'Accept': 'audio/mpeg'
-            },
-            body: JSON.stringify({
-                text: text,
-                voice: voiceDescription || "A warm, professional female voice",
-                speed: speed || 1.0,
-                format: "mp3"
-            })
-        });
-        
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error('Invalid Hume API key');
-            } else if (response.status === 429) {
-                throw new Error('Hume rate limit exceeded');
-            } else {
-                const errorText = await response.text();
-                throw new Error(`Hume API error: ${response.status} - ${errorText}`);
-            }
-        }
-        
-        // Handle streaming audio response
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        
-        currentAudio = new Audio(audioUrl);
-        
-        currentAudio.onplay = function() {
-            console.log('Hume audio started playing');
-        };
-        
-        currentAudio.onended = function() {
-            console.log('Hume audio finished playing');
-            URL.revokeObjectURL(audioUrl);
-            currentAudio = null;
-        };
-        
-        currentAudio.onerror = function(error) {
-            console.error('Hume audio playback error:', error);
-            URL.revokeObjectURL(audioUrl);
-            currentAudio = null;
-        };
-        
-        await currentAudio.play();
-        
-    } catch (error) {
-        console.error('Hume TTS error:', error);
-        showStatus(`Hume error: ${error.message}`, 'error');
-        
-        // Fallback to browser TTS
-        console.log('Falling back to browser TTS');
-        speakWithBrowser(text);
-    }
-}
         
         // ===== SPEECH RECOGNITION SETUP =====
         // Configure the browser's speech recognition API
@@ -3022,6 +3029,7 @@ recognition.onend = function() {
         synthesis.onvoiceschanged = loadVoices;
     }
     
+    // ADD THIS NEW CODE:
     // Reapply scenario voice settings after voices are loaded
     if (currentScenario) {
         applyScenarioVoiceSettings();
@@ -3037,18 +3045,22 @@ recognition.onend = function() {
                 document.getElementById('rateValue').textContent = e.target.value;
             });
             
-            // Hume speed slider
-document.getElementById('humeSpeed').addEventListener('input', function(e) {
-    document.getElementById('humeSpeedValue').textContent = e.target.value;
-});
-
-// Save configuration when changed
-document.getElementById('webhookUrl').addEventListener('change', saveConfig);
-document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
-document.getElementById('sheetId').addEventListener('change', saveConfig);
-document.getElementById('humeApiKey').addEventListener('change', saveConfig);
-document.getElementById('humeVoiceDescription').addEventListener('change', saveConfig);
-document.getElementById('humePredefinedVoice').addEventListener('change', saveConfig);
+            // ElevenLabs sliders
+            document.getElementById('elevenlabsStability').addEventListener('input', function(e) {
+                document.getElementById('stabilityValue').textContent = e.target.value;
+            });
+            
+            document.getElementById('elevenlabsClarity').addEventListener('input', function(e) {
+                document.getElementById('clarityValue').textContent = e.target.value;
+            });
+            
+            // Save configuration when changed
+            document.getElementById('webhookUrl').addEventListener('change', saveConfig);
+            document.getElementById('submitWebhookUrl').addEventListener('change', saveConfig);
+            document.getElementById('sheetId').addEventListener('change', saveConfig);
+           document.getElementById('humeApiKey').addEventListener('change', saveConfig);
+document.getElementById('humeVoice').addEventListener('change', saveConfig);
+document.getElementById('humeFormat').addEventListener('change', saveConfig);
         }
         
         // ===== NEW RECORDING FUNCTIONS =====
@@ -3318,37 +3330,6 @@ function hideReviewSection() {
     document.getElementById('talkButton').disabled = false;
 }
 
-function showKeyboardHints() {
-    // Remove any existing hints
-    const existingHints = document.querySelector('.keyboard-hints');
-    if (existingHints) {
-        existingHints.remove();
-    }
-    
-    // Create keyboard hints element
-    const hintsDiv = document.createElement('div');
-    hintsDiv.className = 'keyboard-hints';
-    hintsDiv.style.cssText = `
-        margin-top: 10px;
-        padding: 10px;
-        background: var(--input-background);
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        text-align: center;
-        font-size: 14px;
-        color: var(--text-secondary);
-    `;
-    hintsDiv.innerHTML = `
-        <strong>Keyboard Shortcuts:</strong> 
-        Press <kbd style="background: var(--card-background); padding: 2px 6px; border-radius: 3px;">Enter</kbd> to send • 
-        <kbd style="background: var(--card-background); padding: 2px 6px; border-radius: 3px;">Escape</kbd> to cancel
-    `;
-    
-    // Add after the review section
-    const reviewSection = document.getElementById('reviewSection');
-    reviewSection.appendChild(hintsDiv);
-}
-
         // ===== GOOGLE SHEETS INTEGRATION =====
         // Load sheet names from Google Sheets
         // ===== CHATBOT CONFIGURATION MANAGEMENT =====
@@ -3392,7 +3373,7 @@ async function loadChatbotConfigurations() {
     feedbackWebhookUrl: row[3] ? row[3].trim() : '',
     description: row[4] ? row[4].trim() : '',
     deepgramApiKey: row[5] ? row[5].trim() : '',
-    humeApiKey: row[6] ? row[6].trim() : ''
+    elevenlabsApiKey: row[6] ? row[6].trim() : ''
 });
                 }
             }
@@ -3404,8 +3385,11 @@ async function loadChatbotConfigurations() {
                 if (firstConfig.deepgramApiKey) {
                     document.getElementById('deepgramApiKey').value = firstConfig.deepgramApiKey;
                 }
-               if (firstConfig.humeApiKey) {
-    document.getElementById('humeApiKey').value = firstConfig.humeApiKey;
+                if (firstConfig.elevenlabsApiKey) {
+    document.getElementById('elevenlabsApiKey').value = firstConfig.elevenlabsApiKey;
+    resetElevenLabsButtonState();
+    // Auto-load voices after API key is populated
+    loadElevenLabsVoices();
 }
             }
             
@@ -3836,7 +3820,7 @@ function setButtonPending(buttonId, pendingText = null) {
             addMessage('Scenario loaded. Press and hold the talk button to start the consultation.', 'ai');
         }
             
-      // Apply voice settings from scenario data
+        // Apply voice settings from scenario data
 function applyScenarioVoiceSettings() {
     if (!currentScenario) return;
     
@@ -3845,12 +3829,11 @@ function applyScenarioVoiceSettings() {
                         currentScenario['Browser Voice'] || 
                         currentScenario['TTS Voice Browser'];
     
-    // Check for Hume voice setting
-    const humeVoiceDescription = currentScenario['Hume Voice Description'] || 
-                                currentScenario['Hume Voice'] || 
-                                currentScenario['Voice Description'] ||
-                                currentScenario['TTS Voice Hume'];
-
+  // Check for Hume voice setting
+const humeVoice = currentScenario['Hume Voice'] || 
+                  currentScenario['Hume TTS Voice'] || 
+                  currentScenario['TTS Voice Hume'];
+    
     // Apply browser TTS voice if specified
     if (browserVoice && browserVoice.trim() !== '') {
         const voiceSelect = document.getElementById('voiceSelect');
@@ -3867,13 +3850,23 @@ function applyScenarioVoiceSettings() {
             }
         }
     }
-
-    // Apply Hume voice description if specified
-    if (humeVoiceDescription && humeVoiceDescription.trim() !== '') {
-        document.getElementById('humeVoiceDescription').value = humeVoiceDescription;
-        console.log(`Applied Hume voice description from scenario: ${humeVoiceDescription}`);
-        showStatus(`Voice description set to: ${humeVoiceDescription}`, 'info');
+    
+   // Apply Hume voice if specified
+if (humeVoice && humeVoice.trim() !== '') {
+    const humeSelect = document.getElementById('humeVoice');
+    const validVoices = ['ITO', 'DACHER', 'AURA', 'WHISPERING_VOICE'];
+    
+    // Try to find matching voice
+    for (let voice of validVoices) {
+        if (voice.toLowerCase() === humeVoice.toLowerCase() ||
+            humeVoice.toLowerCase().includes(voice.toLowerCase())) {
+            humeSelect.value = voice;
+            console.log(`Applied Hume voice from scenario: ${voice}`);
+            showStatus(`Hume voice set to: ${voice}`, 'info');
+            break;
+        }
     }
+}
     
     // Save the updated configuration
     saveConfig();
@@ -4935,7 +4928,7 @@ if (!submitWebhookUrl) {
         // ===== TEXT TO SPEECH =====
         // Convert AI response to speech using selected provider
         
-      function speakText(text) {
+        function speakText(text) {
     console.log('Speaking text with provider:', currentTtsProvider, 'Text:', text);
     
     if (currentTtsProvider === 'hume') {
@@ -4997,6 +4990,85 @@ if (!submitWebhookUrl) {
             synthesis.speak(utterance);
         }
 
+      async function speakWithHume(text) {
+    console.log('Speaking with Hume TTS:', text);
+    
+    const apiKey = document.getElementById('humeApiKey').value;
+    const voice = document.getElementById('humeVoice').value || 'ITO';
+    const format = document.getElementById('humeFormat').value || 'mp3';
+    
+    if (!apiKey) {
+        console.error('Hume API key not provided');
+        showStatus('Please enter your Hume API key', 'error');
+        return;
+    }
+    
+    // Stop any currently playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    synthesis.cancel();
+    
+    try {
+        console.log('Using Hume voice:', voice, 'Format:', format);
+        
+        const response = await fetch('https://api.hume.ai/v0/tts/synthesize_file_streaming', {
+            method: 'POST',
+            headers: {
+                'Accept': `audio/${format}`,
+                'Content-Type': 'application/json',
+                'X-Hume-Api-Key': apiKey
+            },
+            body: JSON.stringify({
+                text: text,
+                voice: voice,
+                format: format
+            })
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Invalid Hume API key');
+            } else if (response.status === 429) {
+                throw new Error('Hume rate limit exceeded');
+            } else {
+                throw new Error(`Hume API error: ${response.status}`);
+            }
+        }
+        
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        currentAudio = new Audio(audioUrl);
+        
+        currentAudio.onplay = function() {
+            console.log('Hume audio started playing');
+        };
+        
+        currentAudio.onended = function() {
+            console.log('Hume audio finished playing');
+            URL.revokeObjectURL(audioUrl);
+            currentAudio = null;
+        };
+        
+        currentAudio.onerror = function(error) {
+            console.error('Hume audio playback error:', error);
+            URL.revokeObjectURL(audioUrl);
+            currentAudio = null;
+        };
+        
+        await currentAudio.play();
+        
+    } catch (error) {
+        console.error('Hume TTS error:', error);
+        showStatus(`Hume error: ${error.message}`, 'error');
+        
+        // Fallback to browser TTS
+        console.log('Falling back to browser TTS');
+        speakWithBrowser(text);
+    }
+}
         
         // ===== CHAT MANAGEMENT =====
         // Handle chat display and messages
@@ -5102,10 +5174,9 @@ if (!submitWebhookUrl) {
         sheetName: getSelectedSheetName(),
         ttsProvider: currentTtsProvider,
         sttProvider: currentSttProvider, // Add this line
-        humeApiKey: document.getElementById('humeApiKey').value,
-        humeVoiceDescription: document.getElementById('humeVoiceDescription').value,
-        humePredefinedVoice: document.getElementById('humePredefinedVoice').value,
-        humeSpeed: document.getElementById('humeSpeed').value,
+       humeApiKey: document.getElementById('humeApiKey').value,
+humeVoice: document.getElementById('humeVoice').value,
+humeFormat: document.getElementById('humeFormat').value,
         deepgramApiKey: document.getElementById('deepgramApiKey').value, // Add this line
         deepgramModel: document.getElementById('deepgramModel').value, // Add this line
         deepgramLanguage: document.getElementById('deepgramLanguage').value, // Add this line
@@ -5113,8 +5184,8 @@ if (!submitWebhookUrl) {
         selectedChatbot: document.getElementById('chatbotSelect').value,
         scenarioSetsId: document.getElementById('scenarioSetsId').value,
         selectedScenarioSet: document.getElementById('scenarioSetSelect').value,
-      browserVoice: document.getElementById('voiceSelect').value,
-        humeVoiceSelection: document.getElementById('humePredefinedVoice').value
+         browserVoice: document.getElementById('voiceSelect').value,
+        elevenlabsVoiceSelection: document.getElementById('elevenlabsVoice').value
     };
     localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
 }
@@ -5126,18 +5197,7 @@ if (!submitWebhookUrl) {
                 document.getElementById('webhookUrl').value = config.webhookUrl || '';
                 document.getElementById('submitWebhookUrl').value = config.submitWebhookUrl || '';
                 document.getElementById('sheetId').value = config.sheetId || '';
-                document.getElementById('humeApiKey').value = config.humeApiKey || '';
-                if (config.humeVoiceDescription) {
-                    document.getElementById('humeVoiceDescription').value = config.humeVoiceDescription;
-                }
-                if (config.humePredefinedVoice) {
-                    document.getElementById('humePredefinedVoice').value = config.humePredefinedVoice;
-                }
-                if (config.humeSpeed) {
-                    document.getElementById('humeSpeed').value = config.humeSpeed;
-                    document.getElementById('humeSpeedValue').textContent = config.humeSpeed;
-                }
-                
+               document.getElementById('humeApiKey').value = config.humeApiKey || '';
                 // ADD THESE NEW LINES after the existing config loading:
                 document.getElementById('configSheetId').value = config.configSheetId || '';
                 document.getElementById('scenarioSetsId').value = config.scenarioSetsId || '';
@@ -5147,8 +5207,8 @@ if (!submitWebhookUrl) {
                 if (config.browserVoice) {
                     document.getElementById('voiceSelect').value = config.browserVoice;
                 }
-                if (config.humeVoiceSelection) {
-                    document.getElementById('humePredefinedVoice').value = config.humeVoiceSelection;
+                if (config.elevenlabsVoiceSelection) {
+                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoiceSelection;
                 }
                 
                 // Restore saved chatbot selection if configurations are already loaded
@@ -5185,7 +5245,13 @@ if (config.deepgramLanguage) {
     document.getElementById('deepgramLanguage').value = config.deepgramLanguage;
 }
      
-               
+                // Set Hume voice if saved
+if (config.humeVoice) {
+    document.getElementById('humeVoice').value = config.humeVoice;
+}
+if (config.humeFormat) {
+    document.getElementById('humeFormat').value = config.humeFormat;
+}
             }
         }
 
@@ -5490,6 +5556,13 @@ function closeHelpModal(event) {
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
 
 
 
