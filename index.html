@@ -3043,16 +3043,7 @@ recognition.onend = function() {
             // Speech rate slider
             document.getElementById('speechRate').addEventListener('input', function(e) {
                 document.getElementById('rateValue').textContent = e.target.value;
-            });
-            
-            // ElevenLabs sliders
-            document.getElementById('elevenlabsStability').addEventListener('input', function(e) {
-                document.getElementById('stabilityValue').textContent = e.target.value;
-            });
-            
-            document.getElementById('elevenlabsClarity').addEventListener('input', function(e) {
-                document.getElementById('clarityValue').textContent = e.target.value;
-            });
+            });          
             
             // Save configuration when changed
             document.getElementById('webhookUrl').addEventListener('change', saveConfig);
@@ -3260,6 +3251,45 @@ function showReviewSection(transcript) {
     showStatus('Review your message above. Edit if needed, then click "Send Message" or press ENTER', 'info');
 }
 
+function showKeyboardHints() {
+    // Check if hints already exist
+    if (document.querySelector('.keyboard-hints')) {
+        return;
+    }
+    
+    // Create keyboard hints element
+    const hintsDiv = document.createElement('div');
+    hintsDiv.className = 'keyboard-hints';
+    hintsDiv.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    `;
+    
+    hintsDiv.innerHTML = `
+        <div><strong>Keyboard Shortcuts:</strong></div>
+        <div>ENTER - Send message</div>
+        <div>ESC - Cancel review</div>
+    `;
+    
+    document.body.appendChild(hintsDiv);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (hintsDiv && hintsDiv.parentNode) {
+            hintsDiv.parentNode.removeChild(hintsDiv);
+        }
+    }, 5000);
+}
+        
 function sendReviewedMessage() {
     const reviewedText = document.getElementById('reviewTranscript').textContent.trim();
     
@@ -3385,13 +3415,7 @@ async function loadChatbotConfigurations() {
                 if (firstConfig.deepgramApiKey) {
                     document.getElementById('deepgramApiKey').value = firstConfig.deepgramApiKey;
                 }
-                if (firstConfig.elevenlabsApiKey) {
-    document.getElementById('elevenlabsApiKey').value = firstConfig.elevenlabsApiKey;
-    resetElevenLabsButtonState();
-    // Auto-load voices after API key is populated
-    loadElevenLabsVoices();
-}
-            }
+               }
             
             populateChatbotDropdown();
             showStatus(`Loaded ${chatbotConfigurations.length} chatbot configurations`, 'success');
@@ -5173,19 +5197,18 @@ if (!submitWebhookUrl) {
         sheetId: document.getElementById('sheetId').value,
         sheetName: getSelectedSheetName(),
         ttsProvider: currentTtsProvider,
-        sttProvider: currentSttProvider, // Add this line
-       humeApiKey: document.getElementById('humeApiKey').value,
-humeVoice: document.getElementById('humeVoice').value,
-humeFormat: document.getElementById('humeFormat').value,
-        deepgramApiKey: document.getElementById('deepgramApiKey').value, // Add this line
-        deepgramModel: document.getElementById('deepgramModel').value, // Add this line
-        deepgramLanguage: document.getElementById('deepgramLanguage').value, // Add this line
+        sttProvider: currentSttProvider,
+        humeApiKey: document.getElementById('humeApiKey').value,
+        humeVoice: document.getElementById('humeVoice').value,
+        humeFormat: document.getElementById('humeFormat').value,
+        deepgramApiKey: document.getElementById('deepgramApiKey').value,
+        deepgramModel: document.getElementById('deepgramModel').value,
+        deepgramLanguage: document.getElementById('deepgramLanguage').value,
         configSheetId: document.getElementById('configSheetId').value,
         selectedChatbot: document.getElementById('chatbotSelect').value,
         scenarioSetsId: document.getElementById('scenarioSetsId').value,
         selectedScenarioSet: document.getElementById('scenarioSetSelect').value,
-         browserVoice: document.getElementById('voiceSelect').value,
-        elevenlabsVoiceSelection: document.getElementById('elevenlabsVoice').value
+        browserVoice: document.getElementById('voiceSelect').value
     };
     localStorage.setItem('pharmacyChatConfig', JSON.stringify(config));
 }
@@ -5204,13 +5227,18 @@ humeFormat: document.getElementById('humeFormat').value,
          
                 // ADD THIS NEW CODE:
                 // Restore voice selections
-                if (config.browserVoice) {
-                    document.getElementById('voiceSelect').value = config.browserVoice;
-                }
-                if (config.elevenlabsVoiceSelection) {
-                    document.getElementById('elevenlabsVoice').value = config.elevenlabsVoiceSelection;
-                }
-                
+if (config.browserVoice) {
+    document.getElementById('voiceSelect').value = config.browserVoice;
+}
+
+// Set Hume voice settings if saved
+if (config.humeVoice) {
+    document.getElementById('humeVoice').value = config.humeVoice;
+}
+if (config.humeFormat) {
+    document.getElementById('humeFormat').value = config.humeFormat;
+}
+                                
                 // Restore saved chatbot selection if configurations are already loaded
                 if (config.selectedChatbot && chatbotConfigurations.length > 0) {
                     document.getElementById('chatbotSelect').value = config.selectedChatbot;
@@ -5556,6 +5584,7 @@ function closeHelpModal(event) {
     </script>
 </body>
 </html>
+
 
 
 
