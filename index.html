@@ -5037,7 +5037,7 @@ if (!submitWebhookUrl) {
     try {
         console.log('Using Hume voice:', voice, 'Format:', format);
         
-        const response = await fetch('https://api.hume.ai/v0/tts/synthesize_file_streaming', {
+        const response = await fetch('https://api.hume.ai/v0/tts', {
             method: 'POST',
             headers: {
                 'Accept': `audio/${format}`,
@@ -5584,6 +5584,7 @@ function closeHelpModal(event) {
     </script>
 </body>
 </html>
+
 
 
 
